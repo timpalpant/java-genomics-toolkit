@@ -26,6 +26,8 @@ Other tools require more input:
 
 === Log transform a Wig file with base 2
 
-  $ > java edu.unc.genomics.wigmath.LogTransform --input input.wig --output output.log2.wig
+  $ > java edu.unc.genomics.wigmath.LogTransform --input input.wig --base 2 --output output.log2.wig
 
-== Those wishing to write there own applications may be interested in https://github.com/timpalpant/java-genomics-io, the toolkit upon which these applications are built.
+== Java Genomics IO
+
+Those wishing to write their own applications may be interested in https://github.com/timpalpant/java-genomics-io, the toolkit upon which these applications are built.
