@@ -1,0 +1,31 @@
+= Java Genomics Toolkit
+
+This is a collection of applications for genomics data processing, primarily high-throughput next-generation sequencing. There is a particular focus on processing data in Wiggle format, since many other tools already cover SAM, BAM, FastQ, etc. However, Wiggle/BigWig formats provide a compact way to store numerical data resulting from ChIP-seq and MNase-seq experiments. Common computations provided in this toolkit include adding, subtracting, dividing, multiplying, log-transforming, averaging, Z-scoring, and Gaussian smoothing Wig files.
+
+== Examples
+
+Applications can be run on the command-line. Calling any script without arguments will display the help, as well as the missing mandatory arguments:
+
+  $ > java edu.unc.genomics.wigmath.AddWig
+  $ Usage: <main class> [options] Input files
+  $   Options:
+  $   * -o, --output   Output file
+
+Mandatory arguments are denoted with a (*).
+
+Other tools require more input:
+
+  $ > java edu.unc.genomics.Autocorrelation
+  $ Usage: <main class> [options]
+  $   Options:
+  $   * -i, --input    Input file
+  $   * -l, --loci     Genomic loci (Bed format)
+  $   -m, --max        Autocorrelation limit (bp)
+  $                    Default: 200
+  $   * -o, --output   Output file
+
+=== Log transform a Wig file with base 2
+
+  $ > java edu.unc.genomics.wigmath.LogTransform --input input.wig --output output.log2.wig
+
+== Those wishing to write there own applications may be interested in https://github.com/timpalpant/java-genomics-io, the toolkit upon which these applications are built.
