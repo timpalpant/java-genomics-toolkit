@@ -1,4 +1,4 @@
-package edu.unc.genomics;
+package edu.unc.genomics.wigmath;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import com.beust.jcommander.ParameterException;
 
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.genomics.ngs.Autocorrelation;
 
 public class WigSummary {
 

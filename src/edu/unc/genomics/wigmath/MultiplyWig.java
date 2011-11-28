@@ -3,6 +3,7 @@ package edu.unc.genomics.wigmath;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,20 +17,15 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class AddWig extends WigMathProgram {
+public class MultiplyWig extends WigMathProgram {
 
-	private static final Logger log = Logger.getLogger(AddWig.class);
+	private static final Logger log = Logger.getLogger(MultiplyWig.class);
 
 	@Parameter(description = "Input files", required = true)
 	public List<String> inputFiles = new ArrayList<String>();
 
 	@Override
 	public void setup() {
-		if (inputFiles.size() < 2) {
-			log.info("No reason to add < 2 files. Exiting");
-			System.exit(1);
-		}
-		
 		log.debug("Initializing input files");
 		for (String inputFile : inputFiles) {
 			try {
@@ -48,21 +44,22 @@ public class AddWig extends WigMathProgram {
 		log.debug("Computing sum for chunk "+chr+":"+start+"-"+stop);
 		
 		int length = stop - start + 1;
-		float[] sum = new float[length];
+		float[] product = new float[length];
+		Arrays.fill(product, 1);
 		
 		for (WigFile wig : inputs) {
 			Iterator<WigItem> data = wig.query(chr, start, stop);
 			while (data.hasNext()) {
 				WigItem item = data.next();
 				for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
-					if (i-start >= 0 && i-start < sum.length) {
-						sum[i-start] += item.getWigValue();
+					if (i-start >= 0 && i-start < product.length) {
+						product[i-start] *= item.getWigValue();
 					}
 				}
 			}
 		}
 		
-		return sum;
+		return product;
 	}
 	
 	
@@ -72,7 +69,7 @@ public class AddWig extends WigMathProgram {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		AddWig application = new AddWig();
+		MultiplyWig application = new MultiplyWig();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

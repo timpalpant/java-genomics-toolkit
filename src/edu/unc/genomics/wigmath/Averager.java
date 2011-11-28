@@ -16,17 +16,19 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class AddWig extends WigMathProgram {
+public class Averager extends WigMathProgram {
 
-	private static final Logger log = Logger.getLogger(AddWig.class);
+	private static final Logger log = Logger.getLogger(Averager.class);
 
 	@Parameter(description = "Input files", required = true)
 	public List<String> inputFiles = new ArrayList<String>();
+	
+	int numFiles;
 
 	@Override
 	public void setup() {
 		if (inputFiles.size() < 2) {
-			log.info("No reason to add < 2 files. Exiting");
+			log.info("No reason to average < 2 files. Exiting");
 			System.exit(1);
 		}
 		
@@ -41,28 +43,34 @@ public class AddWig extends WigMathProgram {
 			}
 		}
 		log.debug("Initialized " + inputs.size() + " input files");
+		
+		numFiles = inputs.size();
 	}
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Computing sum for chunk "+chr+":"+start+"-"+stop);
+		log.debug("Computing average for chunk "+chr+":"+start+"-"+stop);
 		
 		int length = stop - start + 1;
-		float[] sum = new float[length];
+		float[] avg = new float[length];
 		
 		for (WigFile wig : inputs) {
 			Iterator<WigItem> data = wig.query(chr, start, stop);
 			while (data.hasNext()) {
 				WigItem item = data.next();
 				for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
-					if (i-start >= 0 && i-start < sum.length) {
-						sum[i-start] += item.getWigValue();
+					if (i-start >= 0 && i-start < avg.length) {
+						avg[i-start] += item.getWigValue();
 					}
 				}
 			}
 		}
 		
-		return sum;
+		for (int i = 0; i < avg.length; i++) {
+			avg[i] = avg[i] / numFiles;
+		}
+		
+		return avg;
 	}
 	
 	
@@ -72,7 +80,7 @@ public class AddWig extends WigMathProgram {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		AddWig application = new AddWig();
+		Averager application = new Averager();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

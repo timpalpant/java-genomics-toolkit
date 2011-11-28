@@ -1,11 +1,10 @@
-package edu.unc.genomics;
+package edu.unc.genomics.ngs;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -16,7 +15,9 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
-import edu.unc.genomics.io.BedFile;
+import edu.unc.genomics.Interval;
+import edu.unc.genomics.io.IntervalFile;
+import edu.unc.genomics.io.IntervalFileSnifferException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.genomics.util.ArrayUtils;
@@ -52,11 +53,17 @@ public class Autocorrelation {
 		//writer.write("ORF\tChromosome\tStart (+1 Nuc)\tStop (3' Nuc)\tL\tAutocorrelation\n");
 		
 		log.debug("Initializing loci file");
-		BedFile loci = new BedFile(Paths.get(lociFile));
+		IntervalFile<? extends Interval> loci = null;
+		try {
+			loci = IntervalFile.autodetect(Paths.get(lociFile));
+		} catch (IntervalFileSnifferException e) {
+			log.fatal("Error autodetecting interval file format");
+			e.printStackTrace();
+		}
 
 		log.debug("Computing autocorrelation for each window");
 		int skipped = 0;
-		for (BedEntry interval : loci) {
+		for (Interval interval : loci) {
 			if (interval.length() < limit) {
 				log.debug("Skipping interval: " + interval.toString());
 				skipped++;
@@ -76,11 +83,9 @@ public class Autocorrelation {
 			
 			// Compute the autocorrelation with the Wiener-Khinchin theorem
 			FloatFFT_1D fft = new FloatFFT_1D(data.length);
-			data = Arrays.copyOf(data, 2*data.length);
-			fft.realForwardFull(data);
+			fft.realForward(data);
 			abs2(data);
-			fft.realInverseFull(data, true);
-			data = Arrays.copyOfRange(data, 0, limit);
+			fft.realInverse(data, true);
 
 			writer.write(ArrayUtils.join(data, "\t"));
 			writer.newLine();
