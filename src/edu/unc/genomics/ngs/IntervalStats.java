@@ -60,12 +60,10 @@ public class IntervalStats {
 		int count = 0;
 		SummaryStatistics stats = new SummaryStatistics();
 		for (Interval interval : loci) {
-			log.debug("Processing interval: " + interval.toString());
 			List<Double> means = new ArrayList<Double>();
 			for (WigFile wig : wigs) {
 				stats.clear();
 				try {
-					log.debug("...querying " + wig.getPath().getFileName());
 					Iterator<WigItem> result = wig.query(interval);
 					while(result.hasNext()) {
 						WigItem item = result.next();
