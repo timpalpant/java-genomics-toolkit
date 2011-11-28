@@ -57,26 +57,36 @@ public class IntervalStats {
 		IntervalFile<? extends Interval> loci = IntervalFile.autodetect(Paths.get(lociFile));
 		
 		log.debug("Iterating over all intervals and computing statistics");
+		int count = 0;
 		SummaryStatistics stats = new SummaryStatistics();
 		for (Interval interval : loci) {
+			log.debug("Processing interval: " + interval.toString());
 			List<Double> means = new ArrayList<Double>();
 			for (WigFile wig : wigs) {
 				stats.clear();
-				Iterator<WigItem> result = wig.query(interval);
-				while(result.hasNext()) {
-					WigItem item = result.next();
-					for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
-						stats.addValue(item.getWigValue());
+				try {
+					log.debug("...querying " + wig.getPath().getFileName());
+					Iterator<WigItem> result = wig.query(interval);
+					while(result.hasNext()) {
+						WigItem item = result.next();
+						for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
+							stats.addValue(item.getWigValue());
+						}
 					}
+					means.add(stats.getMean());
+				} catch (WigFileException e) {
+					log.debug("Skipping: " + interval.toString());
+					means.add(Double.NaN);
 				}
-				means.add(stats.getMean());
 			}
 			
 			writer.write(interval.toBed() + "\t" + ArrayUtils.join(means, "\t"));
 			writer.newLine();
+			count++;
 		}
 		
 		writer.close();
+		log.info(count + " intervals processed");
 	}
 	
 	public static void main(String[] args) throws IOException, WigFileException, IntervalFileSnifferException {

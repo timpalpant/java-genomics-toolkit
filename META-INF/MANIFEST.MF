@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: java-genomics-toolkit
+Bundle-SymbolicName: java-genomics-toolkit
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Description: This project provides tools for manipulating and analyzing genomics data.
+Bundle-DocURL: http://github.com/timpalpant/java-genomics-toolkit
+Bundle-ClassPath: .,
+ lib/java-genomics-io.jar,
+ lib/BigWig.jar,
+ lib/commons-math-2.2.jar,
+ lib/jcommander-1.20.jar,
+ lib/jtransforms-2.4.jar,
+ lib/log4j-1.2.15.jar
+Export-Package: edu.unc.genomics.io

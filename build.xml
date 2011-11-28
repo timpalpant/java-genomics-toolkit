@@ -1,0 +1,44 @@
+<project name="java-genomics-toolkit" default="compile" basedir=".">
+  <description>
+    build the scripts
+  </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="test" location="test"/>
+  <property name="build" location="build"/>
+  <property name="dist" location="dist"/>
+  <property name="lib" location="lib"/>
+
+  <target name="compile" description="compile the source" >
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}" source="1.7" target="1.7">
+      <classpath location="lib/java-genomics-io.jar"/>
+      <classpath location="lib/log4j-1.2.15.jar"/>
+      <classpath location="lib/jcommander-1.20.jar"/>
+      <classpath location="lib/BigWig.jar"/>
+      <classpath location="lib/commons-math-2.2.jar"/>
+      <classpath location="lib/jtransforms-2.4.jar"/>
+      <classpath location="lib/sam-1.56.jar"/>
+    </javac>
+  </target>
+
+  <target name="dist" depends="compile" description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- Put everything in ${build} into the BigWig.jar file -->
+    <jar jarfile="${dist}/java-genomics-io.jar" manifest="META-INF/MANIFEST.MF">
+      <fileset dir="${build}" />
+      <fileset dir="." includes="**/*.jar"/>
+      <fileset dir="." includes="log4j.properties"/>
+    </jar>
+  </target>
+
+  <target name="clean" description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
