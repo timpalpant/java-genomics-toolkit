@@ -12,13 +12,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.util.ArrayUtils;
 
 /**
  * Abstract class for writing programs to do computation on Wig files
@@ -100,7 +100,7 @@ public abstract class WigMathProgram {
 						throw new RuntimeException("Result is not the expected length!");
 					}
 	
-					writer.write(ArrayUtils.join(result, "\n"));
+					writer.write(StringUtils.join(result, "\n"));
 					writer.newLine();
 					
 					bp = chunkStop + 1;

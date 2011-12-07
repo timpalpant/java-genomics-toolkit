@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
@@ -24,11 +22,10 @@ import edu.unc.genomics.io.IntervalFile;
 import edu.unc.genomics.io.IntervalFileSnifferException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.util.ArrayUtils;
 
-public class IntervalStats {
+public class FindAbsoluteMaxima {
 
-	private static final Logger log = Logger.getLogger(IntervalStats.class);
+	private static final Logger log = Logger.getLogger(FindAbsoluteMaxima.class);
 
 	@Parameter(description = "Input files", required = true)
 	public List<String> inputFiles = new ArrayList<String>();
@@ -59,37 +56,35 @@ public class IntervalStats {
 		
 		log.debug("Iterating over all intervals and computing statistics");
 		int count = 0;
-		SummaryStatistics stats = new SummaryStatistics();
 		for (Interval interval : loci) {
-			List<Double> means = new ArrayList<Double>();
+			writer.write(interval.toBed());
 			for (WigFile wig : wigs) {
-				stats.clear();
-				try {
-					Iterator<WigItem> result = wig.query(interval);
-					while(result.hasNext()) {
-						WigItem item = result.next();
-						for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
-							stats.addValue(item.getWigValue());
-						}
+				float maxValue = -Float.MAX_VALUE;
+				int maxima = -1;
+				Iterator<WigItem> results = wig.query(interval);
+				while (results.hasNext()) {
+					WigItem item = results.next();
+					if (item.getWigValue() > maxValue) {
+						maxValue = item.getWigValue();
+						maxima = (item.getStartBase() + item.getEndBase()) / 2;
 					}
-					means.add(stats.getMean());
-				} catch (WigFileException e) {
-					log.debug("Skipping: " + interval.toString());
-					means.add(Double.NaN);
 				}
+				writer.write("\t" + maxima);
 			}
-			
-			writer.write(interval.toBed() + "\t" + StringUtils.join(means, "\t"));
 			writer.newLine();
 			count++;
 		}
 		
 		writer.close();
+		loci.close();
+		for (WigFile wig : wigs) {
+			wig.close();
+		}
 		log.info(count + " intervals processed");
 	}
 	
 	public static void main(String[] args) throws IOException, WigFileException, IntervalFileSnifferException {
-		IntervalStats application = new IntervalStats();
+		FindAbsoluteMaxima application = new FindAbsoluteMaxima();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

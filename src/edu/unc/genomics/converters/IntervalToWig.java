@@ -16,26 +16,28 @@ import com.beust.jcommander.ParameterException;
 
 import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.Assembly;
-import edu.unc.genomics.BedGraphEntry;
 import edu.unc.genomics.BuiltInAssemblyLoader;
-import edu.unc.genomics.io.BedGraphFile;
+import edu.unc.genomics.Interval;
+import edu.unc.genomics.ValuedInterval;
+import edu.unc.genomics.io.IntervalFile;
+import edu.unc.genomics.io.IntervalFileSnifferException;
 
-public class BedGraphToWig {
+public class IntervalToWig {
 
-	private static final Logger log = Logger.getLogger(BedGraphToWig.class);
+	private static final Logger log = Logger.getLogger(IntervalToWig.class);
 	public static final int DEFAULT_CHUNK_SIZE = 500_000;
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (BedGraph)", required = true)
+	@Parameter(names = {"-i", "--input"}, description = "Input file (Bed/BedGraph)", required = true)
 	public String inputFile;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public String genome;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wig)", required = true)
 	public String outputFile;
 	
-	public void run() throws IOException, DataFormatException {		
-		log.debug("Initializing input BedGraph file");
-		BedGraphFile bedgraph = new BedGraphFile(Paths.get(inputFile));
-		log.info(bedgraph.count() + " entries in input");
+	public void run() throws IOException, DataFormatException, IntervalFileSnifferException {		
+		log.debug("Initializing input interval file");
+		IntervalFile<? extends Interval> intervalFile = IntervalFile.autodetect(Paths.get(inputFile));
+		log.info(intervalFile.count() + " entries in input");
 		
 		log.debug("Initializing assembly");
 		Assembly assembly = BuiltInAssemblyLoader.loadAssembly(genome);
@@ -49,6 +51,8 @@ public class BedGraphToWig {
 		writer.newLine();
 		
 		for (String chr : assembly) {
+			writer.write("fixedStep chrom="+chr+" start=1 step=1 span=1");
+			
 			int start = 1;
 			while (start < assembly.getChrLength(chr)) {
 				int stop = start + DEFAULT_CHUNK_SIZE - 1;
@@ -56,9 +60,16 @@ public class BedGraphToWig {
 				int[] count = new int[length];
 				float[] sum = new float[length];
 				
-				Iterator<BedGraphEntry> it = bedgraph.query(chr, start, stop);
+				Iterator<? extends Interval> it = intervalFile.query(chr, start, stop);
 				while (it.hasNext()) {
-					BedGraphEntry entry = it.next();
+					ValuedInterval entry = null;
+					try {
+						entry = (ValuedInterval) it.next();
+					} catch (ClassCastException e) {
+						log.fatal("Error casting to ValuedInterval");
+						throw new RuntimeException("Error detecting values in interval file!");
+					}
+					
 					for (int i = entry.getStart(); i <= entry.getStop(); i++) {
 						sum[i-start] += entry.getValue().floatValue();
 						count[i-start]++;
@@ -79,8 +90,8 @@ public class BedGraphToWig {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException, DataFormatException {
-		BedGraphToWig application = new BedGraphToWig();
+	public static void main(String[] args) throws IOException, DataFormatException, IntervalFileSnifferException {
+		IntervalToWig application = new IntervalToWig();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

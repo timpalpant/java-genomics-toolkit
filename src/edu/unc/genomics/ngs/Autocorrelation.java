@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
@@ -87,7 +88,7 @@ public class Autocorrelation {
 			abs2(data);
 			fft.realInverse(data, true);
 
-			writer.write(ArrayUtils.join(data, "\t"));
+			writer.write(StringUtils.join(data, "\t"));
 			writer.newLine();
 		}
 		
