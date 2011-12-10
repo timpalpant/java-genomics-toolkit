@@ -1,12 +1,15 @@
-package edu.unc.genomics.ngs;
+package edu.unc.genomics.nucleosomes;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
@@ -22,9 +25,9 @@ import edu.unc.genomics.io.IntervalFileSnifferException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class Autocorrelation {
+public class AutoCaller {
 	
-	private static final Logger log = Logger.getLogger(Autocorrelation.class);
+	private static final Logger log = Logger.getLogger(AutoCaller.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
 	public String inputFile;
@@ -32,16 +35,25 @@ public class Autocorrelation {
 	public String lociFile;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public String outputFile;
-	@Parameter(names = {"-m", "--max"}, description = "Autocorrelation limit (bp)")
-	public int limit = 200;
+	@Parameter(names = {"-m", "--min"}, description = "Minimum NRL (bp)")
+	public int min = 200;
+	@Parameter(names = {"-n", "--max"}, description = "Maximum NRL (bp)")
+	public int max = 200;
 	
 	private WigFile wig;
 	
-	private void abs2(float[] data) {
-		for (int i = 0; i < data.length; i+=2) {
-			data[i] = data[i]*data[i] + data[i+1]*data[i+1];
-			data[i+1] = 0;
+	private int indexOfMax(float[] a) {
+		float maxValue = -Float.MAX_VALUE;
+		int maxIndex = -1;
+		
+		for (int i = 0; i < a.length; i++) {
+			if (a[i] > max) {
+				maxValue = a[i];
+				maxIndex = i;
+			}
 		}
+		
+		return maxIndex;
 	}
 	
 	public void run() throws IOException, WigFileException {		
@@ -50,7 +62,6 @@ public class Autocorrelation {
 		
 		log.debug("Initializing output file");
 		BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFile), Charset.defaultCharset());
-		//writer.write("ORF\tChromosome\tStart (+1 Nuc)\tStop (3' Nuc)\tL\tAutocorrelation\n");
 		
 		log.debug("Initializing loci file");
 		IntervalFile<? extends Interval> loci = null;
@@ -61,34 +72,13 @@ public class Autocorrelation {
 			e.printStackTrace();
 		}
 
-		log.debug("Computing autocorrelation for each window");
+		log.debug("Calling nucleosomes in each window");
 		int skipped = 0;
 		for (Interval interval : loci) {
-			if (interval.length() < limit) {
-				log.debug("Skipping interval: " + interval.toString());
-				skipped++;
-				continue;
-			}
-			
-			Iterator<WigItem> wigIter;
-			try {
-				wigIter = wig.query(interval);
-			} catch (IOException | WigFileException e) {
-				log.debug("Skipping interval: " + interval.toString());
-				skipped++;
-				continue;
-			}
-			
-			float[] data = WigFile.flattenData(wigIter, interval.getStart(), interval.getStop());
-			
-			// Compute the autocorrelation with the Wiener-Khinchin theorem
-			FloatFFT_1D fft = new FloatFFT_1D(data.length);
-			fft.realForward(data);
-			abs2(data);
-			fft.realInverse(data, true);
-
-			writer.write(StringUtils.join(data, "\t"));
-			writer.newLine();
+			// Find the +1 nucleosome
+			Iterator<WigItem> result = wig.query(interval);
+			float[] data = WigFile.flattenData(result, interval.getStart(), interval.getStop());
+			int plusOne = indexOfMax(Arrays.copyOf(data, min));
 		}
 		
 		loci.close();
@@ -97,7 +87,7 @@ public class Autocorrelation {
 	}
 	
 	public static void main(String[] args) throws IOException, WigFileException {
-		Autocorrelation a = new Autocorrelation();
+		AutoCaller a = new AutoCaller();
 		JCommander jc = new JCommander(a);
 		try {
 			jc.parse(args);
