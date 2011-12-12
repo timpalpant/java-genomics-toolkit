@@ -1,5 +1,7 @@
 package edu.unc.genomics.nucleosomes;
 
+import java.util.Comparator;
+
 import edu.unc.genomics.ValuedInterval;
 import edu.unc.genomics.io.IntervalFileFormatException;
 
@@ -137,6 +139,21 @@ public class NucleosomeCall extends ValuedInterval {
 	
 	public double occupancy() {
 		return value;
+	}
+	
+	public static class DyadComparator implements Comparator<NucleosomeCall> {
+
+		@Override
+		public int compare(NucleosomeCall o1, NucleosomeCall o2) {
+			if (o1.getDyad() == o2.getDyad()) {
+				return 0;
+			} else if (o1.getDyad() < o2.getDyad()) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
+		
 	}
 
 }

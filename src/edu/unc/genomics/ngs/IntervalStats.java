@@ -24,7 +24,6 @@ import edu.unc.genomics.io.IntervalFile;
 import edu.unc.genomics.io.IntervalFileSnifferException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.util.ArrayUtils;
 
 public class IntervalStats {
 
@@ -39,7 +38,7 @@ public class IntervalStats {
 	
 	public void run() throws IOException, WigFileException, IntervalFileSnifferException {		
 		log.debug("Initializing input Wig file(s)");
-		List<WigFile> wigs = new ArrayList<WigFile>();
+		List<WigFile> wigs = new ArrayList<>();
 		for (String inputFile : inputFiles) {
 			WigFile wig = WigFile.autodetect(Paths.get(inputFile));
 			wigs.add(wig);
@@ -91,6 +90,7 @@ public class IntervalStats {
 	public static void main(String[] args) throws IOException, WigFileException, IntervalFileSnifferException {
 		IntervalStats application = new IntervalStats();
 		JCommander jc = new JCommander(application);
+		jc.setProgramName(IntervalStats.class.getSimpleName());
 		try {
 			jc.parse(args);
 		} catch (ParameterException e) {

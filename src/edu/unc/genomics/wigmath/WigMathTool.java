@@ -27,9 +27,9 @@ import edu.unc.genomics.io.WigFileException;
  * @author timpalpant
  *
  */
-public abstract class WigMathProgram {
+public abstract class WigMathTool {
 	
-	private static final Logger log = Logger.getLogger(WigMathProgram.class);
+	private static final Logger log = Logger.getLogger(WigMathTool.class);
 	
 	public static final int DEFAULT_CHUNK_SIZE = 500_000;
 	

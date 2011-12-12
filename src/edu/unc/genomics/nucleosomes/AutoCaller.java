@@ -89,6 +89,7 @@ public class AutoCaller {
 	public static void main(String[] args) throws IOException, WigFileException {
 		AutoCaller a = new AutoCaller();
 		JCommander jc = new JCommander(a);
+		jc.setProgramName(AutoCaller.class.getSimpleName());
 		try {
 			jc.parse(args);
 		} catch (ParameterException e) {

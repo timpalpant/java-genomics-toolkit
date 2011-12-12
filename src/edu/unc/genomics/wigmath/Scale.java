@@ -14,7 +14,7 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class Scale extends WigMathProgram {
+public class Scale extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(Scale.class);
 

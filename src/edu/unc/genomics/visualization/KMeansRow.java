@@ -9,7 +9,7 @@ import org.apache.commons.math.stat.clustering.Clusterable;
  * @author timpalpant
  * Holds a row of data for the KMeans program
  */
-public class KMeansRow implements Clusterable<KMeansRow>, Serializable {
+class KMeansRow implements Clusterable<KMeansRow>, Serializable {
 
 	private static final long serialVersionUID = -323598431692368500L;
 	

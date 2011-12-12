@@ -86,6 +86,7 @@ public class FindAbsoluteMaxima {
 	public static void main(String[] args) throws IOException, WigFileException, IntervalFileSnifferException {
 		FindAbsoluteMaxima application = new FindAbsoluteMaxima();
 		JCommander jc = new JCommander(application);
+		jc.setProgramName(FindAbsoluteMaxima.class.getSimpleName());
 		try {
 			jc.parse(args);
 		} catch (ParameterException e) {

@@ -14,9 +14,9 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class ZScorer extends WigMathProgram {
+public class ZScore extends WigMathTool {
 
-	private static final Logger log = Logger.getLogger(ZScorer.class);
+	private static final Logger log = Logger.getLogger(ZScore.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
 	public String inputFile;
@@ -39,6 +39,10 @@ public class ZScorer extends WigMathProgram {
 		
 		mean = input.mean();
 		stdev = input.stdev();
+		if(stdev == 0) {
+			log.error("Cannot Z-score a file with stdev = 0!");
+			throw new RuntimeException("Cannot Z-score a file with stdev = 0!");
+		}
 	}
 	
 	@Override
@@ -61,7 +65,7 @@ public class ZScorer extends WigMathProgram {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		ZScorer application = new ZScorer();
+		ZScore application = new ZScore();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

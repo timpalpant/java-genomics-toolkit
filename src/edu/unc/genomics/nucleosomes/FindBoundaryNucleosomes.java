@@ -22,15 +22,15 @@ import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.IntervalFile;
 import edu.unc.genomics.io.IntervalFileSnifferException;
 
-public class NRLCalculator {
+public class FindBoundaryNucleosomes {
 	
-	private static final Logger log = Logger.getLogger(NRLCalculator.class);
+	private static final Logger log = Logger.getLogger(FindBoundaryNucleosomes.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file (nucleosome calls)", required = true)
 	public String inputFile;
-	@Parameter(names = {"-l", "--loci"}, description = "Genomic loci (Bed format)", required = true)
+	@Parameter(names = {"-l", "--loci"}, description = "Boundary loci (Bed format)", required = true)
 	public String lociFile;
-	@Parameter(names = {"-o", "--output"}, description = "Output file (NRL for each gene)", required = true)
+	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public String outputFile;
 	
 	private Map<String,List<NucleosomeCall>> nucs = new HashMap<String,List<NucleosomeCall>>();
@@ -73,22 +73,26 @@ public class NRLCalculator {
 
 		log.debug("Calculating nucleosome spacing for each interval");
 		NucleosomeCall.DyadComparator comparator = new NucleosomeCall.DyadComparator();
+		int skipped = 0;
 		for (Interval interval : loci) {
 			writer.write(interval.toBed());
 			
 			// Get all of the nucleosomes within this interval
 			List<NucleosomeCall> intervalNucs = getIntervalNucleosomes(interval);
 
-			if (intervalNucs.size() > 1) {
+			if (intervalNucs.size() > 0) {
 				// Sort the list by nucleosome position
 				Collections.sort(intervalNucs, comparator);
 				if (interval.isCrick()) {
 					Collections.reverse(intervalNucs);
 				}
 				
-				for (int i = 1; i < Math.min(intervalNucs.size(), 10); i++) {
-					writer.write("\t" + Math.abs(intervalNucs.get(i).getDyad()-intervalNucs.get(i-1).getDyad()));
-				}
+				int fivePrime = intervalNucs.get(0).getDyad();
+				int threePrime = intervalNucs.get(intervalNucs.size()-1).getDyad();
+				writer.write("\t"+fivePrime+"\t"+threePrime);
+			} else {
+				skipped++;
+				writer.write("\tNA\tNA");
 			}
 			
 			writer.newLine();
@@ -96,12 +100,14 @@ public class NRLCalculator {
 		
 		loci.close();
 		writer.close();
+		
+		log.info("Skipped "+skipped+" intervals with 0 nucleosomes");
 	}
 	
 	public static void main(String[] args) throws IOException {
-		NRLCalculator a = new NRLCalculator();
+		FindBoundaryNucleosomes a = new FindBoundaryNucleosomes();
 		JCommander jc = new JCommander(a);
-		jc.setProgramName(NRLCalculator.class.getSimpleName());
+		jc.setProgramName(FindBoundaryNucleosomes.class.getSimpleName());
 		try {
 			jc.parse(args);
 		} catch (ParameterException e) {

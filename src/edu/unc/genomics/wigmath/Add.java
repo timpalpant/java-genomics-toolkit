@@ -16,9 +16,9 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class AddWig extends WigMathProgram {
+public class Add extends WigMathTool {
 
-	private static final Logger log = Logger.getLogger(AddWig.class);
+	private static final Logger log = Logger.getLogger(Add.class);
 
 	@Parameter(description = "Input files", required = true)
 	public List<String> inputFiles = new ArrayList<String>();
@@ -72,7 +72,7 @@ public class AddWig extends WigMathProgram {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		AddWig application = new AddWig();
+		Add application = new Add();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

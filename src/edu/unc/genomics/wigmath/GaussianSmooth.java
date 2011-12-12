@@ -15,7 +15,7 @@ import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class GaussianSmooth extends WigMathProgram {
+public class GaussianSmooth extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(GaussianSmooth.class);
 

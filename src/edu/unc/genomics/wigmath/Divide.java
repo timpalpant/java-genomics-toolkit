@@ -14,9 +14,9 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class DivideWig extends WigMathProgram {
+public class Divide extends WigMathTool {
 
-	private static final Logger log = Logger.getLogger(DivideWig.class);
+	private static final Logger log = Logger.getLogger(Divide.class);
 
 	@Parameter(names = {"-n", "--numerator"}, description = "Dividend / Numerator (file 1)", required = true)
 	public String dividendFile;
@@ -75,7 +75,7 @@ public class DivideWig extends WigMathProgram {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		DivideWig application = new DivideWig();
+		Divide application = new Divide();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

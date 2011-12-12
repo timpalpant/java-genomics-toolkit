@@ -14,9 +14,9 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class SubtractWig extends WigMathProgram {
+public class Subtract extends WigMathTool {
 
-	private static final Logger log = Logger.getLogger(SubtractWig.class);
+	private static final Logger log = Logger.getLogger(Subtract.class);
 
 	@Parameter(names = {"-m", "--minuend"}, description = "Minuend (file 1)", required = true)
 	public String minuendFile;
@@ -71,7 +71,7 @@ public class SubtractWig extends WigMathProgram {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		SubtractWig application = new SubtractWig();
+		Subtract application = new Subtract();
 		JCommander jc = new JCommander(application);
 		try {
 			jc.parse(args);

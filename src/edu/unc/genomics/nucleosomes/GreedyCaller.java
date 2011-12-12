@@ -42,6 +42,7 @@ public class GreedyCaller {
 	public static void main(String[] args) throws IOException, WigFileException {
 		GreedyCaller a = new GreedyCaller();
 		JCommander jc = new JCommander(a);
+		jc.setProgramName(GreedyCaller.class.getSimpleName());
 		try {
 			jc.parse(args);
 		} catch (ParameterException e) {

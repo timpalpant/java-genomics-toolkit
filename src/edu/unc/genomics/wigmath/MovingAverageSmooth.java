@@ -15,7 +15,7 @@ import com.beust.jcommander.ParameterException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
-public class MovingAverageSmooth extends WigMathProgram {
+public class MovingAverageSmooth extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(MovingAverageSmooth.class);
 

@@ -1,15 +1,22 @@
-<project name="java-genomics-toolkit" default="compile" basedir=".">
+<?xml version="1.0" encoding="iso-8859-1"?>
+<project name="java-genomics-toolkit" default="jar" basedir=".">
   <description>
     build the scripts
   </description>
+  
   <!-- set global properties for this build -->
+  <property name="version" value="1.1.0"/>
+  <property name="buildnumber" value="1"/>
+  <property name="copyright" value="Copyright &#xa9; 2011 Timothy Palpant"/>
+  
   <property name="src" location="src"/>
   <property name="test" location="test"/>
+  <property name="gui" location="gui"/>
   <property name="build" location="build"/>
   <property name="dist" location="dist"/>
   <property name="lib" location="lib"/>
 
-  <target name="compile" description="compile the source" >
+  <target name="compile" description="compile the scripts">
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}"/>
     <!-- Compile the java code from ${src} into ${build} -->
@@ -23,23 +30,70 @@
       <classpath location="lib/jtransforms-2.4.jar"/>
       <classpath location="lib/sam-1.56.jar"/>
     </javac>
+    <javac srcdir="${gui}" destdir="${build}" source="1.7" target="1.7">
+		<classpath location="lib/java-genomics-io.jar"/>
+		<classpath location="lib/log4j-1.2.15.jar"/>
+		<classpath location="lib/jcommander-1.20.jar"/>
+		<classpath location="lib/BigWig.jar"/>
+		<classpath location="lib/commons-lang3-3.1.jar"/>
+		<classpath location="lib/commons-math-2.2.jar"/>
+		<classpath location="lib/jtransforms-2.4.jar"/>
+		<classpath location="lib/sam-1.56.jar"/>
+		<classpath location="lib/forms-1.3.0.jar"/>
+        <classpath location="lib/macify-1.4.jar"/>
+	</javac>
   </target>
 
-  <target name="dist" depends="compile" description="generate the distribution" >
+  <target name="jar" depends="compile" description="generate the jarfile">
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}"/>
 
-    <!-- Put everything in ${build} into the BigWig.jar file -->
-    <jar jarfile="${dist}/java-genomics-io.jar" manifest="META-INF/MANIFEST.MF">
+    <!-- Put everything in ${build} into the jar file -->
+    <jar jarfile="${dist}/${ant.project.name}.jar" manifest="META-INF/MANIFEST.MF">
       <fileset dir="${build}" />
-      <fileset dir="." includes="**/*.jar"/>
       <fileset dir="." includes="log4j.properties"/>
     </jar>
   </target>
 
+  <!-- Package the jar file into a Mac OS X application with jarbundler -->
+  <target name="package-osx" depends="jar" description="Build the application">
+    <taskdef name="jarbundler"
+             classpath="lib/jarbundler-2.2.0.jar" 
+             classname="net.sourceforge.jarbundler.JarBundler"/>
+
+    <jarbundler dir="${dist}" verbose="false" showPlist="false"
+                name="Genomics Toolkit"
+                mainclass="edu.unc.genomics.GenomicsToolkit"
+                jar="${dist}/${ant.project.name}.jar"
+      			jvmversion="1.4+"
+                version="${version}"
+                infostring="${ant.project.name}, ${copyright}"
+                build="${buildnumber}"
+                bundleid="edu.unc.genomics.GenomicsToolkit">
+
+	    <!-- Adjust the look, feel and behavior -->
+	    <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
+	    <javaproperty name="apple.awt.brushMetal" value="true"/>
+	    <javaproperty name="apple.awt.showGrowBox" value="false"/>
+	
+	    <!-- Associate document types with this application -->
+	    <documenttype name="Assembly files"
+	      			  extensions="len" 
+	                  role="Viewer"/>
+	
+	    <!-- Include resource files -->                
+	    <resourcefilelist dir="." files="README.rdoc"/>
+	    <resourcefilelist dir="resources/assemblies" files="*.len"/>
+    </jarbundler>
+  </target>
+
   <target name="clean" description="clean up" >
-    <!-- Delete the ${build} and ${dist} directory trees -->
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
   </target>
 </project>
+
+<!--
+cc -c -I/System/Library/Frameworks/JavaVM.framework/Headers src/obj-c/HelpBookJNI.m
+cc -dynamiclib -o libHelpBookJNI.jnilib HelpBookJNI.o -framework JavaVM -framework Cocoa
+-->
