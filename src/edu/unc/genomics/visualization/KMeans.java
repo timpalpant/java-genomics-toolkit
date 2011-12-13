@@ -37,7 +37,7 @@ public class KMeans extends CommandLineTool {
 	@Parameter(names = {"-1", "--min"}, description = "Minimum column to use for clustering", validateWith = PositiveIntegerValidator.class)
 	public int minCol = 1;
 	@Parameter(names = {"-2", "--max"}, description = "Maximum column to use for clustering", validateWith = PositiveIntegerValidator.class)
-	public int maxCol;
+	public Integer maxCol;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (clustered matrix2png format)", required = true)
 	public Path outputFile;
 	
@@ -55,7 +55,7 @@ public class KMeans extends CommandLineTool {
 			int numColsInMatrix = StringUtils.countMatches(headerLine, "\t");
 			
 			// Validate the range info
-			if (maxCol != 0) {
+			if (maxCol != null) {
 				if (maxCol > numColsInMatrix) {
 					throw new RuntimeException("Invalid range of data specified for clustering ("+maxCol+" > "+numColsInMatrix+")");
 				}

@@ -1,24 +1,23 @@
 package edu.unc.genomics;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.SwingConstants;
 
 import javax.swing.JProgressBar;
@@ -27,22 +26,14 @@ import javax.swing.BoxLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterDescription;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-
 import edu.unc.genomics.converters.IntervalToWig;
-import edu.unc.genomics.io.IntervalFile;
-import edu.unc.genomics.io.WigFile;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.simplericity.macify.eawt.Application;
 import org.simplericity.macify.eawt.ApplicationEvent;
@@ -51,32 +42,29 @@ import org.simplericity.macify.eawt.DefaultApplication;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.lang.reflect.Field;
-import java.nio.file.Path;
-import java.util.List;
 
 public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 	
 	private static final long serialVersionUID = 6454774196137357898L;
 	private static final Logger log = Logger.getLogger(ToolRunnerFrame.class);
 	
+	private final Application application = new DefaultApplication();
+	
 	private final JPanel contentPane = new JPanel();
+	private final JSplitPane splitPane = new JSplitPane();
 	private final JProgressBar progressBar = new JProgressBar();
-	private final JPanel configurationPanel = new JPanel();
+	private final JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
+	private final ConfigurationPanel configurationPanel = new ConfigurationPanel();
 	private final JTextPane helpTextPanel = new JTextPane();
-	private final JTree toolsTree;
-	private final JList<Job> queueList = new JList<>();
-	
-	private final AssemblyManagerDialog manager = new AssemblyManagerDialog(this);
-	private Assembly lastUsedAssembly = null;
-	
-	private Class<? extends CommandLineTool> currentTool = null;
+	private final ToolsTree toolsTree = new ToolsTree();
+		
+	private final JobQueue queue = new JobQueue();
+	private final JobQueueList queueList = new JobQueueList(queue);
 
 	/**
 	 * Create the frame.
 	 */
 	public ToolRunnerFrame() {
-		Application application  = new DefaultApplication();
     //application.addPreferencesMenuItem();
     //application.setEnabledPreferencesMenu(true);
     application.addApplicationListener(this);
@@ -89,80 +77,40 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
-		JPanel queuePanel = new JPanel();
-		queuePanel.setBorder(new EmptyBorder(5, 0, 0, 0));
-		queuePanel.setLayout(new BoxLayout(queuePanel, BoxLayout.PAGE_AXIS));
-		contentPane.add(queuePanel, BorderLayout.EAST);
-		
-		JLabel queueLabel = new JLabel("Job Queue");
-		queueLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-		queuePanel.add(queueLabel);
-		
-		queueList.setPreferredSize(new Dimension(200, 0));
-		queuePanel.add(queueList);
-		
-		JSplitPane splitPane = new JSplitPane();
+		initializeChildren();
+		initializeMenuBar();
+	}
+	
+	private void initializeChildren() {
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
-		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Tools");
-		initializeToolsTree(rootNode);
-    toolsTree = new JTree(rootNode);
-    toolsTree.setCellRenderer(new ToolsTreeCellRenderer());
-		toolsTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		toolsTree.addTreeSelectionListener(new TreeSelectionListener() {
-			public void valueChanged(TreeSelectionEvent e) {
-				changeTool();
-			}
-		});
-		toolsTree.setRootVisible(false);
-		toolsTree.setShowsRootHandles(true);
-		toolsTree.setPreferredSize(new Dimension(200, 0));
-		JScrollPane toolsTreeScrollPane = new JScrollPane(toolsTree);
-		splitPane.setLeftComponent(toolsTreeScrollPane);
+		initializeQueuePanel();
+		initializeToolsTree();
 		
-		JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
 		splitPane.setRightComponent(tabbedPane);
 		
-		JScrollPane configScrollPane = new JScrollPane(configurationPanel);
-		tabbedPane.addTab("Tool Configuration", null, configScrollPane, "Configure tool");
-		configurationPanel.setLayout(new BoxLayout(configurationPanel, BoxLayout.PAGE_AXIS));
-		configurationPanel.setBackground(tabbedPane.getBackground());
-		
-
-		JPanel helpPanel = new JPanel();
-		tabbedPane.addTab("Help", null, helpPanel, null);
-		helpPanel.setLayout(new BorderLayout(0, 0));
-		
-		helpTextPanel.setEditable(false);
-		helpTextPanel.setBackground(tabbedPane.getBackground());
-		JScrollPane helpScrollPane = new JScrollPane(helpTextPanel);
-		helpPanel.add(helpScrollPane);
-		
-		JPanel runPanel = new JPanel();
-		runPanel.setBorder(new EmptyBorder(0, 5, 0, 0));
-		contentPane.add(runPanel, BorderLayout.SOUTH);
-		runPanel.setLayout(new BoxLayout(runPanel, BoxLayout.X_AXIS));
-		
-		runPanel.add(progressBar);
-		
-		JButton btnRun = new JButton("Run");
-		btnRun.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				runTool();
-			}
-		});
-		runPanel.add(btnRun);
-		
+		initializeConfigurationPanel();
+		initializeHelpPanel();
+		initializeRunPanel();
+	}
+	
+	private void initializeMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
-		
+
 		JMenu mnFileMenu = new JMenu("File");
 		menuBar.add(mnFileMenu);
 		
 		JMenuItem mntmAssemblyManager = new JMenuItem("Assembly manager");
 		mntmAssemblyManager.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				manager.setVisible(true);
+				JMenuItem menuItem = (JMenuItem) e.getSource();  
+        JPopupMenu popupMenu = (JPopupMenu) menuItem.getParent();  
+        Component invoker = popupMenu.getInvoker(); //this is the JMenu (in my code)  
+        JComponent invokerAsJComponent = (JComponent) invoker;  
+        Container topLevel = invokerAsJComponent.getTopLevelAncestor();
+				AssemblyManagerDialog dialog = new AssemblyManagerDialog((JFrame) topLevel);
+				dialog.setVisible(true);
 			}
 		});
 		mnFileMenu.add(mntmAssemblyManager);
@@ -184,13 +132,70 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		}
 	}
 	
-	private void initializeToolsTree(DefaultMutableTreeNode rootNode) {
-		DefaultMutableTreeNode converters = new DefaultMutableTreeNode("Converters");
-		rootNode.add(converters);
-		DefaultMutableTreeNode tool = new DefaultMutableTreeNode(IntervalToWig.class);
-		converters.add(tool);
+	private void initializeQueuePanel() {
+		JPanel queuePanel = new JPanel();
+		queuePanel.setBorder(new EmptyBorder(5, 0, 0, 0));
+		queuePanel.setLayout(new BoxLayout(queuePanel, BoxLayout.PAGE_AXIS));
+		contentPane.add(queuePanel, BorderLayout.EAST);
+		
+		JLabel queueLabel = new JLabel("Job Queue");
+		queueLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		queuePanel.add(queueLabel);
+		
+		queueList.setPreferredSize(new Dimension(200, 0));
+		queuePanel.add(queueList);
+	}
+	
+	private void initializeConfigurationPanel() {
+		JScrollPane configScrollPane = new JScrollPane(configurationPanel);
+		tabbedPane.addTab("Tool Configuration", null, configScrollPane, "Configure tool");
+		configurationPanel.setLayout(new BoxLayout(configurationPanel, BoxLayout.PAGE_AXIS));
+		configurationPanel.setBackground(tabbedPane.getBackground());
+	}
+	
+	private void initializeHelpPanel() {
+		JPanel helpPanel = new JPanel();
+		tabbedPane.addTab("Help", null, helpPanel, null);
+		helpPanel.setLayout(new BorderLayout(0, 0));
+		
+		helpTextPanel.setEditable(false);
+		helpTextPanel.setBackground(tabbedPane.getBackground());
+		JScrollPane helpScrollPane = new JScrollPane(helpTextPanel);
+		helpPanel.add(helpScrollPane);
+	}
+	
+	private void initializeRunPanel() {
+		JPanel runPanel = new JPanel();
+		runPanel.setBorder(new EmptyBorder(0, 5, 0, 0));
+		contentPane.add(runPanel, BorderLayout.SOUTH);
+		runPanel.setLayout(new BoxLayout(runPanel, BoxLayout.X_AXIS));
+		
+		runPanel.add(progressBar);
+		
+		JButton btnRun = new JButton("Run");
+		btnRun.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addJobToQueue();
+			}
+		});
+		runPanel.add(btnRun);
+	}
+	
+	private void initializeToolsTree() {
+		toolsTree.addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+				changeTool();
+			}
+		});
+		
+		JScrollPane toolsTreeScrollPane = new JScrollPane(toolsTree);
+		splitPane.setLeftComponent(toolsTreeScrollPane);
 	}
 
+	/**
+	 * Change the configuration panel to the currently selected tool
+	 * to configure a new Job
+	 */
 	private void changeTool() {
 		// Returns the last path element of the selection.
     DefaultMutableTreeNode node = (DefaultMutableTreeNode) toolsTree.getLastSelectedPathComponent();
@@ -200,116 +205,38 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
     }
 
     if (node.isLeaf()) {
-      Class<? extends CommandLineTool> tool = (Class<? extends CommandLineTool>) node.getUserObject();
-      initializeTool(tool);
+			try {
+	      Class<? extends CommandLineTool> tool = (Class<? extends CommandLineTool>) node.getUserObject();
+				Job job = new Job(tool);
+	      configurationPanel.setJob(job);
+			} catch (InstantiationException | IllegalAccessException e) {
+				log.error("Error initializing Job");
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Error initializing job", "Job Initialization Error", JOptionPane.ERROR_MESSAGE);
+			}
+
     }
 	}
 	
-	private void initializeTool(Class<? extends CommandLineTool> tool) {
-		// Clear the configuration panel
-		configurationPanel.removeAll();
-		
-		// Attempt to instantiate the tool and extract parameter information
-		CommandLineTool app = null;
-		try {
-			app = tool.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			log.error("Error initializing tool: " + tool.getSimpleName());
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(this,
-			    "Error initializing tool",
-			    "Tool Error",
-			    JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		JCommander jc = new JCommander(app);
-		List<ParameterDescription> parameters = jc.getParameters();
-		for (ParameterDescription paramDescription : parameters) {
-			JPanel fieldPanel = new JPanel();
-			fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.LINE_AXIS));
-			configurationPanel.add(fieldPanel);
-			
-			// Add the parameter name to the configuration panel
-			String name = paramDescription.getLongestName();
-			while (name.startsWith("-")) {
-				name = name.substring(1);
-			}
-			name = StringUtils.capitalize(name);
-			JLabel label = new JLabel(name);
-			fieldPanel.add(label);
-			
-			// Add a box for configuring the parameter based on its type
-			Field field = paramDescription.getField();
-			Class<?> type = field.getType();
-			if (type.equals(Path.class)) {
-				final JTextField textField = new JTextField();
-				fieldPanel.add(textField);
-				JButton btnChooseFile = new JButton("Choose File");
-				btnChooseFile.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						JFileChooser fc = new JFileChooser();
-						int returnVal = fc.showSaveDialog(textField.getRootPane());
-						if (returnVal == JFileChooser.APPROVE_OPTION) {
-							textField.setText(fc.getSelectedFile().toString());
-						}
-					}
-				});
-				fieldPanel.add(btnChooseFile);
-			} else if (type.equals(IntervalFile.class)) {
-				JTextField textField = new JTextField();
-				fieldPanel.add(textField);
-			} else if (type.equals(WigFile.class)) {
-				JTextField textField = new JTextField();
-				fieldPanel.add(textField);
-			} else if (type.equals(Assembly.class)) {
-				Assembly[] assemblies = new Assembly[manager.getAvailableAssemblies().size()];
-				assemblies = manager.getAvailableAssemblies().toArray(assemblies);
-				final JComboBox<Assembly> cbAssemblyChooser = new JComboBox<Assembly>(assemblies);
-				cbAssemblyChooser.setSelectedItem(lastUsedAssembly);
-				cbAssemblyChooser.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						lastUsedAssembly = (Assembly) cbAssemblyChooser.getSelectedItem();
-					}
-				});
-				fieldPanel.add(cbAssemblyChooser);
-			} else {
-				JTextField textField = new JTextField();
-				fieldPanel.add(textField);
-			}
-		}
-		
-		// Set the help text
-		StringBuilder helpText = new StringBuilder();
-		jc.usage(helpText);
-		helpTextPanel.setText(helpText.toString());
-		
-		configurationPanel.revalidate();
-	}
-	
-	private void runTool() {
-		if (currentTool == null) return;
+	private void addJobToQueue() {
+		Job currentJob = configurationPanel.getJob();
+		if (currentJob == null) return;
 		
 		// Validate the required parameters
 		log.debug("Validating parameters for tool");
-		
-		// Run the tool
-		log.info("Running tool");
-		progressBar.setIndeterminate(true);
-		try {
-			CommandLineTool app = currentTool.newInstance();
-			app.instanceMain(null);
-		} catch (InstantiationException | IllegalAccessException e) {
-			log.error("Error while running tool");
-			e.printStackTrace();
+		if (!currentJob.validateArguments()) {
+			configurationPanel.highlightInvalidArguments();
+			return;
 		}
 		
-		// Set the progress bar
-		log.info("Tool completed successfully");
-		progressBar.setIndeterminate(false);
-		progressBar.setValue(100);
-		
-		// Capture output
+		// Add the job to the queue
+		try {
+			queue.addJob(currentJob);
+		} catch (JobException e) {
+			log.error("Error adding Job to queue");
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Error adding job to queue", "Job Queue Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	public void handleAbout(ApplicationEvent event) {

@@ -31,7 +31,7 @@ public class MatrixAligner extends CommandLineTool {
 	@Parameter(names = {"-l", "--loci"}, description = "Loci file (Bed)", required = true, validateWith = ReadablePathValidator.class)
 	public Path lociFile;
 	@Parameter(names = {"-m", "--max"}, description = "Truncate width (base pairs)")
-	public int maxWidth;
+	public Integer maxWidth;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (matrix2png format)", required = true)
 	public Path outputFile;
 	
@@ -66,7 +66,7 @@ public class MatrixAligner extends CommandLineTool {
 		
 		int leftBound = 0;
 		int rightBound = n-1;
-		if (maxWidth != 0 && maxWidth < n) {
+		if (maxWidth != null && maxWidth < n) {
 			log.info("Truncated to: " + m+"x"+maxWidth);
 			int leftAlignDistance = alignmentPoint;
 			int rightAlignDistance = n - alignmentPoint - 1;

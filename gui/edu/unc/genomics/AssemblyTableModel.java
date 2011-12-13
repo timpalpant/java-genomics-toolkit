@@ -1,6 +1,5 @@
 package edu.unc.genomics;
 
-import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 
@@ -69,6 +68,10 @@ public class AssemblyTableModel extends AbstractTableModel {
 		}
 	}
 	
+	public Assembly getRow(int rowIndex) {
+		return assemblies.get(rowIndex);
+	}
+	
 	public boolean containsAssembly(Assembly a) {
 		String aName = a.toString();
 		for (Assembly assembly : assemblies) {
@@ -85,16 +88,9 @@ public class AssemblyTableModel extends AbstractTableModel {
 		fireTableRowsInserted(assemblies.size()-1, assemblies.size()-1);
 	}
 	
-	public void removeAssembly(Assembly a) {
-		String aName = a.toString();
-		Iterator<Assembly> it = assemblies.iterator();
-		while (it.hasNext()) {
-			Assembly assembly = it.next();
-			if (assembly.toString().equalsIgnoreCase(aName)) {
-				it.remove();
-			}
-		}
-		fireTableDataChanged();
+	public void removeRow(int rowIndex) {
+		assemblies.remove(rowIndex);
+		fireTableRowsDeleted(rowIndex, rowIndex);
 	}
 
 }

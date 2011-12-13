@@ -10,7 +10,7 @@ import javax.swing.JFrame;
  */
 public class GenomicsToolkit {
 
-	private JFrame frmToolRunner;
+	private JFrame frmToolRunner = new ToolRunnerFrame();
 
 	/**
 	 * Launch the application.
@@ -27,12 +27,5 @@ public class GenomicsToolkit {
 				}
 			}
 		});
-	}
-
-	/**
-	 * Create the application.
-	 */
-	public GenomicsToolkit() {
-		frmToolRunner = new ToolRunnerFrame();
 	}
 }
