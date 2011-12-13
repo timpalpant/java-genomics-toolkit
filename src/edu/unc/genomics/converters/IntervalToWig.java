@@ -29,6 +29,7 @@ public class IntervalToWig extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wig)", required = true)
 	public Path outputFile;
 	
+	@Override
 	public void run() throws IOException {
 		log.info(intervalFile.count() + " entries in input");
 		

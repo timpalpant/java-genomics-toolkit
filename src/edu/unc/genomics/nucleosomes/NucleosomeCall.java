@@ -9,7 +9,7 @@ import edu.unc.genomics.io.IntervalFileFormatException;
  * @author timpalpant
  *
  */
-public class NucleosomeCall extends ValuedInterval {
+public class NucleosomeCall extends ValuedInterval implements Comparable<NucleosomeCall> {
 
 	private static final long serialVersionUID = 6522702303121259979L;
 	
@@ -139,6 +139,12 @@ public class NucleosomeCall extends ValuedInterval {
 	
 	public double occupancy() {
 		return value;
+	}
+	
+	@Override
+	public int compareTo(NucleosomeCall o) {
+		DyadComparator comparator = new DyadComparator();
+		return comparator.compare(this, o);
 	}
 	
 	public static class DyadComparator implements Comparator<NucleosomeCall> {

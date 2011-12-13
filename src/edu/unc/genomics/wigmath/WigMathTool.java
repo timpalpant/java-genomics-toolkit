@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
+import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
@@ -27,14 +28,14 @@ import edu.unc.genomics.io.WigFileException;
  * @author timpalpant
  *
  */
-public abstract class WigMathTool {
+public abstract class WigMathTool extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(WigMathTool.class);
 	
 	public static final int DEFAULT_CHUNK_SIZE = 500_000;
 	
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
-	public String outputFile;
+	public Path outputFile;
 	
 	protected List<WigFile> inputs = new ArrayList<WigFile>();
 	
@@ -62,15 +63,13 @@ public abstract class WigMathTool {
 	public abstract float[] compute(String chr, int start, int stop)
 			 throws IOException, WigFileException;
 	
-	public void run() throws IOException, WigFileException {
+	@Override
+	public void run() throws IOException {
 		log.debug("Executing setup operations");
 		setup();
 		
 		log.debug("Processing files and writing result to disk");
-		Path output = Paths.get(outputFile);
-		BufferedWriter writer = Files.newBufferedWriter(output, Charset.defaultCharset());
-		
-		try {
+		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Write the Wig header
 			writer.write("track type=wiggle_0");
 			writer.newLine();
@@ -80,7 +79,7 @@ public abstract class WigMathTool {
 			for (String chr : chromosomes) {
 				int start = getMaxChrStart(inputs, chr);
 				int stop = getMinChrStop(inputs, chr);
-				log.debug("Processing chromosome " + chr + " shared region " + start + "-" + stop);
+				log.debug("Processing chromosome " + chr + " region " + start + "-" + stop);
 				
 				// Write the chromosome header to output
 				writer.write("fixedStep chrom="+chr+" start="+start+" step=1 span=1");
@@ -94,7 +93,15 @@ public abstract class WigMathTool {
 					int expectedLength = chunkStop - chunkStart + 1;
 					log.debug("Processing chunk "+chr+":"+chunkStart+"-"+chunkStop);
 					
-					float[] result = compute(chr, chunkStart, chunkStop);
+					float[] result = null;
+					try {
+						result = compute(chr, chunkStart, chunkStop);
+					} catch (WigFileException e) {
+						log.fatal("Wig file error while processing chunk " + chr + " region " + start + "-" + stop);
+						e.printStackTrace();
+						throw new RuntimeException("Wig file error while processing chunk " + chr + " region " + start + "-" + stop);
+					}
+					
 					if (result.length != expectedLength) {
 						log.error("Expected result length="+expectedLength+", got="+result.length);
 						throw new RuntimeException("Result is not the expected length!");
@@ -106,14 +113,10 @@ public abstract class WigMathTool {
 					bp = chunkStop + 1;
 				}
 			}
-		} catch (Exception e) {
-			log.fatal("Error while processing Wig files");
-			e.printStackTrace();
-			// Remove partial results
-			writer.close();
-			Files.deleteIfExists(output);
-		} finally {
-			writer.close();
+		}
+		
+		for (WigFile wig : inputs) {
+			wig.close();
 		}
 	}
 	

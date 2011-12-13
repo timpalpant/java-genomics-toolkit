@@ -6,11 +6,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
@@ -18,7 +15,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.IntervalFile;
 import edu.unc.genomics.io.IntervalFileSnifferException;

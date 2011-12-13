@@ -1,17 +1,15 @@
 package edu.unc.genomics.wigmath;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Iterator;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
+import edu.unc.genomics.PositiveIntegerValidator;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
@@ -20,8 +18,8 @@ public class MovingAverageSmooth extends WigMathTool {
 	private static final Logger log = Logger.getLogger(MovingAverageSmooth.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
-	public String inputFile;
-	@Parameter(names = {"-w", "--width"}, description = "Width of kernel (bp)")
+	public WigFile inputFile;
+	@Parameter(names = {"-w", "--width"}, description = "Width of kernel (bp)", validateWith = PositiveIntegerValidator.class)
 	public int width = 10;
 	
 	WigFile input;
@@ -29,15 +27,7 @@ public class MovingAverageSmooth extends WigMathTool {
 
 	@Override
 	public void setup() {
-		log.debug("Initializing input file");
-		try {
-			input = WigFile.autodetect(Paths.get(inputFile));
-		} catch (IOException | WigFileException e) {
-			log.fatal("Error initializing input Wig files");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		inputs.add(input);
+		inputs.add(inputFile);
 		
 		log.debug("Initializing statistics");
 		stats = new DescriptiveStatistics();
@@ -71,16 +61,7 @@ public class MovingAverageSmooth extends WigMathTool {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		MovingAverageSmooth application = new MovingAverageSmooth();
-		JCommander jc = new JCommander(application);
-		try {
-			jc.parse(args);
-		} catch (ParameterException e) {
-			jc.usage();
-			System.exit(-1);
-		}
-		
-		application.run();
+		new MovingAverageSmooth().instanceMain(args);
 	}
 
 }

@@ -41,6 +41,7 @@ public class Autocorrelation extends CommandLineTool {
 		}
 	}
 	
+	@Override
 	public void run() throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			log.debug("Computing autocorrelation for each window");

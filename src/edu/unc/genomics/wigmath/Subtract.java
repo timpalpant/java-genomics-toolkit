@@ -1,15 +1,12 @@
 package edu.unc.genomics.wigmath;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
@@ -18,29 +15,16 @@ public class Subtract extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(Subtract.class);
 
-	@Parameter(names = {"-m", "--minuend"}, description = "Minuend (file 1)", required = true)
-	public String minuendFile;
-	@Parameter(names = {"-s", "--subtrahend"}, description = "Subtrahend (file 2)", required = true)
-	public String subtrahendFile;
-	
-	WigFile minuend;
-	WigFile subtrahend;
+	@Parameter(names = {"-m", "--minuend"}, description = "Minuend (top - file 1)", required = true)
+	public WigFile minuendFile;
+	@Parameter(names = {"-s", "--subtrahend"}, description = "Subtrahend (bottom - file 2)", required = true)
+	public WigFile subtrahendFile;
 
 	@Override
 	public void setup() {
 		log.debug("Initializing input files");
-		
-		try {
-			minuend = WigFile.autodetect(Paths.get(minuendFile));
-			subtrahend = WigFile.autodetect(Paths.get(subtrahendFile));
-		} catch (IOException | WigFileException e) {
-			log.fatal("Error initializing input Wig files");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		inputs.add(minuend);
-		inputs.add(subtrahend);
+		inputs.add(minuendFile);
+		inputs.add(subtrahendFile);
 		log.debug("Initialized " + inputs.size() + " input files");
 	}
 	
@@ -48,8 +32,8 @@ public class Subtract extends WigMathTool {
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
 		log.debug("Computing difference for chunk "+chr+":"+start+"-"+stop);
 		
-		Iterator<WigItem> minuendData = minuend.query(chr, start, stop);
-		Iterator<WigItem> subtrahendData = subtrahend.query(chr, start, stop);
+		Iterator<WigItem> minuendData = minuendFile.query(chr, start, stop);
+		Iterator<WigItem> subtrahendData = subtrahendFile.query(chr, start, stop);
 		
 		float[] result = WigFile.flattenData(minuendData, start, stop);
 		while (subtrahendData.hasNext()) {
@@ -71,16 +55,7 @@ public class Subtract extends WigMathTool {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		Subtract application = new Subtract();
-		JCommander jc = new JCommander(application);
-		try {
-			jc.parse(args);
-		} catch (ParameterException e) {
-			jc.usage();
-			System.exit(-1);
-		}
-		
-		application.run();
+		new Subtract().instanceMain(args);
 	}
 
 }

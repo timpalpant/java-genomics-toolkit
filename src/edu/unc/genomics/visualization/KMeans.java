@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,72 +18,74 @@ import org.apache.commons.math.stat.clustering.Cluster;
 import org.apache.commons.math.stat.clustering.KMeansPlusPlusClusterer;
 import org.apache.log4j.Logger;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
+import edu.unc.genomics.CommandLineTool;
+import edu.unc.genomics.PositiveIntegerValidator;
+import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileSnifferException;
 import edu.unc.genomics.io.WigFileException;
 
-public class KMeans {
+public class KMeans extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(KMeans.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (matrix2png format)", required = true)
-	public String inputFile;
-	@Parameter(names = {"-k", "--clusters"}, description = "Number of clusters", required = true)
+	@Parameter(names = {"-i", "--input"}, description = "Input file (matrix2png format)", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
+	@Parameter(names = {"-k", "--clusters"}, description = "Number of clusters", required = true, validateWith = PositiveIntegerValidator.class)
 	public int k;
-	@Parameter(names = {"-1", "--min"}, description = "Minimum column to use for clustering")
+	@Parameter(names = {"-1", "--min"}, description = "Minimum column to use for clustering", validateWith = PositiveIntegerValidator.class)
 	public int minCol = 1;
-	@Parameter(names = {"-2", "--max"}, description = "Maximum column to use for clustering")
-	public int maxCol = -1;
+	@Parameter(names = {"-2", "--max"}, description = "Maximum column to use for clustering", validateWith = PositiveIntegerValidator.class)
+	public int maxCol;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (clustered matrix2png format)", required = true)
-	public String outputFile;
+	public Path outputFile;
 	
 	private Map<String, String> rows = new HashMap<String, String>();
 	private List<KMeansRow> data = new ArrayList<KMeansRow>();
 	
-	public void run() throws IOException, WigFileException, IntervalFileSnifferException {
+	@Override
+	public void run() throws IOException {
 		log.debug("Loading data from the input matrix");
-		Path input = Paths.get(inputFile);
-		BufferedReader reader = Files.newBufferedReader(input, Charset.defaultCharset());
-		
-		// Header line
-		int lineNum = 1;
-		String headerLine = reader.readLine();
-		int numColsInMatrix = StringUtils.countMatches(headerLine, "\t");
-		
-		// Validate the range info
-		if (maxCol != -1) {
-			if (maxCol > numColsInMatrix) {
-				throw new RuntimeException("Invalid range of data specified for clustering");
-			}
-		} else {
-			maxCol = numColsInMatrix;
-		}
-		
-		// Loop over the rows and load the data
-		String line;
-		while ((line = reader.readLine()) != null) {
-			lineNum++;
-			if (StringUtils.countMatches(line, "\t") != numColsInMatrix) {
-				throw new RuntimeException("Irregular input matrix does not have same number of columns on line " + lineNum);
+		String headerLine = "";
+		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.defaultCharset())) {
+			// Header line
+			int lineNum = 1;
+			headerLine = reader.readLine();
+			int numColsInMatrix = StringUtils.countMatches(headerLine, "\t");
+			
+			// Validate the range info
+			if (maxCol != 0) {
+				if (maxCol > numColsInMatrix) {
+					throw new RuntimeException("Invalid range of data specified for clustering ("+maxCol+" > "+numColsInMatrix+")");
+				}
+			} else {
+				maxCol = numColsInMatrix;
 			}
 			
-			int delim = line.indexOf('\t');
-			String id = line.substring(0, delim);
-			String[] row = line.substring(delim+1).split("\t");
-			String[] subset = Arrays.copyOfRange(row, minCol, maxCol);
-			float[] rowData = new float[subset.length];
-			for (int i = 0; i < subset.length; i++) {
-				try {
-					rowData[i] = Float.parseFloat(subset[i]);
-				} catch (NumberFormatException e) {
-					rowData[i] = Float.NaN;
+			// Loop over the rows and load the data
+			String line;
+			while ((line = reader.readLine()) != null) {
+				lineNum++;
+				if (StringUtils.countMatches(line, "\t") != numColsInMatrix) {
+					throw new RuntimeException("Irregular input matrix does not have same number of columns on line " + lineNum);
 				}
+				
+				int delim = line.indexOf('\t');
+				String id = line.substring(0, delim);
+				String[] row = line.substring(delim+1).split("\t");
+				String[] subset = Arrays.copyOfRange(row, minCol, maxCol);
+				float[] rowData = new float[subset.length];
+				for (int i = 0; i < subset.length; i++) {
+					try {
+						rowData[i] = Float.parseFloat(subset[i]);
+					} catch (NumberFormatException e) {
+						rowData[i] = Float.NaN;
+					}
+				}
+				data.add(new KMeansRow(id, rowData));
+				rows.put(id, line);
 			}
-			data.add(new KMeansRow(id, rowData));
-			rows.put(id, line);
 		}
 		
 		// Perform the clustering
@@ -95,36 +96,26 @@ public class KMeans {
 		
 		// Write to output
 		log.debug("Writing clustered data to output file");
-		Path output = Paths.get(outputFile);
-		BufferedWriter writer = Files.newBufferedWriter(output, Charset.defaultCharset());
-		writer.write(headerLine);
-		writer.newLine();
-		int n = 1;
-		int count = 1;
-		for (Cluster<KMeansRow> cluster : clusters) {
-			int numRowsInCluster = cluster.getPoints().size();
-			int stop = count + numRowsInCluster - 1;
-			log.info("Cluster "+(n++)+": rows "+count+"-"+stop);
-			count = stop+1;
-			for (KMeansRow row : cluster.getPoints()) {
-				writer.write(rows.get(row.getId()));
-				writer.newLine();
+		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+			writer.write(headerLine);
+			writer.newLine();
+			int n = 1;
+			int count = 1;
+			for (Cluster<KMeansRow> cluster : clusters) {
+				int numRowsInCluster = cluster.getPoints().size();
+				int stop = count + numRowsInCluster - 1;
+				log.info("Cluster "+(n++)+": rows "+count+"-"+stop);
+				count = stop+1;
+				for (KMeansRow row : cluster.getPoints()) {
+					writer.write(rows.get(row.getId()));
+					writer.newLine();
+				}
 			}
 		}
-		writer.close();
 	}
 	
 	public static void main(String[] args) throws IOException, WigFileException, IntervalFileSnifferException {
-		KMeans application = new KMeans();
-		JCommander jc = new JCommander(application);
-		try {
-			jc.parse(args);
-		} catch (ParameterException e) {
-			jc.usage();
-			System.exit(-1);
-		}
-		
-		application.run();
+		new KMeans().instanceMain(args);
 	}
 
 }

@@ -10,6 +10,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -64,6 +65,7 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 	private final JPanel configurationPanel = new JPanel();
 	private final JTextPane helpTextPanel = new JTextPane();
 	private final JTree toolsTree;
+	private final JList<Job> queueList = new JList<>();
 	
 	private final AssemblyManagerDialog manager = new AssemblyManagerDialog(this);
 	private Assembly lastUsedAssembly = null;
@@ -81,11 +83,23 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Genomics Toolkit Tool Runner");
-		setBounds(100, 100, 800, 600);
+		setBounds(100, 100, 1000, 600);
 		
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		
+		JPanel queuePanel = new JPanel();
+		queuePanel.setBorder(new EmptyBorder(5, 0, 0, 0));
+		queuePanel.setLayout(new BoxLayout(queuePanel, BoxLayout.PAGE_AXIS));
+		contentPane.add(queuePanel, BorderLayout.EAST);
+		
+		JLabel queueLabel = new JLabel("Job Queue");
+		queueLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		queuePanel.add(queueLabel);
+		
+		queueList.setPreferredSize(new Dimension(200, 0));
+		queuePanel.add(queueList);
 		
 		JSplitPane splitPane = new JSplitPane();
 		contentPane.add(splitPane, BorderLayout.CENTER);

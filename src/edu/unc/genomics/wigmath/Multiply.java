@@ -10,9 +10,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
@@ -69,16 +67,7 @@ public class Multiply extends WigMathTool {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		Multiply application = new Multiply();
-		JCommander jc = new JCommander(application);
-		try {
-			jc.parse(args);
-		} catch (ParameterException e) {
-			jc.usage();
-			System.exit(-1);
-		}
-		
-		application.run();
+		new Multiply().instanceMain(args);
 	}
 
 }

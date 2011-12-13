@@ -1,15 +1,12 @@
 package edu.unc.genomics.wigmath;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
@@ -19,28 +16,14 @@ public class Divide extends WigMathTool {
 	private static final Logger log = Logger.getLogger(Divide.class);
 
 	@Parameter(names = {"-n", "--numerator"}, description = "Dividend / Numerator (file 1)", required = true)
-	public String dividendFile;
+	public WigFile dividendFile;
 	@Parameter(names = {"-d", "--denominator"}, description = "Divisor / Denominator (file 2)", required = true)
-	public String divisorFile;
-	
-	WigFile dividend;
-	WigFile divisor;
+	public WigFile divisorFile;
 
 	@Override
-	public void setup() {
-		log.debug("Initializing input files");
-		
-		try {
-			dividend = WigFile.autodetect(Paths.get(dividendFile));
-			divisor = WigFile.autodetect(Paths.get(divisorFile));
-		} catch (IOException | WigFileException e) {
-			log.fatal("Error initializing input Wig files");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		inputs.add(dividend);
-		inputs.add(divisor);
+	public void setup() {		
+		inputs.add(dividendFile);
+		inputs.add(divisorFile);
 		log.debug("Initialized " + inputs.size() + " input files");
 	}
 	
@@ -48,8 +31,8 @@ public class Divide extends WigMathTool {
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
 		log.debug("Computing difference for chunk "+chr+":"+start+"-"+stop);
 		
-		Iterator<WigItem> dividendData = dividend.query(chr, start, stop);
-		Iterator<WigItem> divisorData = divisor.query(chr, start, stop);
+		Iterator<WigItem> dividendData = dividendFile.query(chr, start, stop);
+		Iterator<WigItem> divisorData = divisorFile.query(chr, start, stop);
 		
 		float[] result = WigFile.flattenData(dividendData, start, stop);
 		while (divisorData.hasNext()) {
@@ -75,16 +58,7 @@ public class Divide extends WigMathTool {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		Divide application = new Divide();
-		JCommander jc = new JCommander(application);
-		try {
-			jc.parse(args);
-		} catch (ParameterException e) {
-			jc.usage();
-			System.exit(-1);
-		}
-		
-		application.run();
+		new Divide().instanceMain(args);
 	}
 
 }
