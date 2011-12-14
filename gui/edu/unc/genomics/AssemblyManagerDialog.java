@@ -21,6 +21,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.zip.DataFormatException;
 
+/**
+ * View for AssemblyManager
+ * 
+ * @author timpalpant
+ *
+ */
 public class AssemblyManagerDialog extends JDialog {
 	
 	public static final int DEFAULT_WIDTH = 400;

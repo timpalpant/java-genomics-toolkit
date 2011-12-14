@@ -5,8 +5,11 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 
 /**
- * @author timpalpant
  * The main application for running the genomics toolkit gui
+ * Could do resource checking, etc. prior to startup
+ * 
+ * @author timpalpant
+ * 
  */
 public class GenomicsToolkit {
 

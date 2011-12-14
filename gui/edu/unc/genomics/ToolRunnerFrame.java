@@ -9,8 +9,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -26,23 +28,28 @@ import javax.swing.BoxLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 
-import edu.unc.genomics.converters.IntervalToWig;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.simplericity.macify.eawt.Application;
 import org.simplericity.macify.eawt.ApplicationEvent;
 import org.simplericity.macify.eawt.ApplicationListener;
 import org.simplericity.macify.eawt.DefaultApplication;
+import org.xml.sax.SAXException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
+/**
+ * The main ToolRunner window
+ * and controller for creating, running, and managing Jobs
+ * 
+ * @author timpalpant
+ *
+ */
 public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 	
 	private static final long serialVersionUID = 6454774196137357898L;
@@ -54,12 +61,12 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 	private final JSplitPane splitPane = new JSplitPane();
 	private final JProgressBar progressBar = new JProgressBar();
 	private final JTabbedPane tabbedPane = new JTabbedPane(SwingConstants.TOP);
-	private final ConfigurationPanel configurationPanel = new ConfigurationPanel();
+	private final JobConfigPanel configurationPanel = new JobConfigPanel();
 	private final JTextPane helpTextPanel = new JTextPane();
 	private final ToolsTree toolsTree = new ToolsTree();
 		
-	private final JobQueue queue = new JobQueue();
-	private final JobQueueList queueList = new JobQueueList(queue);
+	private final JobQueueManager queueManager = new JobQueueManager();
+	private final JList<SubmittedJob> queueList = new JList<>(queueManager.getListModel());
 
 	/**
 	 * Create the frame.
@@ -73,7 +80,7 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		setTitle("Genomics Toolkit Tool Runner");
 		setBounds(100, 100, 1000, 600);
 		
-		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		contentPane.setBorder(BorderFactory.createEmptyBorder());
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
@@ -182,6 +189,19 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 	}
 	
 	private void initializeToolsTree() {
+		try {
+			ToolsTreeModel model = ToolsTreeModel.loadDefaultConfig();
+			toolsTree.setModel(model);
+		} catch (ParserConfigurationException | SAXException | IOException e1) {
+			log.error("Error loading tool configuration file");
+			e1.printStackTrace();
+			System.exit(-1);
+		} catch (ClassNotFoundException e) {
+			log.error("Error loading tool: " + e.getMessage());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+
 		toolsTree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				changeTool();
@@ -198,15 +218,16 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 	 */
 	private void changeTool() {
 		// Returns the last path element of the selection.
-    DefaultMutableTreeNode node = (DefaultMutableTreeNode) toolsTree.getLastSelectedPathComponent();
+    Object node = toolsTree.getLastSelectedPathComponent();
     // Nothing is selected
     if (node == null) {   
     	return;
     }
 
-    if (node.isLeaf()) {
+    if (node instanceof ToolsTreeNode) {
+    	ToolsTreeNode toolNode = (ToolsTreeNode) node;
 			try {
-	      Class<? extends CommandLineTool> tool = (Class<? extends CommandLineTool>) node.getUserObject();
+	      Class<? extends CommandLineTool> tool = toolNode.getClazz();
 				Job job = new Job(tool);
 	      configurationPanel.setJob(job);
 			} catch (InstantiationException | IllegalAccessException e) {
@@ -223,7 +244,7 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		if (currentJob == null) return;
 		
 		// Validate the required parameters
-		log.debug("Validating parameters for tool");
+		log.info("Validating parameters for tool");
 		if (!currentJob.validateArguments()) {
 			configurationPanel.highlightInvalidArguments();
 			return;
@@ -231,7 +252,7 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		
 		// Add the job to the queue
 		try {
-			queue.addJob(currentJob);
+			queueManager.submitJob(currentJob);
 		} catch (JobException e) {
 			log.error("Error adding Job to queue");
 			e.printStackTrace();

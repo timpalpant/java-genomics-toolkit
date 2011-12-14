@@ -10,6 +10,13 @@ import java.util.zip.DataFormatException;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Suite of static methods for managing the built-in assemblies in the resources dir
+ * as well as keeping track of the last used assembly
+ * 
+ * @author timpalpant
+ *
+ */
 public class AssemblyManager {
 	
 	private static final Logger log = Logger.getLogger(AssemblyManager.class);

@@ -27,7 +27,7 @@ public abstract class CommandLineTool {
 	 * Initialize parameters
 	 * @param args
 	 */
-	public void parseArguments(String[] args) {
+	public void parseArguments(String[] args, boolean exitOnMissingRequired) {
 		JCommander jc = new JCommander(this);
 		
 		// Add factories for parsing Paths, Assemblies, IntervalFiles, and WigFiles
@@ -45,7 +45,9 @@ public abstract class CommandLineTool {
 		} catch (ParameterException e) {
 			System.err.println(e.getMessage());
 			jc.usage();
-			System.exit(-1);
+			if (exitOnMissingRequired) {
+				System.exit(1);
+			}
 		}
 	}
 	
@@ -54,11 +56,13 @@ public abstract class CommandLineTool {
 	 * @param args
 	 */
 	public void instanceMain(String[] args) {
-		parseArguments(args);
+		parseArguments(args, true);
+		
 		try {
 			run();
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw new CommandLineToolException("IO error while running tool");
 		}
 	}
 }

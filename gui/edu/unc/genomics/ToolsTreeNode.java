@@ -3,6 +3,10 @@ package edu.unc.genomics;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
+ * A node in the ToolsTreeModel
+ * Contains a class and a name for the tool
+ * TODO Add help for each tool
+ * 
  * @author timpalpant
  *
  */
@@ -17,7 +21,7 @@ public class ToolsTreeNode extends DefaultMutableTreeNode {
 	 * @param userObject
 	 */
 	public ToolsTreeNode(String name, Class<? extends CommandLineTool> clazz) {
-		super(clazz);
+		super(name, false);
 		
 		this.name = name;
 		this.clazz = clazz;

@@ -1,11 +1,12 @@
 package edu.unc.genomics;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
 /**
+ * Model for the AssemblyManagerDialog table view
+ * 
  * @author timpalpant
  *
  */

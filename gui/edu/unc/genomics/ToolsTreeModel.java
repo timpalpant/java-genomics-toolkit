@@ -17,7 +17,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Loads the available tools from a configuration file
+ * Model for the ToolsTree
+ * Essentially just a DefaultTreeModel, but provides methods for
+ * loading the available tools from a configuration file
+ * 
  * @author timpalpant
  *
  */
@@ -29,23 +32,23 @@ public class ToolsTreeModel extends DefaultTreeModel {
 
 	private static final long serialVersionUID = -6587614270922489960L;
 
-	/**
-	 * @param root
-	 * @throws ParserConfigurationException 
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws ClassNotFoundException 
-	 */
-	public ToolsTreeModel() throws ParserConfigurationException, SAXException, IOException, ClassNotFoundException {
+	public ToolsTreeModel() {
 		super(new DefaultMutableTreeNode("Tools"));
-
-		DefaultMutableTreeNode root = (DefaultMutableTreeNode) getRoot();
+	}
+	
+	public static ToolsTreeModel loadDefaultConfig() throws ClassNotFoundException, ParserConfigurationException, SAXException, IOException {
+		return loadConfig(DEFAULT_CONFIGURATION_FILE);
+	}
+	
+	public static ToolsTreeModel loadConfig(Path p) throws ParserConfigurationException, SAXException, IOException, ClassNotFoundException {
+		ToolsTreeModel model = new ToolsTreeModel();
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 		
 		// Populate the TreeModel with the tools in the default configuration file
 		log.debug("Loading tools from: " + DEFAULT_CONFIGURATION_FILE.toAbsolutePath());
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(DEFAULT_CONFIGURATION_FILE.toFile());
+		Document doc = dBuilder.parse(p.toFile());
 		
 		// Iterate over the sections
 		NodeList sections = doc.getElementsByTagName("section");
@@ -71,6 +74,8 @@ public class ToolsTreeModel extends DefaultTreeModel {
 				}
 			}
 		}
+		
+		return model;
 	}
 
 }

@@ -1,26 +1,27 @@
 package edu.unc.genomics;
 
 /**
- * Exception thrown if attempting to perform an invalid action with a Job
- * 
  * @author timpalpant
  *
  */
-public class JobException extends Exception {
-
-	private static final long serialVersionUID = -831504993593959450L;
+public class CommandLineToolException extends RuntimeException {
 
 	/**
 	 * 
 	 */
-	public JobException() {
+	private static final long serialVersionUID = 4740440799806133636L;
+
+	/**
+	 * 
+	 */
+	public CommandLineToolException() {
 		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * @param message
 	 */
-	public JobException(String message) {
+	public CommandLineToolException(String message) {
 		super(message);
 		// TODO Auto-generated constructor stub
 	}
@@ -28,7 +29,7 @@ public class JobException extends Exception {
 	/**
 	 * @param cause
 	 */
-	public JobException(Throwable cause) {
+	public CommandLineToolException(Throwable cause) {
 		super(cause);
 		// TODO Auto-generated constructor stub
 	}
@@ -37,7 +38,7 @@ public class JobException extends Exception {
 	 * @param message
 	 * @param cause
 	 */
-	public JobException(String message, Throwable cause) {
+	public CommandLineToolException(String message, Throwable cause) {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}
@@ -48,7 +49,7 @@ public class JobException extends Exception {
 	 * @param enableSuppression
 	 * @param writableStackTrace
 	 */
-	public JobException(String message, Throwable cause,
+	public CommandLineToolException(String message, Throwable cause,
 			boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 		// TODO Auto-generated constructor stub
