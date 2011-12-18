@@ -1,12 +1,16 @@
 package edu.unc.genomics;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
@@ -28,6 +32,9 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 	private final Class<? extends CommandLineTool> tool;
 	private final CommandLineTool app;
 	private final List<ParameterDescription> parameters;
+	private final String usageText;
+	private boolean isRunning = false;
+	//private StringWriter writer = new StringWriter();
 	
 	/**
 	 * Arguments for running this Job
@@ -46,7 +53,30 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 		// Attempt to instantiate the tool and extract parameter information
 		app = tool.newInstance();
 		JCommander jc = new JCommander(app);
+		jc.setProgramName(tool.getSimpleName());
 		parameters = jc.getParameters();
+		StringBuilder sbuilder = new StringBuilder();
+		jc.usage(sbuilder);
+		usageText = sbuilder.toString();
+		
+		// Set default arguments
+		for (ParameterDescription param : parameters) {
+			if (param.getDefault() != null) {
+				setArgument(param, String.valueOf(param.getDefault()));
+			}
+		}
+	}
+	
+	/**
+	 * Copy-constructor
+	 * @param job
+	 */
+	public Job(final Job job) {
+		this.tool = job.tool;
+		this.app = job.app;
+		this.parameters = job.parameters;
+		this.args = job.args;
+		this.usageText = job.usageText;
 	}
 	
 	@Override
@@ -62,7 +92,12 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 		}
 		
 		// Attempt to instantiate and run the tool
+		//Appender appender = new WriterAppender(new PatternLayout(), writer);
+		//Logger.getRootLogger().addAppender(appender);
+		isRunning = true;
 		app.instanceMain(args);
+		isRunning = false;
+		//Logger.getRootLogger().removeAppender(appender);
 	}
 	
 	/**
@@ -83,6 +118,10 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 		
 		String[] ret = new String[cmdArgs.size()];
 		return cmdArgs.toArray(ret);
+	}
+	
+	public String getArgument(final ParameterDescription p) {
+		return args.get(p);
 	}
 	
 	/**
@@ -131,10 +170,34 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 		
 		return hasAllRequiredParams;
 	}
+	
+	public int numParameters() {
+		return parameters.size();
+	}
 
 	@Override
 	public Iterator<ParameterDescription> iterator() {
 		return parameters.iterator();
+	}
+	
+	public String getName() {
+		return tool.getSimpleName();
+	}
+	
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	/**
+	 * @return the usageText
+	 */
+	public String getUsageText() {
+		return usageText;
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 	
 }

@@ -3,6 +3,7 @@ package edu.unc.genomics;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
@@ -13,15 +14,20 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.layout.SpringUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
@@ -46,6 +52,8 @@ public class JobConfigPanel extends JPanel {
 	private static final long serialVersionUID = 3336295203155728629L;
 	private static final Logger log = Logger.getLogger(JobConfigPanel.class);
 	
+	private static final ImageIcon fileIcon = new ImageIcon(ResourceManager.getImagesDirectory().resolve("folder_page.png").toString());
+	
 	/**
 	 * Maps parameters in the Job to GUI components (forward data-binding)
 	 */
@@ -64,7 +72,9 @@ public class JobConfigPanel extends JPanel {
 	/**
 	 * Initialize a new ConfigurationPanel with no Job
 	 */
-	public JobConfigPanel() { }
+	public JobConfigPanel() { 
+		this(null);
+	}
 	
 	/**
 	 * Initialize a new ConfigurationPanel for the given Job
@@ -72,6 +82,7 @@ public class JobConfigPanel extends JPanel {
 	 */
 	public JobConfigPanel(final Job job) {
 		setJob(job);
+		setLayout(new SpringLayout());
 	}
 	
 	/**
@@ -114,15 +125,15 @@ public class JobConfigPanel extends JPanel {
 		removeAll();
 		guiMap.clear();
 		jobMap.clear();
-		if (job == null) return;
+		if (job == null) {
+			validate();
+			repaint();
+			return;
+		}
 		
 		// Iterate through the parameters in the Job
 		// and render them appropriately based on their type
 		for (ParameterDescription paramDescription : job) {
-			JPanel fieldPanel = new JPanel();
-			fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.LINE_AXIS));
-			add(fieldPanel);
-			
 			// Add the parameter name to the configuration panel
 			String name = paramDescription.getLongestName();
 			while (name.startsWith("-")) {
@@ -131,9 +142,12 @@ public class JobConfigPanel extends JPanel {
 			name = StringUtils.capitalize(name);
 			JLabel label = new JLabel(name);
 			label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
-			fieldPanel.add(label);
+			add(label);
 			
-			// Add a box for configuring the parameter
+			// Add a panel for configuring the parameter
+			JPanel fieldPanel = new JPanel();
+			fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.LINE_AXIS));
+			add(fieldPanel);
 			Field field = paramDescription.getField();
 			Class<?> type = field.getType();
 			if (type.equals(Assembly.class)) {
@@ -158,7 +172,11 @@ public class JobConfigPanel extends JPanel {
 				jobMap.put(cbAssemblyChooser, paramDescription);
 			} else {
 				final JTextField textField = new JTextField();
-				textField.setPreferredSize(new Dimension(0, 25));
+				// Set to default parameter, if it exists
+				if (job.isSet(paramDescription)) {
+					textField.setText(job.getArgument(paramDescription));
+				}
+				textField.setPreferredSize(new Dimension(0, 20));
 				textField.setMaximumSize(new Dimension(Integer.MAX_VALUE, textField.getPreferredSize().height));
 				textField.getDocument().addDocumentListener(new DocumentListener() {
 					public void changedUpdate(DocumentEvent e) {
@@ -193,12 +211,22 @@ public class JobConfigPanel extends JPanel {
 				// For input/output files, add a file chooser button
 				if (type.equals(Path.class) || type.equals(WigFile.class) || type.equals(IntervalFile.class)) {
 					// TODO Replace with file icon
-					JButton btnChooseFile = new JButton("Choose File");
+					JButton btnChooseFile = new JButton(fileIcon);
 					btnChooseFile.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
+							// AWT FileDialog uses native components, but seems to hang
+							//Component c = (Component) e.getSource();
+			        //JFrame frame = (JFrame) SwingUtilities.getRoot(c);
+							//FileDialog fd = new FileDialog(frame, "Choose File");
+							//fd.setVisible(true);
+							//if (fd.getFile() != null) {
+							//	textField.setText(fd.getDirectory()+fd.getFile());
+							//}
+							
+							// Swing JFileChooser
 							JFileChooser fc = new JFileChooser();
-							int returnVal = fc.showDialog(textField.getRootPane(), "OK");
-							if (returnVal == JFileChooser.APPROVE_OPTION) {
+							int retValue = fc.showDialog(getParent(), "OK");
+							if (retValue == JFileChooser.APPROVE_OPTION) {
 								textField.setText(fc.getSelectedFile().toString());
 							}
 						}
@@ -208,7 +236,11 @@ public class JobConfigPanel extends JPanel {
 			}
 		}
 		
-		revalidate();
+		// Lay out the panel
+		SpringUtilities.makeCompactGrid(this, job.numParameters(), 2, 5, 5, 5, 5);
+		
+		validate();
+		repaint();
 	}
 
 }

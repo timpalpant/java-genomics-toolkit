@@ -1,12 +1,9 @@
 package edu.unc.genomics;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import javax.swing.DefaultListModel;
 
 import org.apache.log4j.Logger;
 
@@ -18,22 +15,20 @@ import org.apache.log4j.Logger;
  *
  */
 public class JobQueueManager {
-	
-	public static final int JOB_POLL_INTERVAL = 1000;
-	
+		
 	private static final Logger log = Logger.getLogger(JobQueueManager.class);
 	
+	private final JobQueue queue;
 	private final ExecutorService exec;
 	private final Thread monitor;
-	private final DefaultListModel<SubmittedJob> listModel;
-	private final List<SubmittedJob> submittedJobs = new ArrayList<>();
 	
-	public JobQueueManager() {
-		listModel = new DefaultListModel<>();
+	public JobQueueManager(JobQueue queue) {
+		this.queue = queue;
 		
 		int numProcessors = Runtime.getRuntime().availableProcessors();
 		log.debug("Initializing thread pool with "+numProcessors+" processors");
 		exec = Executors.newFixedThreadPool(numProcessors);
+		
 		monitor = new Thread(new JobMonitor());
 		monitor.start();
 	}
@@ -58,37 +53,53 @@ public class JobQueueManager {
 		SubmittedJob submittedJob = new SubmittedJob(job, future);
 		log.info("Submitted job " + submittedJob.getId());
 		
-		// Add the Job to the ListModel
-		submittedJobs.add(submittedJob);
-		listModel.addElement(submittedJob);
-
+		// Add the SubmittedJob to the JobQueue
+		queue.add(submittedJob);
 		return submittedJob;
 	}
+	
+	/**
+	 * Are any jobs running? (not done)
+	 * @return
+	 */
+	public boolean isRunning() {
+		for (SubmittedJob job : queue) {
+			if (!job.isDone()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
 
 	/**
-	 * @return the listModel
+	 * Background process for polling the status of submitted jobs
+	 * @author timpalpant
+	 *
 	 */
-	public DefaultListModel<SubmittedJob> getListModel() {
-		return listModel;
-	}
-	
-	private class JobMonitor implements Runnable {
+	public class JobMonitor implements Runnable {
+
+		public static final int JOB_POLL_INTERVAL = 1_000;
+		
 		public void run() {
 			try {
 				while (true) {
 					// Check Job statuses every 1s
 					Thread.sleep(JOB_POLL_INTERVAL);
 					
-					for (SubmittedJob job : submittedJobs) {
-						//if (job.getFuture().)
-						if (job.getFuture().isDone()) {
-							listModel.removeElement(job);
+					for (SubmittedJob job : queue) {
+						if (job.isDone()) {
+							queue.update(job);
 						}
 					}
 				}
 			} catch (InterruptedException e) {
-				// Don't care
+				log.fatal("JobMonitor crashed");
+				e.printStackTrace();
+				throw new RuntimeException("JobMonitor crashed");
 			}
 		}
 	}
+
 }

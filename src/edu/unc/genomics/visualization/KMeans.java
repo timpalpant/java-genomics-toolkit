@@ -33,7 +33,7 @@ public class KMeans extends CommandLineTool {
 	@Parameter(names = {"-i", "--input"}, description = "Input file (matrix2png format)", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-k", "--clusters"}, description = "Number of clusters", required = true, validateWith = PositiveIntegerValidator.class)
-	public int k;
+	public int k = 10;
 	@Parameter(names = {"-1", "--min"}, description = "Minimum column to use for clustering", validateWith = PositiveIntegerValidator.class)
 	public int minCol = 1;
 	@Parameter(names = {"-2", "--max"}, description = "Maximum column to use for clustering", validateWith = PositiveIntegerValidator.class)

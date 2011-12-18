@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 
+import org.apache.log4j.Logger;
+
 /**
  * The main application for running the genomics toolkit gui
  * Could do resource checking, etc. prior to startup
@@ -11,7 +13,9 @@ import javax.swing.JFrame;
  * @author timpalpant
  * 
  */
-public class GenomicsToolkit {
+public class ToolRunner {
+	
+	private static final Logger log = Logger.getLogger(ToolRunner.class);
 
 	private JFrame frmToolRunner = new ToolRunnerFrame();
 
@@ -23,7 +27,7 @@ public class GenomicsToolkit {
 			@Override
 			public void run() {
 				try {
-					GenomicsToolkit window = new GenomicsToolkit();
+					ToolRunner window = new ToolRunner();
 					window.frmToolRunner.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();

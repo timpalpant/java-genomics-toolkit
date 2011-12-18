@@ -1,6 +1,7 @@
 package edu.unc.genomics;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -37,7 +38,7 @@ public class ToolsTreeModel extends DefaultTreeModel {
 	}
 	
 	public static ToolsTreeModel loadDefaultConfig() throws ClassNotFoundException, ParserConfigurationException, SAXException, IOException {
-		return loadConfig(DEFAULT_CONFIGURATION_FILE);
+		return loadConfig(ResourceManager.getResourceDirectory().resolve(DEFAULT_CONFIGURATION_FILE));
 	}
 	
 	public static ToolsTreeModel loadConfig(Path p) throws ParserConfigurationException, SAXException, IOException, ClassNotFoundException {

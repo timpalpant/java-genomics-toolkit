@@ -20,7 +20,7 @@ public class GaussianSmooth extends WigMathTool {
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
 	public WigFile inputFile;
 	@Parameter(names = {"-s", "--stdev"}, description = "Standard deviation of Gaussian (bp)", validateWith = PositiveIntegerValidator.class)
-	public int stdev = 2;
+	public int stdev = 20;
 	
 	float[] filter;
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DataFormatException;
@@ -33,7 +34,7 @@ public class AssemblyManager {
 	public static List<Assembly> getAvailableAssemblies() {
 		List<Assembly> assemblies = new ArrayList<>();
 		
-		try (DirectoryStream<Path> stream = Files.newDirectoryStream(AssemblyConverter.ASSEMBLIES_DIR, "*.{len}")) {
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(ResourceManager.getAssembliesDirectory(), "*.{len}")) {
       for (Path entry : stream) {
       	log.debug("Loading assembly: " + entry);
 				try {
@@ -62,7 +63,7 @@ public class AssemblyManager {
 		// TODO: Warn if this assembly is already loaded
 		
 		// Copy the assembly file into the built-in assemblies directory
-		Files.copy(assemblyFile, AssemblyConverter.ASSEMBLIES_DIR.resolve(assemblyFile.getFileName()));
+		Files.copy(assemblyFile, ResourceManager.getAssembliesDirectory().resolve(assemblyFile.getFileName()));
 		return a;
 	}
 

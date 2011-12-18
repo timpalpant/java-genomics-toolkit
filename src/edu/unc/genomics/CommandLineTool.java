@@ -45,9 +45,7 @@ public abstract class CommandLineTool {
 		} catch (ParameterException e) {
 			System.err.println(e.getMessage());
 			jc.usage();
-			if (exitOnMissingRequired) {
-				System.exit(1);
-			}
+			throw e;
 		}
 	}
 	

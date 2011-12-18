@@ -2,6 +2,7 @@ package edu.unc.genomics;
 
 import java.awt.Dimension;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTree;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -28,6 +29,7 @@ public class ToolsTree extends JTree {
 	private void initialize() {
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		
+		setBorder(BorderFactory.createEmptyBorder());
 		setRootVisible(false);
 		setShowsRootHandles(true);
 		setPreferredSize(new Dimension(200, 0));

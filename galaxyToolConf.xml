@@ -1,0 +1,49 @@
+<!-- Add to galaxy/tool_conf.xml within the <toolbox></toolbox> section -->
+  <label name="Java Genomics Toolkit" />
+  <section name="Converters" id="java-genomics-toolkit-converters">
+    <tool file="java-genomics-toolkit/galaxy-conf/romanNumeralize.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/bedToWig.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/bedGraphToWig.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/affyToBedGraph.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/gffToWig.xml" />
+    <tool file="java-genomics-toolkit/other-tools/bar2wig.xml" />
+  </section>
+  <section name="Nucleosomes" id="java-genomics-toolkit-nucleosomes">
+    <tool file="java-genomics-toolkit/galaxy-conf/callNukes.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/mapDyads.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/conditionalPositioning.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/powerSpectrum.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/findNuke.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/distogram.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/phasogram.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/sequencePreferences.xml" />
+  </section>
+  <section name="NGS" id="java-genomics-toolkit-ngs">
+    <tool file="java-genomics-toolkit/other-tools/tagdust.xml" />
+    <!-- Duplicated Galaxy functionality, but much more efficient -->
+    <tool file="java-genomics-toolkit/galaxy-conf/readSelector.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/windowStats.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/regionIntensity.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/baseAlignCounts.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/mapStarts.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/rollingReadLength.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/extractRegions.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/dumpBigWig.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/findAbsoluteMaxima.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/spectralDensity.xml" />
+  </section>
+  <section name="WigMath" id="java-genomics-toolkit-wigmath">
+    <tool file="java-genomics-toolkit/galaxy-conf/averager.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/sum.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/difference.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/divide.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/percenter.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/zscorer.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/smoother.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/logger.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/wigstats.xml" />
+  </section>
+  <section name="Visualization" id="java-genomics-toolkit-visualization">
+    <tool file="java-genomics-toolkit/galaxy-conf/patternFinder.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/matrixAligner.xml" />
+  </section>

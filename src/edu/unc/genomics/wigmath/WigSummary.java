@@ -23,11 +23,9 @@ public class WigSummary extends CommandLineTool {
 	public WigFile inputFile;
 	@Parameter(names = {"-o", "--output"}, description = "Output file")
 	public Path outputFile;
-	
-	private WigFile wig;
-	
+		
 	public void run() throws IOException {		
-		String summary = wig.toString();
+		String summary = inputFile.toString();
 		
 		if (outputFile != null) {
 			log.debug("Writing to output file");

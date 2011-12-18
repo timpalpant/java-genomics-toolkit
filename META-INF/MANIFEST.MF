@@ -1,6 +1,5 @@
 Manifest-Version: 1.0
 Main-Class: edu.unc.genomics.GenomicsToolkit
-Class-Path: ../lib/log4j-1.2.15.jar ../lib/forms-1.3.0.jar ../lib/java-genomics-io.jar
 Bundle-ManifestVersion: 2
 Bundle-Name: java-genomics-toolkit
 Bundle-SymbolicName: java-genomics-toolkit

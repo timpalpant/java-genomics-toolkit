@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <project name="java-genomics-toolkit" default="jar" basedir=".">
   <description>
-    build the scripts
+    build the toolkit
   </description>
   
   <!-- set global properties for this build -->
@@ -9,6 +9,7 @@
   <property name="buildnumber" value="1"/>
   <property name="copyright" value="Copyright &#xa9; 2011 Timothy Palpant"/>
   
+  <!-- directory variables -->
   <property name="src" location="src"/>
   <property name="test" location="test"/>
   <property name="gui" location="gui"/>
@@ -16,34 +17,31 @@
   <property name="dist" location="dist"/>
   <property name="lib" location="lib"/>
 
+  <!-- compile all Java code -->
   <target name="compile" description="compile the scripts">
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}"/>
+    
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}" source="1.7" target="1.7">
-      <classpath location="lib/java-genomics-io.jar"/>
-      <classpath location="lib/log4j-1.2.15.jar"/>
-      <classpath location="lib/jcommander-1.20.jar"/>
-      <classpath location="lib/BigWig.jar"/>
-      <classpath location="lib/commons-lang3-3.1.jar"/>
-      <classpath location="lib/commons-math-2.2.jar"/>
-      <classpath location="lib/jtransforms-2.4.jar"/>
-      <classpath location="lib/sam-1.56.jar"/>
+	  <classpath>
+	    <path id="lib.path.ref">
+	      <fileset dir="lib" includes="*.jar"/>
+	    </path>
+	  </classpath>
     </javac>
+    
+    <!-- Compile the java code from ${gui} into ${build} -->
     <javac srcdir="${gui}" destdir="${build}" source="1.7" target="1.7">
-		<classpath location="lib/java-genomics-io.jar"/>
-		<classpath location="lib/log4j-1.2.15.jar"/>
-		<classpath location="lib/jcommander-1.20.jar"/>
-		<classpath location="lib/BigWig.jar"/>
-		<classpath location="lib/commons-lang3-3.1.jar"/>
-		<classpath location="lib/commons-math-2.2.jar"/>
-		<classpath location="lib/jtransforms-2.4.jar"/>
-		<classpath location="lib/sam-1.56.jar"/>
-		<classpath location="lib/forms-1.3.0.jar"/>
-        <classpath location="lib/macify-1.4.jar"/>
+      <classpath>
+  	    <path id="lib.path.ref">
+  	      <fileset dir="lib" includes="*.jar"/>
+  	    </path>
+  	  </classpath>
 	</javac>
   </target>
 
+  <!-- package all Java code into a JAR file -->
   <target name="jar" depends="compile" description="generate the jarfile">
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}"/>
@@ -51,40 +49,60 @@
     <!-- Put everything in ${build} into the jar file -->
     <jar jarfile="${dist}/${ant.project.name}.jar" manifest="META-INF/MANIFEST.MF">
       <fileset dir="${build}" />
-      <fileset dir="." includes="log4j.properties"/>
     </jar>
   </target>
 
   <!-- Package the jar file into a Mac OS X application with jarbundler -->
-  <target name="package-osx" depends="jar" description="Build the application">
+  <target name="package-osx" depends="jar" description="Build the application for OS X">
     <taskdef name="jarbundler"
-             classpath="lib/jarbundler-2.2.0.jar" 
+             classpath="${lib}/jarbundler-2.2.0.jar" 
              classname="net.sourceforge.jarbundler.JarBundler"/>
 
     <jarbundler dir="${dist}" verbose="false" showPlist="false"
                 name="Genomics Toolkit"
-                mainclass="edu.unc.genomics.GenomicsToolkit"
-                jar="${dist}/${ant.project.name}.jar"
-      			jvmversion="1.4+"
+                mainclass="edu.unc.genomics.ToolRunner"
+      			jvmversion="1.7+"
+      			stubfile="stubFile.sh"
                 version="${version}"
                 infostring="${ant.project.name}, ${copyright}"
                 build="${buildnumber}"
                 bundleid="edu.unc.genomics.GenomicsToolkit">
+      
+        <jarfilelist dir="${dist}" files="${ant.project.name}.jar"/>
+        <jarfileset dir="${lib}">
+          <include name="*.jar" />
+          <exclude name="launch4j.jar" />
+          <exclude name="xstream.jar" />
+          <exclude name="jarbundler-2.2.0.jar" />
+        </jarfileset>
 
 	    <!-- Adjust the look, feel and behavior -->
 	    <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
 	    <javaproperty name="apple.awt.brushMetal" value="true"/>
 	    <javaproperty name="apple.awt.showGrowBox" value="false"/>
+      	<javaproperty name="apple.awt.textantialiasing" value="true"/>
+        <javaproperty name="apple.awt.antialiasing" value="true"/>
 	
 	    <!-- Associate document types with this application -->
 	    <documenttype name="Assembly files"
 	      			  extensions="len" 
-	                  role="Viewer"/>
+	                  role="Viewer" />
 	
 	    <!-- Include resource files -->                
 	    <resourcefilelist dir="." files="README.rdoc"/>
-	    <resourcefilelist dir="resources/assemblies" files="*.len"/>
+        <resourcefilelist dir="." files="toolConf.xml"/>
+	    <resourcefileset dir="." includes="resources/assemblies/*.len"/>
+        <javafilelist dir="." files="log4j.properties"/>
     </jarbundler>
+  </target>
+  
+  <!-- Package the jar file into a Windows application with launch4j -->
+  <target name="package-win" depends="jar" description="Build the application for Windows">
+    <taskdef name="launch4j"
+        classname="net.sf.launch4j.ant.Launch4jTask"
+        classpath="${lib}/launch4j.jar:${lib}/xstream.jar" />
+    
+    <launch4j configFile="launch4j.xml" />
   </target>
 
   <target name="clean" description="clean up" >
@@ -92,8 +110,3 @@
     <delete dir="${dist}"/>
   </target>
 </project>
-
-<!--
-cc -c -I/System/Library/Frameworks/JavaVM.framework/Headers src/obj-c/HelpBookJNI.m
-cc -dynamiclib -o libHelpBookJNI.jnilib HelpBookJNI.o -framework JavaVM -framework Cocoa
--->
