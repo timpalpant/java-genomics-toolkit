@@ -1,0 +1,20 @@
+<tool id="WigMultiply" name="Multiply" version="1.0.0">
+  <description>multiple (Big)Wig files</description>
+  <command interpreter="sh">
+    galaxyToolRunner.sh wigmath.Multiply -o $output
+      #for $input in $inputs
+        ${input.file}
+      #end for
+  </command>
+  <inputs>
+      <repeat name="inputs" title="(Big)Wig file">
+        <param name="file" type="data" format="bigwig,wig" />
+      </repeat>
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" />
+  </outputs>
+  
+<help>
+</help>
+</tool>

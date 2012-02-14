@@ -1,0 +1,16 @@
+<tool id="IntervalAverager" name="Average intervals" version="1.0.0">
+  <description>that have been aligned</description>
+  <command interpreter="sh">
+    galaxyToolRunner.sh visualization.IntervalAverager -i $input -l $loci -o $output
+  </command>
+  <inputs>
+      <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
+      <param format="bed" name="loci" type="data" label="List of intervals (with alignment points)" />
+  </inputs>
+  <outputs>
+      <data format="tabular" name="output" />
+  </outputs>
+  
+<help>
+</help>
+</tool>

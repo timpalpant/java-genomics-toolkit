@@ -1,0 +1,48 @@
+<tool id="WigZScore" name="Z-Score" version="1.0.0">
+  <description>a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.ZScore -i $input -o $output</command>
+  <inputs>
+      <param format="bigwig,wig" name="input" type="data" label="Z-score the data in" />
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+  <tests>
+    <!--<test>
+	    <param name="input" value="wigmath.input1"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="zscorer.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input1.bw"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="zscorer.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input2"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="zscorer.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input2.bw"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="zscorer.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input3"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="zscorer.output3"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input3.bw"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="zscorer.output3"/>
+	  </test>-->
+  </tests>
+  
+<help>
+.. class:: warningmark
+
+This tool was contributed by Timothy Palpant.
+</help>
+</tool>

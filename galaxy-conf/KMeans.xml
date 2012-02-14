@@ -1,0 +1,18 @@
+<tool id="KMeans" name="KMeans cluster" version="1.0.0">
+  <description>an aligned matrix</description>
+  <command interpreter="sh">galaxyToolRunner.sh visualization.KMeans -i $input -k $K -1 $min -2 $max -o $output</command>
+  <inputs>
+    <param format="tabular" name="input" type="data" label="Aligned matrix" />
+    <param name="K" type="integer" value="10" label="Number of clusters" />
+    <param name="min" type="integer" value="1" label="Minimum column to use for clustering" />
+    <param name="min" type="integer" value="-1" label="Maximum column to use for clustering (-1 to end)" />
+  </inputs>
+  <outputs>
+    <data format="tabular" name="output" metadata="input" />
+  </outputs>
+  <tests>
+  </tests>
+  
+  <help>
+  </help>
+</tool>

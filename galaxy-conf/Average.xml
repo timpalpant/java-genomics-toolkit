@@ -1,0 +1,26 @@
+<tool id="WigAvg" name="Average" version="1.0.0">
+  <description>multiple (Big)Wig files</description>
+  <command interpreter="sh">
+    galaxyToolRunner.sh wigmath.Average -o $output $file1 $file2
+      #for $input in $inputs
+        ${input.file}
+      #end for
+  </command>
+  <inputs>
+      <param name="(Big)Wig file 1" type="data" format="bigwig,wig" />
+      <param name="(Big)Wig file 2" type="data" format="bigwig,wig" />
+      <repeat name="inputs" title="Additional (Big)Wig file">
+        <param name="file" type="data" format="bigwig,wig" />
+      </repeat>
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" />
+  </outputs>
+  <tests>
+	  <!-- TODO -->
+  </tests>
+
+
+<help>
+</help>
+</tool>

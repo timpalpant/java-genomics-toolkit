@@ -1,0 +1,13 @@
+<tool id="WigStats" name="Compute basic statistics" version="1.0.0">
+  <description>on a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.WigSummary -i $input -o $output</command>
+  <inputs>
+      <param format="bigwig,wig" name="input" type="data" label="(Big)Wig file" />
+  </inputs>
+  <outputs>
+      <data format="text" name="output" />
+  </outputs>
+  
+<help>
+</help>
+</tool>

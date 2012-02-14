@@ -1,0 +1,52 @@
+<tool id="WigScale" name="Scale" version="1.0.0">
+  <description>a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.Scale -i $input -m $M -o $output</command>
+  <inputs>
+    <param format="bigwig,wig" name="input" type="data" label="Scale the data in" />
+    <param name="M" type="float" value="0" label="Multiply by (leave 0 to scale by 1/mean)" />
+  </inputs>
+  <outputs>
+    <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+  <tests>
+    <!--<test>
+	    <param name="input" value="wigmath.input1"/>
+	    <param name="T" value="0"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="percenter.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input1.bw"/>
+	    <param name="T" value="0"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="percenter.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input2"/>
+	    <param name="T" value="2"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="percenter.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input2.bw"/>
+	    <param name="T" value="2"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="percenter.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input3"/>
+	    <param name="T" value="1000000"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="percenter.output3"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input3.bw"/>
+	    <param name="T" value="1000000"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="percenter.output3"/>
+	  </test>-->
+  </tests>
+  
+  <help>
+  </help>
+</tool>

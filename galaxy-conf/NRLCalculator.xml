@@ -1,0 +1,17 @@
+<tool id="NRLCalculator" name="Compute the NRL" version="1.0.0">
+  <description>from nucleosome calls</description>
+  <command interpreter="sh">galaxyToolRunner.sh nucleosome.NRLCalculator -i $input -l $windows -o $output</command>
+  <inputs>
+      <param format="tabular" name="input" type="data" label="Nucleosome calls" />
+      <param format="bed,bedgraph,gff" name="windows" type="data" label="List of intervals/genes" />
+  </inputs>
+  <outputs>
+      <data format="tabular" name="output" />
+  </outputs>
+  
+<help>
+.. class:: warningmark
+
+This tool requires a set of nucleosome calls as input.
+</help>
+</tool>

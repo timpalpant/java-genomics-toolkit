@@ -11,4 +11,5 @@ then
   find src/edu/unc/genomics/**/*.java -exec basename -s .java {} \;
 fi
 
-java -Dlog4j.configuration=log4j.properties -cp .:../build:../lib/* edu.unc.genomics."$@"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+java -Dlog4j.configuration=log4j.properties -cp $DIR/..:$DIR/../build:$DIR/../dist/*:$DIR/../lib/* edu.unc.genomics."$@"

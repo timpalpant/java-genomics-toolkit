@@ -1,0 +1,67 @@
+<tool id="MatrixAligner" name="Align values in a matrix" version="1.0.0">
+  <description>for a heatmap</description>
+  <command interpreter="sh">
+    galaxyToolRunner.sh visualization.MatrixAligner -i $input -l $loci -m $M -o $output
+  </command>
+  <inputs>
+      <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
+      <param format="bed" name="loci" type="data" label="List of intervals (with alignment points)" />
+      <param type="integer" name="M" value="4000" label="Maximum row length" />
+      <!--  TODO: Bring back optional markers
+      <conditional name="ladder">
+        <param name="draw" type="boolean" checked="false" falsevalue="false" truevalue="true" label="Include marker ladder across X-axis"/>
+        <when value="true">
+          <param name="spacing" type="integer" value="200" label="Draw marker every N base pairs" />
+        </when>
+        <when value="false">
+        </when>
+      </conditional> -->
+  </inputs>
+  <outputs>
+      <data format="tabular" name="output" />
+  </outputs>
+  <!-- TODO:<tests>
+    <test>
+      <param name="input" value="test.wig"/>
+	    <param name="loci" value="test.bed"/>
+	    <param name="M" value="4000"/>
+	    <output name="output" file="matrixAligner.output"/>
+    </test>
+    <test>
+      <param name="input" value="test.bw"/>
+	    <param name="loci" value="test.bed"/>
+	    <param name="M" value="4000"/>
+	    <output name="output" file="matrixAligner.output"/>
+    </test>
+    <test>
+      <param name="input" value="test.wig"/>
+	    <param name="loci" value="test2.bed"/>
+	    <param name="M" value="4000"/>
+	    <output name="output" file="matrixAligner.output2"/>
+    </test>
+    <test>
+      <param name="input" value="test.bw"/>
+	    <param name="loci" value="test2.bed"/>
+	    <param name="M" value="4000"/>
+	    <output name="output" file="matrixAligner.output2"/>
+    </test>
+    <test>
+      <param name="input" value="test.wig"/>
+	    <param name="loci" value="test3.bed"/>
+	    <param name="M" value="4000"/>
+	    <output name="output" file="matrixAligner.output3"/>
+    </test>
+    <test>
+      <param name="input" value="test.bw"/>
+	    <param name="loci" value="test3.bed"/>
+	    <param name="M" value="4000"/>
+	    <output name="output" file="matrixAligner.output3"/>
+    </test>
+  </tests>-->
+  
+<help>
+.. class:: warningmark
+
+Large heatmap matrices may require a long time to generate. To reduce the size of an MxN matrix with large M, rows (N) can be truncated using the maximum row length parameter. Rows are truncated from the alignment point (symmetrically) if possible, or as nearly symmetrically as possible.
+</help>
+</tool>

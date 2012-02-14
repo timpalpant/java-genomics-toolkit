@@ -1,0 +1,17 @@
+<tool id="Phasogram" name="Make phasogram" version="1.0.0">
+  <description>of dyads</description>
+  <command interpreter="ruby">phasogram.rb -i $input -m $max -o $output</command>
+  <inputs>
+    <param name="input" type="data" format="bigwig,wig" label="Dyads BigWig file" />
+    <param name="max" type="integer" value="1000" label="Maximum phase shift (bp)" />
+  </inputs>
+  <outputs>
+    <data name="output" format="tabular" />
+  </outputs>
+  
+  <help>
+    .. class:: warningmark
+    
+    This tool requires mapped dyads in BigWig format.
+  </help>
+</tool>

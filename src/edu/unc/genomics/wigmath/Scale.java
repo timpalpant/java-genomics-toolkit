@@ -25,7 +25,7 @@ public class Scale extends WigMathTool {
 	public void setup() {
 		inputs.add(inputFile);
 		
-		if (multiplier == null) {
+		if (multiplier == null || multiplier == 0) {
 			multiplier = inputFile.numBases() / inputFile.total();
 		}
 	}

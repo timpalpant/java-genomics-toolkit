@@ -1,0 +1,22 @@
+<tool id="StripMatrix" name="Strip headers" version="1.0.0">
+  <description>from an aligned matrix</description>
+  <command interpreter="sh">galaxyToolRunner.sh visualization.StripMatrix -i $input -o $output</command>
+  <inputs>
+    <param format="tabular" name="input" type="data" label="Aligned matrix" />
+  </inputs>
+  <outputs>
+    <data format="tabular" name="output" metadata="input" />
+  </outputs>
+  <tests>
+    <test>
+      <param name="input" value="stripMatrix.input"/>
+	    <output name="output" file="stripMatrix.output"/>
+    </test>
+  </tests>
+  
+  <help>
+    .. class:: warningmark
+    
+    This tool is intended to strip the column/row headers off of an aligned matrix (in matrix2png format) for easy import into Matlab if only data values are required.
+  </help>
+</tool>

@@ -1,0 +1,52 @@
+<tool id="Logger" name="Log transform" version="1.0.0">
+  <description>a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.LogTransform -i $input -b $base -o $output</command>
+  <inputs>
+    <param format="bigwig,wig" name="input" type="data" label="(Big)Wig file" />
+    <param name="base" type="integer" value="2" label="Logarithm base" />
+  </inputs>
+  <outputs>
+    <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+  <tests>
+    <!--<test>
+	    <param name="input" value="wigmath.input1"/>
+	    <param name="base" value="2"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="logger.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input1.bw"/>
+	    <param name="base" value="2"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="logger.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input2"/>
+	    <param name="base" value="2"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="logger.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input2.bw"/>
+	    <param name="base" value="2"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="logger.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input3"/>
+	    <param name="base" value="10"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="logger.output3"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath.input3.bw"/>
+	    <param name="base" value="10"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <output name="output" file="logger.output3"/>
+	  </test>-->
+  </tests>
+  
+  <help>
+  </help>
+</tool>

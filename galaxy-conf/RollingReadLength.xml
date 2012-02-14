@@ -1,0 +1,20 @@
+<tool id="RollingReadLength" name="Compute read length" version="1.0.0">
+  <description>from paired-end sequencing reads</description>
+  <command interpreter="sh">galaxyToolRunner.sh ngs.RollingReadLength -i $input -a ${chromInfo} -o $output</command>
+  <inputs>
+      <param format="bam" name="input" type="data" label="Mapped reads" />
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" />
+  </outputs>
+  
+<help>
+.. class:: warningmark
+
+This tool requires paired-end BAM formatted data. Using single-end data will result in a constant read length.
+
+.. class:: warningmark
+
+This tool was contributed by Timothy Palpant.
+</help>
+</tool>

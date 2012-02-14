@@ -1,0 +1,24 @@
+<tool id="FindWigMaxima" name="Find absolute maxima" version="1.0.0">
+  <description>in windows</description>
+  <command interpreter="sh">
+    galaxyToolRunner.sh ngs.FindAbsoluteMaxima -l $window -o $output
+  	  #for $input in $inputs
+        ${input.file}
+      #end for
+  </command>
+  <inputs>
+    <repeat name="inputs" title="(Big)Wig file">
+      <param name="file" type="data" format="bigwig,wig" />
+    </repeat>
+    <param name="window" type="data" format="bed,bedgraph,gff" label="Windows to find maxima in" />
+  </inputs>
+  <outputs>
+    <data name="output" format="tabular" />
+  </outputs>
+  
+  <help>
+    .. class:: warningmark
+    
+    This tool requires input data in Wig format. Regions should be specified as Bed, BedGraph, or GFF format
+  </help>
+</tool>

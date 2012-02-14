@@ -15,7 +15,6 @@ import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.Assembly;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
-import edu.unc.genomics.PositiveIntegerValidator;
 import edu.unc.genomics.io.IntervalFile;
 
 public class MapDyads extends CommandLineTool {
@@ -24,7 +23,7 @@ public class MapDyads extends CommandLineTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file (reads)", required = true)
 	public IntervalFile<? extends Interval> inputFile;
-	@Parameter(names = {"-s", "--size"}, description = "Mononucleosome length (default: read length)", validateWith = PositiveIntegerValidator.class)
+	@Parameter(names = {"-s", "--size"}, description = "Mononucleosome length (default: read length)")
 	public Integer nucleosomeSize;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public Assembly assembly;
@@ -59,7 +58,7 @@ public class MapDyads extends CommandLineTool {
 					Iterator<? extends Interval> it = inputFile.query(chr, start, stop);
 					while (it.hasNext()) {
 						Interval entry = it.next();
-						if (nucleosomeSize == null) {
+						if (nucleosomeSize == null || nucleosomeSize == -1) {
 							count[entry.center()-start]++;
 						} else {
 							count[entry.getStart()+nucleosomeSize-start]++;

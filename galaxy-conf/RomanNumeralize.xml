@@ -1,0 +1,22 @@
+<tool id="RomanNumeralize" name="Convert Arabic to Roman numerals" version="1.0.0">
+  <description>on any file</description>
+  <command interpreter="sh">galaxyToolRunner.sh converters.RomanNumeralize -i $input -o $output</command>
+  <inputs>
+      <param name="input" type="data" label="Convert Arabic integer chromosome coordinates in" />
+  </inputs>
+  <outputs>
+      <data name="output" format="input" />
+  </outputs>
+  <tests>
+    <test>
+      <param name="input" value="romanNumeralize.input"/>
+      <output name="output" file="romanNumeralize.output"/>
+    </test>
+  </tests>
+  
+<help>
+.. class:: warningmark
+
+This tool will work for any genomic data with chromosomal coordinates of the form "chr5" by replacing them with "chrV"
+</help>
+</tool>

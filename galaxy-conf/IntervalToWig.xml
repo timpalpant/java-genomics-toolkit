@@ -1,0 +1,17 @@
+<tool id="BedToWig" name="Interval to Wig" version="1.0.0">
+  <description>converter</description>
+  <command interpreter="sh">galaxyToolRunner.sh converters.IntervalToWig -i $input -a ${chromInfo} -o $output</command>
+  <inputs>
+      <param name="input" type="data" format="bed,bedGraph,gff" label="Input Bed/BedGraph/GFF file" />
+  </inputs>
+  <outputs>
+      <data name="output" format="wig" metadata_source="input" />
+  </outputs>
+	
+<help>
+
+.. class:: warningmark
+	
+This tool requires Bed, BedGraph, or GFF formatted data. If you have tabular data that was not correctly autodetected, change the metadata by clicking on the pencil icon for the dataset.
+</help>
+</tool>

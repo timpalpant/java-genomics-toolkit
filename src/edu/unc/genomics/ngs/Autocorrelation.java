@@ -16,7 +16,6 @@ import com.beust.jcommander.Parameter;
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
-import edu.unc.genomics.PositiveIntegerValidator;
 import edu.unc.genomics.io.IntervalFile;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
@@ -31,7 +30,7 @@ public class Autocorrelation extends CommandLineTool {
 	public IntervalFile<? extends Interval> loci;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
-	@Parameter(names = {"-m", "--max"}, description = "Autocorrelation limit (bp)", validateWith = PositiveIntegerValidator.class)
+	@Parameter(names = {"-m", "--max"}, description = "Autocorrelation limit (bp)")
 	public int limit = 200;
 	
 	private void abs2(float[] data) {

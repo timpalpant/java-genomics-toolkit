@@ -1,0 +1,58 @@
+<tool id="GaussianSmoother" name="Gaussian smooth" version="1.0.0">
+  <description>a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.MovingAverageSmooth -i $input -w $W -o $output</command>
+  <inputs>
+      <param name="input" type="data" format="bigwig,wig" label="Smooth the data in" />
+      <param name="W" type="integer" value="20" optional="true" label="Width of the moving average in base pairs" />
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+  <tests>
+    <!--<test>
+	    <param name="input" value="test.wig"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <param name="S" value="20"/>
+	    <param name="W" value="3"/>
+	    <output name="output" file="smoother.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="test.bw"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <param name="S" value="20"/>
+	    <param name="W" value="3"/>
+	    <output name="output" file="smoother.output1"/>
+	  </test>
+	  <test>
+	    <param name="input" value="test.wig"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <param name="S" value="10"/>
+	    <param name="W" value="2"/>
+	    <output name="output" file="smoother.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="test.bw"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <param name="S" value="10"/>
+	    <param name="W" value="2"/>
+	    <output name="output" file="smoother.output2"/>
+	  </test>
+	  <test>
+	    <param name="input" value="test.wig"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <param name="S" value="50"/>
+	    <param name="W" value="1"/>
+	    <output name="output" file="smoother.output3"/>
+	  </test>
+	  <test>
+	    <param name="input" value="test.bw"/>
+	    <param name="dbkey" value="sacCer2"/>
+	    <param name="S" value="5"/>
+	    <param name="W" value="1"/>
+	    <output name="output" file="smoother.output3"/>
+	  </test>-->
+  </tests>
+  
+<help>
+</help>
+</tool>

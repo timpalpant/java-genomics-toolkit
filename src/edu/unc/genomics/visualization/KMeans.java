@@ -54,7 +54,7 @@ public class KMeans extends CommandLineTool {
 			int numColsInMatrix = StringUtils.countMatches(headerLine, "\t");
 			
 			// Validate the range info
-			if (maxCol != null) {
+			if (maxCol != null || maxCol == -1) {
 				if (maxCol > numColsInMatrix) {
 					throw new RuntimeException("Invalid range of data specified for clustering ("+maxCol+" > "+numColsInMatrix+")");
 				}

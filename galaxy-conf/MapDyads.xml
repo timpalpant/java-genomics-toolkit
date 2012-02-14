@@ -1,0 +1,37 @@
+<tool id="MapDyads" name="Map dyads" version="1.0.0">
+  <description>from sequencing reads</description>
+  <command interpreter="sh">
+    galaxyToolRunner.sh nucleosome.MapDyads -i $input -a ${chromInfo} -o $output
+    #if $type.read == 'single'
+      -s $type.size
+    #end if
+  </command>
+  <inputs>
+      <param name="input" type="data" format="bam" label="Sequencing reads" />
+      <conditional name="type">
+        <param name="read" type="select" label="Type of reads">
+          <option value="paired" selected="true">Paired-End</option>
+          <option value="single">Single-End</option>
+        </param>
+        <when value="single">
+          <param name="size" type="integer" value="147" label="Estimated mononucleosome length (used to offset +/- strands)" />
+        </when>
+        <when value="paired">
+          <!-- No values here -->
+        </when>
+      </conditional>
+  </inputs>
+  <outputs>
+      <data name="output" format="wig" />
+  </outputs>
+  
+<help>
+.. class:: warningmark
+
+  This tool requires sequencing reads in BAM format. If your reads are in SAM format, use the SAM-to-BAM tool under NGS: SAMTools.
+
+.. class:: warningmark
+
+For paired-end MNase data, read centers are approximated by using the center of the read. For single-end data, the estimated mononucleosome fragment length must be specified, which will be used to offset reads from the + and - strands.
+</help>
+</tool>
