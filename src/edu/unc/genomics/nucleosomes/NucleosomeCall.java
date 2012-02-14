@@ -52,6 +52,11 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 		
 		return call;
 	}
+	
+	@Override
+	public String toString() {
+		return chr+"\t"+start+"\t"+stop+"\t"+length()+"\t"+lengthStdev+"\t"+dyad+"\t"+dyadStdev+"\t"+conditionalPosition+"\t"+dyadMean+"\t"+occupancy();
+	}
 
 	/**
 	 * @return the dyad
@@ -139,6 +144,10 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 	
 	public double occupancy() {
 		return value;
+	}
+	
+	public void setOccupancy(double value) {
+		this.value = value;
 	}
 	
 	@Override

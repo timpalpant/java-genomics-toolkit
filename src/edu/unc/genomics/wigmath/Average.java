@@ -11,6 +11,7 @@ import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
+import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
@@ -26,8 +27,7 @@ public class Average extends WigMathTool {
 	@Override
 	public void setup() {
 		if (inputFiles.size() < 2) {
-			log.info("No reason to average < 2 files. Exiting");
-			System.exit(1);
+			throw new CommandLineToolException("No reason to add < 2 files.");
 		}
 		
 		log.debug("Initializing input files");
@@ -37,7 +37,7 @@ public class Average extends WigMathTool {
 			} catch (IOException | WigFileException e) {
 				log.error("Error initializing input Wig file: " + inputFile);
 				e.printStackTrace();
-				System.exit(-1);
+				throw new CommandLineToolException(e.getMessage());
 			}
 		}
 		log.debug("Initialized " + inputs.size() + " input files");

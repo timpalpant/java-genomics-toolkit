@@ -13,6 +13,22 @@ import com.beust.jcommander.ParameterException;
 public abstract class CommandLineTool {
 	
 	/**
+	 * JCommander command-line argument parser
+	 */
+	private final JCommander jc = new JCommander(this);
+	
+	public CommandLineTool() {
+		// Add factories for parsing Paths, Assemblies, IntervalFiles, and WigFiles
+		jc.addConverterFactory(new PathFactory());
+		jc.addConverterFactory(new AssemblyFactory());
+		jc.addConverterFactory(new IntervalFileFactory());
+		jc.addConverterFactory(new WigFileFactory());
+		
+		// Set the program name to be the class name
+		jc.setProgramName(this.getClass().getSimpleName());
+	}
+	
+	/**
 	 * The default bite-size to use for applications that process files in chunks
 	 */
 	public static final int DEFAULT_CHUNK_SIZE = 500_000;
@@ -24,37 +40,28 @@ public abstract class CommandLineTool {
 	public abstract void run() throws IOException;
 	
 	/**
-	 * Initialize parameters
+	 * Parse command-line arguments and run the tool
+	 * Exit on parameter exceptions
 	 * @param args
 	 */
-	public void parseArguments(String[] args, boolean exitOnMissingRequired) {
-		JCommander jc = new JCommander(this);
-		
-		// Add factories for parsing Paths, Assemblies, IntervalFiles, and WigFiles
-		jc.addConverterFactory(new PathFactory());
-		jc.addConverterFactory(new AssemblyFactory());
-		jc.addConverterFactory(new IntervalFileFactory());
-		jc.addConverterFactory(new WigFileFactory());
-		
-		// Set the program name to be the class name
-		jc.setProgramName(this.getClass().getSimpleName());
-		
-		// Attempt to parse the arguments and exit with usage if there is an error
+	public void instanceMain(String[] args) throws CommandLineToolException {
 		try {
-			jc.parse(args);
+			toolRunnerMain(args);
 		} catch (ParameterException e) {
 			System.err.println(e.getMessage());
 			jc.usage();
-			throw e;
+			System.exit(-1);
 		}
 	}
 	
 	/**
 	 * Parse command-line arguments and run the tool
 	 * @param args
+	 * @throws ParameterException if there are invalid/missing parameters
+	 * @throws CommandLineToolException if an exception occurs while running the tool
 	 */
-	public void instanceMain(String[] args) {
-		parseArguments(args, true);
+	public void toolRunnerMain(String[] args) throws ParameterException, CommandLineToolException {
+		jc.parse(args);
 		
 		try {
 			run();

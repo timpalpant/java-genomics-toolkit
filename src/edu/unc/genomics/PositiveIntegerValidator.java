@@ -13,7 +13,7 @@ public class PositiveIntegerValidator implements IParameterValidator {
 	 * @see com.beust.jcommander.IParameterValidator#validate(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void validate(String name, String value) throws ParameterException {
+	public void validate(String name, String value) throws ParameterException {		
 		int n = Integer.parseInt(value);
 		if (n <= 0) {
 			throw new ParameterException("Parameter "+name+" must be > 0 (was "+value+")");

@@ -19,7 +19,7 @@ public class MovingAverageSmooth extends WigMathTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
 	public WigFile inputFile;
-	@Parameter(names = {"-w", "--width"}, description = "Width of kernel (bp)", validateWith = PositiveIntegerValidator.class)
+	@Parameter(names = {"-w", "--width"}, description = "Width of kernel (bp)")
 	public int width = 10;
 	
 	WigFile input;
@@ -51,7 +51,7 @@ public class MovingAverageSmooth extends WigMathTool {
 			}
 		}
 		
-		return data;
+		return smoothed;
 	}
 	
 	

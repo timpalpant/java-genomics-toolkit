@@ -107,7 +107,7 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		initializeToolsTree();
 		
 		mainPane.setLayout(new BorderLayout(0, 0));
-		mainPane.setBorder(BorderFactory.createEmptyBorder());
+		mainPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		mainPane.add(tabbedPane, BorderLayout.CENTER);
 		
 		JPanel runPanel = new JPanel();
@@ -170,7 +170,7 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 	private void initializeQueuePanel() {
 		JPanel queuePanel = new JPanel();
 		queuePanel.setLayout(new BoxLayout(queuePanel, BoxLayout.PAGE_AXIS));
-		queuePanel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.GRAY));
+		queuePanel.setBorder(BorderFactory.createEmptyBorder());
 		contentPane.add(queuePanel, BorderLayout.EAST);
 		
 		JLabel queueLabel = new JLabel("Job Queue");
@@ -228,7 +228,7 @@ public class ToolRunnerFrame extends JFrame implements ApplicationListener {
 		});
 		
 		JScrollPane toolsTreeScrollPane = new JScrollPane(toolsTree);
-		//toolsTreeScrollPane.setBorder(BorderFactory.createEmptyBorder());
+		toolsTreeScrollPane.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
 		splitPane.setLeftComponent(toolsTreeScrollPane);
 	}
 

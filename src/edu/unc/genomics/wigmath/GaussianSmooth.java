@@ -8,8 +8,6 @@ import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
-import edu.unc.genomics.PositiveIntegerValidator;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
@@ -19,7 +17,7 @@ public class GaussianSmooth extends WigMathTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
 	public WigFile inputFile;
-	@Parameter(names = {"-s", "--stdev"}, description = "Standard deviation of Gaussian (bp)", validateWith = PositiveIntegerValidator.class)
+	@Parameter(names = {"-s", "--stdev"}, description = "Standard deviation of Gaussian (bp)")
 	public int stdev = 20;
 	
 	float[] filter;
@@ -27,34 +25,40 @@ public class GaussianSmooth extends WigMathTool {
 	@Override
 	public void setup() {
 		inputs.add(inputFile);
-	}
-	
-	private void initializeFilter(int length) {
-		filter = new float[length];
+		
+		// Use a window size equal to +/- 3 SD's
+		filter = new float[6*stdev+1];
+		float sum = 0;
+		for (int i = 0; i < filter.length; i++) {
+			float x = i - 3*stdev;
+			float value = (float) Math.exp(-(x*x) / (2*stdev*stdev));
+			filter[i] = value;
+			sum += value;
+		}
+		for (int i = 0; i < filter.length; i++) {
+			filter[i] /= sum;
+		}
 	}
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
 		log.debug("Smoothing chunk "+chr+":"+start+"-"+stop);
 		
-		// Recompute the filter if the window size has changed
-		int length = stop - start + 1;
-		if (filter == null || filter.length != length) {
-			initializeFilter(length);
+		// Pad the query for smoothing
+		int paddedStart = Math.max(start-3*stdev, inputFile.getChrStart(chr));
+		int paddedStop = Math.min(stop+3*stdev, inputFile.getChrStop(chr));
+		Iterator<WigItem> result = inputFile.query(chr, paddedStart, paddedStop);
+		float[] data = WigFile.flattenData(result, start-3*stdev, stop+3*stdev);
+		
+		// Convolve the data with the filter
+		float[] smoothed = new float[stop-start+1];
+		for (int i = 0; i < smoothed.length; i++) {
+			for (int j = 0; j < filter.length; j++) {
+				smoothed[i] += data[i+j] * filter[j];
+			}
 		}
 		
-		Iterator<WigItem> result = inputFile.query(chr, start, stop);
-		float[] data = WigFile.flattenData(result, start, stop);
-		
-		// Convolution is multiplication in frequency space
-		FloatFFT_1D fft = new FloatFFT_1D(data.length);
-		fft.realForward(data);
-		for (int i = 0; i < data.length; i++) {
-			data[i] = filter[i] * data[i];
-		}
-		fft.realInverse(data, false);
-		
-		return data;
+		return smoothed;
 	}
 	
 	

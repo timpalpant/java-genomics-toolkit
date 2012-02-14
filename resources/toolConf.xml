@@ -10,20 +10,17 @@
 		<tool name="Autocorrelation" class="edu.unc.genomics.ngs.Autocorrelation" />
 		<tool name="BaseAlignCounts" class="edu.unc.genomics.ngs.BaseAlignCounts" />
 		<tool name="FindAbsoluteMaxima" class="edu.unc.genomics.ngs.FindAbsoluteMaxima" />
-		<tool name="InputNormalize" class="edu.unc.genomics.ngs.InputNormalize" />
+		<tool name="IntervalLengthDistribution" class="edu.unc.genomics.ngs.IntervalLengthDistribution" />
 		<tool name="IntervalStats" class="edu.unc.genomics.ngs.IntervalStats" />
-		<tool name="MapStarts" class="edu.unc.genomics.ngs.MapStarts" />
 		<tool name="PowerSpectrum" class="edu.unc.genomics.ngs.PowerSpectrum" />
 		<tool name="RollingReadLength" class="edu.unc.genomics.ngs.RollingReadLength" />
 	</section>
 	
 	<section name="Nucleosomes">
-		<tool name="AutoCaller" class="edu.unc.genomics.nucleosomes.AutoCaller" />
 		<tool name="FindBoundaryNucleosomes" class="edu.unc.genomics.nucleosomes.FindBoundaryNucleosomes" />
 		<tool name="GreedyCaller" class="edu.unc.genomics.nucleosomes.GreedyCaller" />
 		<tool name="MapDyads" class="edu.unc.genomics.nucleosomes.MapDyads" />
 		<tool name="NRLCalculator" class="edu.unc.genomics.nucleosomes.NRLCalculator" />
-		<tool name="PairedEndDistogram" class="edu.unc.genomics.nucleosomes.PairedEndDistogram" />
 		<tool name="Phasogram" class="edu.unc.genomics.nucleosomes.Phasogram" />
 	</section>
 	

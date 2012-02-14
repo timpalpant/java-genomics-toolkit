@@ -4,49 +4,68 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
 
 import org.apache.log4j.Logger;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
-import edu.unc.genomics.Interval;
-import edu.unc.genomics.io.IntervalFile;
-import edu.unc.genomics.io.IntervalFileSnifferException;
+import edu.unc.genomics.CommandLineTool;
+import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.io.WigFileException;
 
-public class Phasogram {
+public class Phasogram extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(Phasogram.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (reads)", required = true)
-	public String inputFile;
-	@Parameter(names = {"-o", "--output"}, description = "Output file (Wig)", required = true)
-	public String outputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input wig file (read counts)", required = true)
+	public WigFile inputFile;
+	@Parameter(names = {"-m", "--max"}, description = "Maximum phase shift", required = true)
+	public int maxPhase;
+	@Parameter(names = {"-o", "--output"}, description = "Output file (histogram)", required = true)
+	public Path outputFile;
 		
-	public void run() throws IOException {		
-		log.debug("Initializing input file");
+	public void run() throws IOException {
+		long[] phaseCounts = new long[maxPhase+1];
 		
-	}
-	
-	public static void main(String[] args) throws IOException {
-		Phasogram a = new Phasogram();
-		JCommander jc = new JCommander(a);
-		jc.setProgramName(Phasogram.class.getSimpleName());
-		try {
-			jc.parse(args);
-		} catch (ParameterException e) {
-			jc.usage();
-			System.exit(-1);
+		// Process each chromosome in the assembly
+		for (String chr : inputFile.chromosomes()) {
+			log.debug("Processing chromosome " + chr);
+						
+			int start = inputFile.getChrStart(chr);
+			while (start < inputFile.getChrStop(chr)) {
+				int stop = start + DEFAULT_CHUNK_SIZE - 1;
+								
+				try {
+					float[] data = WigFile.flattenData(inputFile.query(chr, start, stop), start, stop);
+					for (int i = 0; i < data.length-maxPhase; i++) {
+						for (int j = 0; j <= maxPhase; j++) {
+							phaseCounts[j] += data[i];
+						}
+					}
+					
+				} catch (WigFileException e) {
+					log.fatal("Error querying data from Wig file!");
+					e.printStackTrace();
+					throw new CommandLineToolException("Error querying data from Wig file!");
+				}
+				
+				// Process the next chunk
+				start = stop - maxPhase + 1;
+			}
 		}
 		
-		a.run();
+		log.debug("Writing output to disk");
+		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+			for (int i = 0; i < phaseCounts.length; i++) {
+				writer.write(i+"\t"+phaseCounts[i]);
+				writer.newLine();
+			}
+		}
+	}
+	
+	public static void main(String[] args) {
+		new Phasogram().instanceMain(args);
 	}
 }

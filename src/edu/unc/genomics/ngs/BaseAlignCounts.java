@@ -25,6 +25,8 @@ public class BaseAlignCounts extends CommandLineTool {
 	public IntervalFile<? extends Interval> intervalFile;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public Assembly assembly;
+	@Parameter(names = {"-x", "--extend"}, description = "Extend reads from 5' end (default = read length)")
+	public Integer extend;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wig)", required = true)
 	public Path outputFile;
 	
@@ -56,7 +58,16 @@ public class BaseAlignCounts extends CommandLineTool {
 					Iterator<? extends Interval> it = intervalFile.query(chr, start, stop);
 					while (it.hasNext()) {
 						Interval entry = it.next();
-						for (int i = entry.getStart(); i <= entry.getStop(); i++) {
+						int entryStop = entry.getStop();
+						if (extend != null) {
+							if (entry.isWatson()) {
+								entryStop = entry.getStart() + extend;
+							} else {
+								entryStop = entry.getStart() - extend;
+							}
+						}
+						
+						for (int i = entry.getStart(); i <= entryStop; i++) {
 							count[i-start]++;
 						}
 						mapped++;

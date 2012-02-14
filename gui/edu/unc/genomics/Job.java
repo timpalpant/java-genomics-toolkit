@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
@@ -34,7 +33,7 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 	private final List<ParameterDescription> parameters;
 	private final String usageText;
 	private boolean isRunning = false;
-	//private StringWriter writer = new StringWriter();
+	private StringWriter writer = new StringWriter();
 	
 	/**
 	 * Arguments for running this Job
@@ -92,12 +91,13 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 		}
 		
 		// Attempt to instantiate and run the tool
-		//Appender appender = new WriterAppender(new PatternLayout(), writer);
-		//Logger.getRootLogger().addAppender(appender);
+		WriterAppender appender = new WriterAppender(new PatternLayout(), writer);
+		appender.addFilter(new ThreadFilter(Thread.currentThread().getName()));
+		Logger.getRootLogger().addAppender(appender);
 		isRunning = true;
-		app.instanceMain(args);
+		app.toolRunnerMain(args);
 		isRunning = false;
-		//Logger.getRootLogger().removeAppender(appender);
+		Logger.getRootLogger().removeAppender(appender);
 	}
 	
 	/**
@@ -198,6 +198,10 @@ public class Job implements Iterable<ParameterDescription>, Runnable {
 	@Override
 	public String toString() {
 		return getName();
+	}
+	
+	public String getOutput() {
+		return writer.toString();
 	}
 	
 }

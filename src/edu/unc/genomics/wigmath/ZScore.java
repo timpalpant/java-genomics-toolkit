@@ -8,6 +8,7 @@ import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
+import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
@@ -29,7 +30,7 @@ public class ZScore extends WigMathTool {
 		stdev = inputFile.stdev();
 		if(stdev == 0) {
 			log.error("Cannot Z-score a file with stdev = 0!");
-			throw new RuntimeException("Cannot Z-score a file with stdev = 0!");
+			throw new CommandLineToolException("Cannot Z-score a file with stdev = 0!");
 		}
 	}
 	

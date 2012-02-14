@@ -4,68 +4,85 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.zip.DataFormatException;
 
 import org.apache.log4j.Logger;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
 import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.Assembly;
+import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
-import edu.unc.genomics.ValuedInterval;
+import edu.unc.genomics.PositiveIntegerValidator;
 import edu.unc.genomics.io.IntervalFile;
-import edu.unc.genomics.io.IntervalFileSnifferException;
 
-public class MapDyads {
-	
-	public static final int DEFAULT_CHUNK_SIZE = 500_000;
+public class MapDyads extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(MapDyads.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file (reads)", required = true)
-	public String inputFile;
-	@Parameter(names = {"-l", "--length"}, description = "Mononucleosome length (default: read length)")
-	public int length;
+	public IntervalFile<? extends Interval> inputFile;
+	@Parameter(names = {"-s", "--size"}, description = "Mononucleosome length (default: read length)", validateWith = PositiveIntegerValidator.class)
+	public Integer nucleosomeSize;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public Assembly assembly;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wig)", required = true)
-	public String outputFile;
+	public Path outputFile;
 		
-	public void run() throws IOException, IntervalFileSnifferException, DataFormatException {		
-		log.debug("Initializing input file");
-		IntervalFile<? extends Interval> reads = IntervalFile.autodetect(Paths.get(inputFile));
-		
+	@Override
+	public void run() throws IOException {
 		log.debug("Initializing output file");
-		BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputFile), Charset.defaultCharset());
-		TrackHeader header = new TrackHeader("wiggle_0");
-		header.setName("Mapped Dyads: " + Paths.get(inputFile).getFileName());
-		header.setDescription("Mapped Dyads: " + Paths.get(inputFile).getFileName());
-		writer.write(header.toString());
-		writer.newLine();
-		
-		for (String chr : assembly) {
-			writer.write("fixedStep chrom="+chr+" start=1 step=1 span=1");
+		int mapped = 0;
+		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+			// Write the Wiggle track header to the output file
+			TrackHeader header = new TrackHeader("wiggle_0");
+			header.setName("Converted " + inputFile.getPath().getFileName());
+			header.setDescription("Converted " + inputFile.getPath().getFileName());
+			writer.write(header.toString());
+			writer.newLine();
 			
-			
+			// Process each chromosome in the assembly
+			for (String chr : assembly) {
+				log.debug("Processing chromosome " + chr);
+				// Write the contig header to the output file
+				writer.write("fixedStep chrom="+chr+" start=1 step=1 span=1");
+				writer.newLine();
+				
+				int start = 1;
+				while (start < assembly.getChrLength(chr)) {
+					int stop = start + DEFAULT_CHUNK_SIZE - 1;
+					int length = stop - start + 1;
+					int[] count = new int[length];
+					
+					Iterator<? extends Interval> it = inputFile.query(chr, start, stop);
+					while (it.hasNext()) {
+						Interval entry = it.next();
+						if (nucleosomeSize == null) {
+							count[entry.center()-start]++;
+						} else {
+							count[entry.getStart()+nucleosomeSize-start]++;
+						}
+						mapped++;
+					}
+					
+					// Write the average at each base pair to the output file
+					for (int i = 0; i < count.length; i++) {
+						writer.write(count[i]);
+						writer.newLine();
+					}
+					
+					// Process the next chunk
+					start = stop + 1;
+				}
+			}
 		}
+		
+		log.info("Mapped "+mapped+" reads");
 	}
 	
-	public static void main(String[] args) throws IOException, IntervalFileSnifferException, DataFormatException {
-		MapDyads a = new MapDyads();
-		JCommander jc = new JCommander(a);
-		jc.setProgramName(MapDyads.class.getSimpleName());
-		try {
-			jc.parse(args);
-		} catch (ParameterException e) {
-			jc.usage();
-			System.exit(-1);
-		}
-		
-		a.run();
+	public static void main(String[] args) {
+		new MapDyads().instanceMain(args);
 	}
 }

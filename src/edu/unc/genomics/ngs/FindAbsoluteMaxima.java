@@ -58,7 +58,7 @@ public class FindAbsoluteMaxima extends CommandLineTool {
 			}
 			writer.newLine();
 			
-			log.debug("Iterating over all intervals and computing statistics");
+			log.debug("Iterating over all intervals and finding maxima");
 			for (Interval interval : lociFile) {
 				writer.write(interval.toBed());
 				for (WigFile wig : wigs) {
