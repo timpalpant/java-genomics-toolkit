@@ -42,9 +42,9 @@ public class GreedyCaller extends CommandLineTool {
 				int chunkStart = smoothedDyadsFile.getChrStart(chr);
 				int chrStop = smoothedDyadsFile.getChrStop(chr);
 				while (chunkStart < chrStop) {
-					int chunkStop = chunkStart + CHUNK_SIZE;
-					int paddedStart = chunkStart - nucleosomeSize;
-					int paddedStop = chunkStop + nucleosomeSize;
+					int chunkStop = Math.min(chunkStart+CHUNK_SIZE-1, smoothedDyadsFile.getChrStop(chr));
+					int paddedStart = Math.max(chunkStart-nucleosomeSize, 1);
+					int paddedStop = Math.min(chunkStop+nucleosomeSize, smoothedDyadsFile.getChrStop(chr));
 					log.debug("Processing chunk "+chunkStart+"-"+chunkStop);
 					
 					log.debug("Loading data and sorting");
@@ -61,16 +61,16 @@ public class GreedyCaller extends CommandLineTool {
 					float[] dyads = WigFile.flattenData(dyadsIter, paddedStart, paddedStop);
 					float[] smoothed = WigFile.flattenData(smoothedIter, paddedStart, paddedStop);
 					int[] sortedIndices = SortUtils.indexSort(smoothed);
-					
+
 					// Proceed through the data in descending order
 					log.debug("Calling nucleosomes");
-					for (int j = sortedIndices.length; j >= 0; j++) {
+					for (int j = sortedIndices.length-1; j >= 0; j--) {
 						int i = sortedIndices[j];
 						int dyad = paddedStart + i;
 						
 						if (smoothed[i] > 0) {
-							int nucStart = Math.max(1, dyad-halfNuc);
-							int nucStop = Math.min(dyad+halfNuc, chrStop);
+							int nucStart = Math.max(paddedStart, dyad-halfNuc);
+							int nucStop = Math.min(dyad+halfNuc, paddedStop);
 							NucleosomeCall call = new NucleosomeCall(chr, nucStart, nucStop);
 							call.setDyad(dyad);
 							
@@ -87,7 +87,7 @@ public class GreedyCaller extends CommandLineTool {
 							call.setOccupancy(occupancy);
 							
 							if (occupancy > 0) {
-								call.setDyadMean(Math.round(weightedSum/occupancy));
+								call.setDyadMean((int)Math.round(weightedSum/occupancy));
 								call.setConditionalPosition(smoothed[i] / smoothedSum);
 								double variance = (sumOfSquares - weightedSum*call.getDyadMean()) / occupancy;
 								call.setDyadStdev(Math.sqrt(variance));

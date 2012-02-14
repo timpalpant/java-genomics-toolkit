@@ -1,7 +1,7 @@
 <tool id="MapDyads" name="Map dyads" version="1.0.0">
   <description>from sequencing reads</description>
   <command interpreter="sh">
-    galaxyToolRunner.sh nucleosome.MapDyads -i $input -a ${chromInfo} -o $output
+    galaxyToolRunner.sh nucleosomes.MapDyads -i $input -a ${chromInfo} -o $output
     #if $type.read == 'single'
       -s $type.size
     #end if

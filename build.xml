@@ -23,7 +23,7 @@
     <mkdir dir="${build}"/>
     
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}" source="1.7" target="1.7">
+    <javac srcdir="${src}" destdir="${build}" source="1.7" target="1.7" debug="true">
 	  <classpath>
 	    <path id="lib.path.ref">
 	      <fileset dir="lib" includes="*.jar"/>
@@ -32,7 +32,7 @@
     </javac>
     
     <!-- Compile the java code from ${gui} into ${build} -->
-    <javac srcdir="${gui}" destdir="${build}" source="1.7" target="1.7">
+    <javac srcdir="${gui}" destdir="${build}" source="1.7" target="1.7" debug="true">
       <classpath>
   	    <path id="lib.path.ref">
   	      <fileset dir="lib" includes="*.jar"/>

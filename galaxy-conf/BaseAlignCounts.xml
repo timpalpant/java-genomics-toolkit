@@ -1,8 +1,8 @@
 <tool id="BaseAlignCounts" name="Map coverage" version="1.0.0">
   <description>of sequencing reads</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.BaseAlignCounts -i $input -g ${chromInfo} -x $X -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh ngs.BaseAlignCounts -i $input -a ${chromInfo} -x $X -o $output</command>
   <inputs>
-    <param name="input" type="data" format="bam,sam,bed,bedgraph" label="Sequencing reads" />
+    <param name="input" type="data" format="bam" label="Sequencing reads" />
     <param name="X" type="integer" value="0" label="In silico extension (leave 0 for read length)" />
   </inputs>
   <outputs>
@@ -12,6 +12,6 @@
   <help>
     .. class:: warningmark
     
-    This tool requires sequencing reads in SAM/BAM/Bed/BedGraph format.
+    This tool requires sequencing reads in BAM format.
   </help>
 </tool>

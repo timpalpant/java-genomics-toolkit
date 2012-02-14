@@ -15,7 +15,7 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 	
 	private int dyad;
 	private double dyadStdev;
-	private double dyadMean;
+	private int dyadMean;
 	private double conditionalPosition;
 	private int length;
 	private double lengthStdev;
@@ -47,7 +47,7 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 		call.setDyad(Integer.parseInt(entry[5]));
 		call.setDyadStdev(Double.parseDouble(entry[6]));
 		call.setConditionalPosition(Double.parseDouble(entry[7]));
-		call.setDyadMean(Double.parseDouble(entry[8]));
+		call.setDyadMean(Integer.parseInt(entry[8]));
 		call.setValue(Double.parseDouble(entry[9]));
 		
 		return call;
@@ -89,14 +89,14 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 	/**
 	 * @return the dyadMean
 	 */
-	public double getDyadMean() {
+	public int getDyadMean() {
 		return dyadMean;
 	}
 
 	/**
 	 * @param dyadMean the dyadMean to set
 	 */
-	public void setDyadMean(double dyadMean) {
+	public void setDyadMean(int dyadMean) {
 		this.dyadMean = dyadMean;
 	}
 
