@@ -51,7 +51,7 @@ public class BaseAlignCounts extends CommandLineTool {
 				
 				int start = 1;
 				while (start < assembly.getChrLength(chr)) {
-					int stop = start + DEFAULT_CHUNK_SIZE - 1;
+					int stop = Math.min(start+DEFAULT_CHUNK_SIZE-1, assembly.getChrLength(chr));
 					int length = stop - start + 1;
 					int[] count = new int[length];
 					
