@@ -57,7 +57,9 @@ public class RollingReadLength extends CommandLineTool {
 					Iterator<? extends Interval> it = intervalFile.query(chr, start, stop);
 					while (it.hasNext()) {
 						Interval entry = it.next();
-						for (int i = entry.getStart(); i <= entry.getStop(); i++) {
+						int entryStart = Math.max(entry.getStart(), start);
+						int entryStop = Math.min(entry.getStop(), stop);
+						for (int i = entryStart; i <= entryStop; i++) {
 							sum[i-start] += entry.length();
 							count[i-start]++;
 						}

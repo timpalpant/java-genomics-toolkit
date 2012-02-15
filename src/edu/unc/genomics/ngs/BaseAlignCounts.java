@@ -67,7 +67,10 @@ public class BaseAlignCounts extends CommandLineTool {
 							}
 						}
 						
-						for (int i = entry.getStart(); i <= entryStop; i++) {
+						// Clamp to the current chunk
+						int entryStart = Math.max(entry.getStart(), start);
+						entryStop = Math.min(entryStop, stop);
+						for (int i = entryStart; i <= entryStop; i++) {
 							count[i-start]++;
 						}
 						mapped++;

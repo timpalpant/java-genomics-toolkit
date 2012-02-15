@@ -58,12 +58,18 @@ public class MapDyads extends CommandLineTool {
 					Iterator<? extends Interval> it = inputFile.query(chr, start, stop);
 					while (it.hasNext()) {
 						Interval entry = it.next();
+						int center;
 						if (nucleosomeSize == null || nucleosomeSize == -1) {
-							count[entry.center()-start]++;
+							center = entry.center() - start;
 						} else {
-							count[entry.getStart()+nucleosomeSize-start]++;
+							center = entry.getStart() + nucleosomeSize - start;
 						}
-						mapped++;
+						
+						// Only map if it is in the current chunk
+						if (start <= center && center <= stop) {
+							count[center]++;
+							mapped++;
+						}
 					}
 					
 					// Write the average at each base pair to the output file
