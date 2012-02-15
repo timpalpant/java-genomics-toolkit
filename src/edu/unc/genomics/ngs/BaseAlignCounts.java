@@ -75,7 +75,7 @@ public class BaseAlignCounts extends CommandLineTool {
 					
 					// Write the count at each base pair to the output file
 					for (int i = 0; i < count.length; i++) {
-						writer.write(count[i]);
+						writer.write(Integer.toString(count[i]));
 						writer.newLine();
 					}
 					
