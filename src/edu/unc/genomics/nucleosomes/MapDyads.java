@@ -32,6 +32,8 @@ public class MapDyads extends CommandLineTool {
 		
 	@Override
 	public void run() throws IOException {
+		int halfNuc = nucleosomeSize / 2;
+		
 		log.debug("Initializing output file");
 		int mapped = 0;
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
@@ -60,9 +62,9 @@ public class MapDyads extends CommandLineTool {
 						Interval entry = it.next();
 						int center;
 						if (nucleosomeSize == null || nucleosomeSize == -1) {
-							center = entry.center() - start;
+							center = entry.center();
 						} else {
-							center = entry.getStart() + nucleosomeSize - start;
+							center = entry.getStart() + halfNuc;
 						}
 						
 						// Only map if it is in the current chunk
