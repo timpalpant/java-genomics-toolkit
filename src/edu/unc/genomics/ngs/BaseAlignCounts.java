@@ -26,7 +26,7 @@ public class BaseAlignCounts extends CommandLineTool {
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public Assembly assembly;
 	@Parameter(names = {"-x", "--extend"}, description = "Extend reads from 5' end (default = read length)")
-	public Integer extend;
+	public Integer extend = -1;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wig)", required = true)
 	public Path outputFile;
 	
@@ -59,7 +59,7 @@ public class BaseAlignCounts extends CommandLineTool {
 					while (it.hasNext()) {
 						Interval entry = it.next();
 						int entryStop = entry.getStop();
-						if (extend != null) {
+						if (extend != null && extend != -1) {
 							if (entry.isWatson()) {
 								entryStop = entry.getStart() + extend;
 							} else {
