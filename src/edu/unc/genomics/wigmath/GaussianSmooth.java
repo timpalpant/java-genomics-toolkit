@@ -50,6 +50,16 @@ public class GaussianSmooth extends WigMathTool {
 		Iterator<WigItem> result = inputFile.query(chr, paddedStart, paddedStop);
 		float[] data = WigFile.flattenData(result, start-3*stdev, stop+3*stdev);
 		
+		// Replace NaNs off the end of the chromosome with zeros
+		int k = 0;
+		while (data[k] == Float.NaN) {
+			data[k++] = 0;
+		}
+		k = data.length - 1;
+		while (data[k] == Float.NaN) {
+			data[k--] = 0;
+		}
+		
 		// Convolve the data with the filter
 		float[] smoothed = new float[stop-start+1];
 		for (int i = 0; i < smoothed.length; i++) {
