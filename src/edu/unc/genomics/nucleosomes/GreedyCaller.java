@@ -35,7 +35,7 @@ public class GreedyCaller extends CommandLineTool {
 	
 	public void run() throws IOException {
 		int halfNuc = nucleosomeSize / 2;
-		
+		int count = 0;
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			for (String chr : smoothedDyadsFile.chromosomes()) {
 				log.debug("Processing chromosome "+chr);
@@ -96,11 +96,12 @@ public class GreedyCaller extends CommandLineTool {
 								if (chunkStart <= dyad && dyad <= chunkStop) {
 									writer.write(call.toString());
 									writer.newLine();
+									count++;
 								}
 								
 								// Don't allow nucleosome calls overlapping this nucleosome
 								int low = Math.max(i-nucleosomeSize, 0);
-								int high = Math.min(i-nucleosomeSize, paddedStop-1);
+								int high = Math.min(i+nucleosomeSize, smoothed.length-1);
 								for (int k = low; k <= high; k++) {
 									smoothed[k] = 0;
 								}
@@ -112,6 +113,8 @@ public class GreedyCaller extends CommandLineTool {
 				}
 			}
 		}
+		
+		log.info("Called "+count+" nucleosomes");
 	}
 	
 	public static void main(String[] args) {
