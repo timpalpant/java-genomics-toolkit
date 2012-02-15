@@ -67,7 +67,7 @@ public class MapDyads extends CommandLineTool {
 						
 						// Only map if it is in the current chunk
 						if (start <= center && center <= stop) {
-							count[center]++;
+							count[center-start]++;
 							mapped++;
 						}
 					}
