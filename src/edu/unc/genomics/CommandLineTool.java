@@ -30,8 +30,9 @@ public abstract class CommandLineTool {
 	
 	/**
 	 * The default bite-size to use for applications that process files in chunks
+	 * TODO Read from a configuration file
 	 */
-	public static final int DEFAULT_CHUNK_SIZE = 500_000;
+	public static final int DEFAULT_CHUNK_SIZE = 200_000;
 	
 	/**
 	 * Do the main computation of this tool

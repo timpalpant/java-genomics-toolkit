@@ -21,8 +21,6 @@ import edu.unc.utils.SortUtils;
 public class GreedyCaller extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(GreedyCaller.class);
-	
-	private static final int CHUNK_SIZE = 500_000;
 
 	@Parameter(names = {"-d", "--dyads"}, description = "Dyad counts file", required = true, validateWith = ReadablePathValidator.class)
 	public WigFile dyadsFile;
@@ -42,7 +40,7 @@ public class GreedyCaller extends CommandLineTool {
 				int chunkStart = smoothedDyadsFile.getChrStart(chr);
 				int chrStop = smoothedDyadsFile.getChrStop(chr);
 				while (chunkStart < chrStop) {
-					int chunkStop = Math.min(chunkStart+CHUNK_SIZE-1, smoothedDyadsFile.getChrStop(chr));
+					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, smoothedDyadsFile.getChrStop(chr));
 					int paddedStart = Math.max(chunkStart-nucleosomeSize, 1);
 					int paddedStop = Math.min(chunkStop+nucleosomeSize, smoothedDyadsFile.getChrStop(chr));
 					log.debug("Processing chunk "+chunkStart+"-"+chunkStop);
