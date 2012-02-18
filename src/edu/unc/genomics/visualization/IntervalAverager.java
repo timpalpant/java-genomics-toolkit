@@ -83,10 +83,13 @@ public class IntervalAverager extends CommandLineTool {
 			// Locus alignment point (entry value) should be positioned over the global alignment point
 			int n1 = alignmentPoint - Math.abs(entry.getValue().intValue()-entry.getStart());
 			int n2 = alignmentPoint + Math.abs(entry.getValue().intValue()-entry.getStop());
+			assert data.length == n2-n1+1;
 			for (int bp = n1; bp <= n2; bp++) {
 				sum[bp] += data[bp-n1];
 				counts[bp]++;
 			}
+			
+			count++;
 		}
 		
 		inputFile.close();
