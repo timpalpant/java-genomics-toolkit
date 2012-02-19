@@ -46,7 +46,7 @@ public class IntervalLengthDistribution extends CommandLineTool {
 		log.debug("Writing histogram output");
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			for (int i = min; i <= max; i++) {
-				writer.write(i+"\t"+freq.getCount(i));
+				writer.write(i+"\t"+freq.getPct(i));
 				writer.newLine();
 			}
 		}
