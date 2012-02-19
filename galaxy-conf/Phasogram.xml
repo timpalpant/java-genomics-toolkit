@@ -2,7 +2,7 @@
   <description>of dyads</description>
   <command interpreter="sh">galaxyToolRunner.sh nucleosomes.Phasogram -i $input -m $max -o $output</command>
   <inputs>
-    <param name="input" type="data" format="bigwig,wig" label="Dyads BigWig file" />
+    <param name="input" type="data" format="bigwig,wig" label="Dyads (Big)Wig file" />
     <param name="max" type="integer" value="1000" label="Maximum phase shift (bp)" />
   </inputs>
   <outputs>

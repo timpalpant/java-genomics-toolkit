@@ -35,7 +35,7 @@ public class Phasogram extends CommandLineTool {
 						
 			int start = inputFile.getChrStart(chr);
 			while (start < inputFile.getChrStop(chr)) {
-				int stop = start + DEFAULT_CHUNK_SIZE - 1;
+				int stop = Math.min(start+DEFAULT_CHUNK_SIZE-1, inputFile.getChrStop(chr));
 								
 				try {
 					float[] data = WigFile.flattenData(inputFile.query(chr, start, stop), start, stop);
