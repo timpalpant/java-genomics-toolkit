@@ -31,8 +31,6 @@ public class IntervalToWig extends CommandLineTool {
 	
 	@Override
 	public void run() throws IOException {
-		log.info(intervalFile.count() + " entries in input");
-		
 		log.debug("Initializing output file");
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Write the Wiggle track header to the output file
@@ -43,7 +41,7 @@ public class IntervalToWig extends CommandLineTool {
 			writer.newLine();
 			
 			// Process each chromosome in the assembly
-			for (String chr : assembly) {
+			for (String chr : intervalFile.chromosomes()) {
 				log.debug("Processing chromosome " + chr);
 				// Write the contig header to the output file
 				writer.write("fixedStep chrom="+chr+" start=1 step=1 span=1");
@@ -60,9 +58,10 @@ public class IntervalToWig extends CommandLineTool {
 					while (it.hasNext()) {
 						ValuedInterval entry = (ValuedInterval) it.next();
 						if (entry.getValue() != null) {
-							for (int i = entry.getStart(); i <= entry.getStop(); i++) {
+							int entryStart = Math.max(start, entry.getStart());
+							int entryStop = Math.min(stop, entry.getStop());
+							for (int i = entryStart; i <= entryStop; i++) {
 								sum[i-start] += entry.getValue().floatValue();
-								count[i-start]++;
 							}
 						}
 					}
@@ -81,6 +80,8 @@ public class IntervalToWig extends CommandLineTool {
 					start = stop + 1;
 				}
 			}
+		} finally {
+			intervalFile.close();
 		}
 	}
 	

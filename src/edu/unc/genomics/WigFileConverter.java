@@ -1,6 +1,7 @@
 package edu.unc.genomics;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.beust.jcommander.IStringConverter;
@@ -19,6 +20,11 @@ public class WigFileConverter implements IStringConverter<WigFile> {
 	public WigFile convert(String value) throws ParameterException {
 		PathConverter converter = new PathConverter();
 		Path p = converter.convert(value);
+		
+		if (!Files.isReadable(p)) {
+			throw new ParameterException("Cannot find/read input Wig/BigWig file " + value);
+		}
+		
 		try {
 			return WigFile.autodetect(p);
 		} catch (WigFileException | IOException e) {

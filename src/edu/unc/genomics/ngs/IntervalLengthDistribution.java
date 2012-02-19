@@ -50,6 +50,8 @@ public class IntervalLengthDistribution extends CommandLineTool {
 				writer.newLine();
 			}
 		}
+		
+		inputFile.close();
 	}
 	
 	public static void main(String[] args) {

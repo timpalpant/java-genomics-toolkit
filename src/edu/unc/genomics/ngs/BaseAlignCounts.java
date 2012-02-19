@@ -33,7 +33,6 @@ public class BaseAlignCounts extends CommandLineTool {
 	@Override
 	public void run() throws IOException {
 		log.debug("Initializing output file");
-		int mapped = 0;
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Write the Wiggle track header to the output file
 			TrackHeader header = new TrackHeader("wiggle_0");
@@ -73,7 +72,6 @@ public class BaseAlignCounts extends CommandLineTool {
 						for (int i = entryStart; i <= entryStop; i++) {
 							count[i-start]++;
 						}
-						mapped++;
 					}
 					
 					// Write the count at each base pair to the output file
@@ -88,7 +86,7 @@ public class BaseAlignCounts extends CommandLineTool {
 			}
 		}
 		
-		log.info("Mapped "+mapped+" reads");
+		intervalFile.close();
 	}
 	
 	public static void main(String[] args) {

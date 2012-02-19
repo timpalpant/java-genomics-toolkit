@@ -2,7 +2,7 @@
   <description>from paired-end sequencing reads</description>
   <command interpreter="sh">galaxyToolRunner.sh ngs.RollingReadLength -i $input -a ${chromInfo} -o $output</command>
   <inputs>
-      <param format="bam" name="input" type="data" label="Mapped reads" />
+      <param format="sam,bam,bed,bedgraph" name="input" type="data" label="Mapped reads" />
   </inputs>
   <outputs>
       <data format="wig" name="output" />

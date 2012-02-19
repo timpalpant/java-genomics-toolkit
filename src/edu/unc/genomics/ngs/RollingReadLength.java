@@ -31,7 +31,6 @@ public class RollingReadLength extends CommandLineTool {
 	@Override
 	public void run() throws IOException {
 		log.debug("Initializing output file");
-		int mapped = 0;
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Write the Wiggle track header to the output file
 			TrackHeader header = new TrackHeader("wiggle_0");
@@ -63,7 +62,6 @@ public class RollingReadLength extends CommandLineTool {
 							sum[i-start] += entry.length();
 							count[i-start]++;
 						}
-						mapped++;
 					}
 					
 					// Write the average at each base pair to the output file
@@ -82,7 +80,7 @@ public class RollingReadLength extends CommandLineTool {
 			}
 		}
 		
-		log.info("Mapped "+mapped+" reads");
+		intervalFile.close();
 	}
 	
 	public static void main(String[] args) {

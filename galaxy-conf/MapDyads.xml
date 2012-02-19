@@ -7,7 +7,7 @@
     #end if
   </command>
   <inputs>
-      <param name="input" type="data" format="bam" label="Sequencing reads" />
+      <param name="input" type="data" format="sam,bam,bed,bedGraph" label="Sequencing reads" />
       <conditional name="type">
         <param name="read" type="select" label="Type of reads">
           <option value="paired" selected="true">Paired-End</option>
