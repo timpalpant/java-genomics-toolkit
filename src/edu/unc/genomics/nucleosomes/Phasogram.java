@@ -27,7 +27,7 @@ public class Phasogram extends CommandLineTool {
 	public Path outputFile;
 		
 	public void run() throws IOException {
-		long[] phaseCounts = new long[maxPhase+1];
+		float[] phaseCounts = new float[maxPhase+1];
 		
 		// Process each chromosome in the assembly
 		for (String chr : inputFile.chromosomes()) {
