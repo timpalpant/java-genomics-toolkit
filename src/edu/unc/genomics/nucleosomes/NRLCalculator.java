@@ -7,9 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -31,32 +30,10 @@ public class NRLCalculator extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file (NRL for each gene)", required = true)
 	public Path outputFile;
 	
-	private Map<String,List<NucleosomeCall>> nucs = new HashMap<>();
-	
-	private List<NucleosomeCall> getIntervalNucleosomes(Interval i) {
-		List<NucleosomeCall> intervalNucs = new ArrayList<>();
-		for (NucleosomeCall call : nucs.get(i.getChr())) {
-			if (call.getDyad() >= i.low() && call.getDyad() <= i.high()) {
-				intervalNucs.add(call);
-			}
-		}
-		
-		return intervalNucs;
-	}
-	
 	@Override
 	public void run() throws IOException {		
 		log.debug("Initializing input file");
 		NucleosomeCallsFile nucsFile = new NucleosomeCallsFile(inputFile);
-		log.debug("Loading all nucleosomes");
-		for (NucleosomeCall nuc : nucsFile) {
-			if (nuc == null) continue;
-			if (!nucs.containsKey(nuc.getChr())) {
-				nucs.put(nuc.getChr(), new ArrayList<NucleosomeCall>());
-			}
-			nucs.get(nuc.getChr()).add(nuc);
-		}
-		nucsFile.close();
 		
 		log.debug("Initializing output file");
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
@@ -66,7 +43,11 @@ public class NRLCalculator extends CommandLineTool {
 				writer.write(interval.toBed());
 				
 				// Get all of the nucleosomes within this interval
-				List<NucleosomeCall> intervalNucs = getIntervalNucleosomes(interval);
+				Iterator<NucleosomeCall> it = nucsFile.query(interval);
+				List<NucleosomeCall> intervalNucs = new ArrayList<NucleosomeCall>();
+				while (it.hasNext()) {
+					intervalNucs.add(it.next());
+				}
 	
 				if (intervalNucs.size() > 1) {
 					// Sort the list by nucleosome position
@@ -85,6 +66,7 @@ public class NRLCalculator extends CommandLineTool {
 		}
 		
 		lociFile.close();
+		nucsFile.close();
 	}
 	
 	public static void main(String[] args) throws IOException {
