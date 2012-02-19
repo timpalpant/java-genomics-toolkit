@@ -36,12 +36,14 @@ public class Phasogram extends CommandLineTool {
 			int start = inputFile.getChrStart(chr);
 			while (start < inputFile.getChrStop(chr)) {
 				int stop = Math.min(start+DEFAULT_CHUNK_SIZE-1, inputFile.getChrStop(chr));
+				log.debug("Processing chunk "+chr+":"+start+"-"+stop);
+				int paddedStop = Math.min(stop+maxPhase, inputFile.getChrStop(chr));
 								
 				try {
-					float[] data = WigFile.flattenData(inputFile.query(chr, start, stop), start, stop);
+					float[] data = WigFile.flattenData(inputFile.query(chr, start, paddedStop), start, paddedStop);
 					for (int i = 0; i < data.length-maxPhase; i++) {
 						for (int j = 0; j <= maxPhase; j++) {
-							phaseCounts[j] += data[i];
+							phaseCounts[j] += data[i]*data[i+j];
 						}
 					}
 					
@@ -52,7 +54,7 @@ public class Phasogram extends CommandLineTool {
 				}
 				
 				// Process the next chunk
-				start = stop - maxPhase + 1;
+				start = stop + 1;
 			}
 		}
 		
