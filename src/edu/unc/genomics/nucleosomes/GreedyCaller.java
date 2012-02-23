@@ -35,6 +35,10 @@ public class GreedyCaller extends CommandLineTool {
 		int halfNuc = nucleosomeSize / 2;
 		int count = 0;
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+			// Write header
+			writer.write("#chr\tstart\tstop\tlength\tlengthStdev\tdyad\tdyadStdev\tconditionalPosition\tdyadMean\toccupancy");
+			writer.newLine();
+			
 			for (String chr : smoothedDyadsFile.chromosomes()) {
 				log.debug("Processing chromosome "+chr);
 				int chunkStart = smoothedDyadsFile.getChrStart(chr);
@@ -45,7 +49,6 @@ public class GreedyCaller extends CommandLineTool {
 					int paddedStop = Math.min(chunkStop+nucleosomeSize, smoothedDyadsFile.getChrStop(chr));
 					log.debug("Processing chunk "+chunkStart+"-"+chunkStop);
 					
-					log.debug("Loading data and sorting");
 					Iterator<WigItem> dyadsIter;
 					Iterator<WigItem> smoothedIter;
 					try {
@@ -61,7 +64,6 @@ public class GreedyCaller extends CommandLineTool {
 					int[] sortedIndices = SortUtils.indexSort(smoothed);
 
 					// Proceed through the data in descending order
-					log.debug("Calling nucleosomes");
 					for (int j = sortedIndices.length-1; j >= 0; j--) {
 						int i = sortedIndices[j];
 						int dyad = paddedStart + i;
@@ -72,24 +74,34 @@ public class GreedyCaller extends CommandLineTool {
 							NucleosomeCall call = new NucleosomeCall(chr, nucStart, nucStop);
 							call.setDyad(dyad);
 							
+							// Find the dyad mean
 							double occupancy = 0;
 							double weightedSum = 0;
 							double smoothedSum = 0;
-							double sumOfSquares = 0;
 							for (int bp = nucStart; bp <= nucStop; bp++) {
 								occupancy += dyads[bp-paddedStart];
-								weightedSum += bp * dyads[bp-paddedStart];
+								weightedSum += dyads[bp-paddedStart] * bp;
 								smoothedSum += smoothed[bp-paddedStart];
-								sumOfSquares += bp * bp * dyads[bp-paddedStart];
 							}
 							call.setOccupancy(occupancy);
+							double dyadMean = weightedSum / occupancy;
 							
 							if (occupancy > 0) {
-								call.setDyadMean((int)Math.round(weightedSum/occupancy));
+								call.setDyadMean((int)Math.round(dyadMean));
 								call.setConditionalPosition(smoothed[i] / smoothedSum);
-								double variance = (sumOfSquares - weightedSum*call.getDyadMean()) / occupancy;
+								
+								// Find the variance
+								double sumOfSquares = 0;
+								for (int bp = nucStart; bp <= nucStop; bp++) {
+									sumOfSquares += dyads[bp-paddedStart] * Math.pow(bp-dyadMean, 2);
+								}
+								double variance = sumOfSquares / occupancy;
 								call.setDyadStdev(Math.sqrt(variance));
 								
+								// variance = mean of squares minus square of mean
+								// this is more efficient but causing cancellation with floats
+								//double variance = sumOfSquares/occupancy - Math.pow(weightedSum/occupancy, 2);
+
 								// Only write nucleosomes within the current chunk to disk
 								if (chunkStart <= dyad && dyad <= chunkStop) {
 									writer.write(call.toString());
