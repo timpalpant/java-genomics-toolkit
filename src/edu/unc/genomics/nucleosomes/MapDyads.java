@@ -43,7 +43,11 @@ public class MapDyads extends CommandLineTool {
 			writer.newLine();
 			
 			// Process each chromosome in the assembly
-			for (String chr : assembly) {
+			for (String chr : inputFile.chromosomes()) {
+				if (!assembly.includes(chr)) {
+					continue;
+				}
+				
 				log.debug("Processing chromosome " + chr);
 				// Write the contig header to the output file
 				writer.write("fixedStep chrom="+chr+" start=1 step=1 span=1");
