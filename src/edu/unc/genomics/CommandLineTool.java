@@ -2,6 +2,8 @@ package edu.unc.genomics;
 
 import java.io.IOException;
 
+import net.sf.samtools.SAMFileReader;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
@@ -63,6 +65,8 @@ public abstract class CommandLineTool {
 	 */
 	public void toolRunnerMain(String[] args) throws ParameterException, CommandLineToolException {
 		jc.parse(args);
+		
+		SAMFileReader.setDefaultValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
 		
 		try {
 			run();
