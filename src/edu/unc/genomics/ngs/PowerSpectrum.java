@@ -75,7 +75,7 @@ public class PowerSpectrum extends CommandLineTool {
 					continue;
 				}
 				
-				if (interval.length() > 0) {
+				if (interval.length() > 1) {
 					float[] data = WigFile.flattenData(wigIter, interval.getStart(), interval.getStop());
 					// Compute the power spectrum
 					FloatFFT_1D fft = new FloatFFT_1D(data.length);
@@ -96,6 +96,7 @@ public class PowerSpectrum extends CommandLineTool {
 					}
 					writer.newLine();
 				} else {
+					skipped++;
 					writer.write(interval.toBed());
 					writer.newLine();
 				}
