@@ -75,25 +75,30 @@ public class PowerSpectrum extends CommandLineTool {
 					continue;
 				}
 				
-				float[] data = WigFile.flattenData(wigIter, interval.getStart(), interval.getStop());
-				// Compute the power spectrum
-				FloatFFT_1D fft = new FloatFFT_1D(data.length);
-				fft.realForward(data);
-				float[] ps = abs2(data);
-				// and normalize the power spectrum
-				float sum = 0;
-				for (int i = 1; i < ps.length; i++) {
-					sum += ps[i];
+				if (interval.length() > 0) {
+					float[] data = WigFile.flattenData(wigIter, interval.getStart(), interval.getStop());
+					// Compute the power spectrum
+					FloatFFT_1D fft = new FloatFFT_1D(data.length);
+					fft.realForward(data);
+					float[] ps = abs2(data);
+					// and normalize the power spectrum
+					float sum = 0;
+					for (int i = 1; i < ps.length; i++) {
+						sum += ps[i];
+					}
+					for (int i = 1; i < ps.length; i++) {
+						ps[i] /= sum;
+					}
+		
+					writer.write(interval.toBed());
+					for (int i = 1; i < Math.min(ps.length, 40); i++) {
+						writer.write("\t"+ps[i]);
+					}
+					writer.newLine();
+				} else {
+					writer.write(interval.toBed());
+					writer.newLine();
 				}
-				for (int i = 1; i < ps.length; i++) {
-					ps[i] /= sum;
-				}
-	
-				writer.write(interval.toBed());
-				for (int i = 1; i < Math.min(ps.length, 40); i++) {
-					writer.write("\t"+ps[i]);
-				}
-				writer.newLine();
 			}
 			
 			log.info("Skipped " + skipped + " intervals");
