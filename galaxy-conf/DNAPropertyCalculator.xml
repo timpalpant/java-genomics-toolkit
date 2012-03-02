@@ -16,8 +16,8 @@
       </param>
       <when value="indexed">
         <param name="index" type="select" label="Select a reference genome" help="if your genome of interest is not listed - contact Galaxy team">
-          <options from_data_table="sam_fa_indices">
-            <filter type="sort_by" column="2" />
+          <options from_data_table="sam_fa_indexes">
+            <filter type="sort_by" column="1" />
             <validator type="no_options" message="No indexes are available" />
           </options>
         </param>
