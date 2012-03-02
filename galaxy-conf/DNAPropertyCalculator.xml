@@ -60,7 +60,7 @@
     <param name="N" type="boolean" checked="true" truevalue="-n" falsevalue="" label="Output normalized values" />
   </inputs>
   <outputs>
-      <data format="wig" name="output" label="Calculate ${property.value_label} for ${refGenomeSource.index.fields.}">
+      <data format="wig" name="output" label="Calculate ${property.value_label}">
         <actions>
           <conditional name="refGenomeSource.genomeSource">
             <when value="indexed">
