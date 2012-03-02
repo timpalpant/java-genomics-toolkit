@@ -22,7 +22,7 @@ public class DNAPropertyCalculator extends CommandLineTool {
 	@Parameter(names = {"-i", "--input"}, description = "Input file (FASTA)", required = true)
 	public FastaFile inputFile;
 	@Parameter(names = {"-p", "--property"}, description = "DNA property to calculate", required = true)
-	public DNAProperty property;
+	public String propertyName;
 	@Parameter(names = {"-n", "--normalize"}, description = "Output normalized values")
 	public boolean normalize = true;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wiggle)", required = true)
@@ -30,6 +30,8 @@ public class DNAPropertyCalculator extends CommandLineTool {
 	
 	@Override
 	public void run() throws IOException {
+		DNAProperty property = DNAProperty.create(propertyName);
+		
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Write the Wiggle track header
 			writer.write("track type=wiggle_0");
