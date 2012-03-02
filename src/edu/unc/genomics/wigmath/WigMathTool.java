@@ -30,7 +30,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(WigMathTool.class);
 	
-	// TODO: Variable resolution output
+	// TODO: Variable resolution output?
 	
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;

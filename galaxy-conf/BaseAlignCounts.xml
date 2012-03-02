@@ -12,6 +12,6 @@
   <help>
     .. class:: warningmark
     
-    This tool requires sequencing reads in BAM format.
+    This tool requires sequencing reads in SAM, BAM, or Bed format.
   </help>
 </tool>

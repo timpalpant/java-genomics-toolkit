@@ -1,16 +1,14 @@
 = Java Genomics Toolkit
 
-This is a collection of applications for genomics data processing, primarily high-throughput next-generation sequencing. There is a particular focus on processing data in Wiggle format, since many other tools already cover SAM, BAM, FastQ, etc. However, Wiggle/BigWig formats provide a compact way to store numerical data resulting from ChIP-seq and MNase-seq experiments. Common computations provided in this toolkit include adding, subtracting, dividing, multiplying, log-transforming, averaging, Z-scoring, and Gaussian smoothing Wig files.
+This is a collection of applications for genomics data processing, primarily high-throughput next-generation sequencing. There is a particular focus on processing data in Wiggle format, since many other tools already cover SAM, BAM, FastQ, etc. However, Wiggle/BigWig formats provide a compact way to store numerical data resulting from ChIP-seq and MNase-seq experiments. Common computations provided in this toolkit include adding, subtracting, dividing, multiplying, log-transforming, averaging, Z-scoring, and Gaussian smoothing Wig files. There are also tools for processing MNase-seq (nucleosome) data, creating heatmap matrices, and KMeans clustering.
 
-Tools may be run from the command-line, a simple Swing GUI, or from Galaxy (http://getgalaxy.org).
+Tools may be run from the command-line or from Galaxy (http://getgalaxy.org).
 
 == Loading the Tools into Galaxy
 
-TODO
-
-== Using the ToolRunner GUI
-
-TODO
+One-click installation is available for your local Galaxy instance through the Galaxy Tool Shed (<a href="http://toolshed.g2.bx.psu.edu">toolshed.g2.bx.psu.edu</a>).
+	
+Configuration files are provided for loading the applications into Galaxy manually. Unzip or check out the java-genomics-toolkit distribution into Galaxy's "tools" folder, and add the supplied toolConf entries to your toolConf.xml file.
 
 == Command-Line Usage
 

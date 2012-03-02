@@ -32,7 +32,7 @@ public class PowerSpectrum extends CommandLineTool {
 		
 	/**
 	 * Computes the power spectrum from FFT data
-	 * taking into accound even/odd length arrays
+	 * taking into account even/odd length arrays
 	 * refer to JTransforms documentation for layout of the FFT data
 	 * @param f
 	 * @return

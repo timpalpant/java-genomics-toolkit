@@ -39,10 +39,4 @@
 	    <output name="output" file="zscorer.output3"/>
 	  </test>-->
   </tests>
-  
-<help>
-.. class:: warningmark
-
-This tool was contributed by Timothy Palpant.
-</help>
 </tool>

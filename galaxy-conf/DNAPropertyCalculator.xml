@@ -1,0 +1,65 @@
+<tool id="DNAPropertyCalculator" name="Calculate sequence-specific DNA properties" version="1.0.0">
+  <description>for a genome</description>
+  <command interpreter="sh">galaxyToolRunner.sh dna.DNAPropertyCalculator -i 
+    #if $refGenomeSource.genomeSource == "history":
+      $refGenomeSource.ownFile
+    #else
+      ${refGenomeSource.index.fields.path}
+    #end if
+	$N -p $property -o $output
+  </command>
+  <inputs>
+    <conditional name="refGenomeSource">
+      <param name="genomeSource" type="select" label="Will you select a reference genome from your history or use a built-in index?" help="Built-ins were indexed using default options">
+        <option value="indexed">Use a built-in index</option>
+        <option value="history">Use one from the history</option>
+      </param>
+      <when value="indexed">
+        <param name="index" type="select" label="Select a reference genome" help="if your genome of interest is not listed - contact Galaxy team">
+          <options from_data_table="sam_fa_indices">
+            <filter type="sort_by" column="2" />
+            <validator type="no_options" message="No indexes are available" />
+          </options>
+        </param>
+      </when>
+      <when value="history">
+        <param name="ownFile" type="data" format="fasta" metadata_name="dbkey" label="Select the reference genome" />
+      </when>  <!-- history -->
+    </conditional>  <!-- refGenomeSource -->
+
+    <param name="property" type="select" label="Property to calculate">
+      <option value="ATG-density">ATG</option>
+      <option value="G-content">G</option>
+      <option value="C-content">C</option>
+      <option value="T-content">T</option>
+      <option value="A-content">A</option>
+      <option value="GC-content">GC</option>
+      <option value="AT-content">AT</option>
+      <option value="Pyrimidine-content">Pyrimidine</option>
+      <option value="Purine-content">Purine</option>
+      <option value="Bendability">Bendability</option>
+      <option value="zDNA">zDNA</option>
+      <option value="DuplexStabilityFreeEnergy">Duplex Stability Free Energy</option>
+      <option value="DuplexStabilityDisruptEnergy">Duplex Stability Disrupt Energy</option>
+      <option value="DNADenaturation">DNA Denaturation</option>
+      <option value="PropellorTwist">Propellor Twist</option>
+      <option value="BaseStacking">Base Stacking</option>
+      <option value="ProteinDeformation">Protein Deformation</option>
+      <option value="BendingStiffness">Bending Stiffness</option>
+      <option value="ProteinDNATwist">Protein DNA Twist</option>
+      <option value="bDNATwist">bDNA Twist</option>
+      <option value="APhilicity">APhilicity</option>
+      <option value="NucleosomePosition">Nucleosome Position (trinucleotide model)</option>
+      <option value="Twist">Twist</option>
+      <option value="Tilt">Tilt</option>
+      <option value="Roll">Roll</option>
+      <option value="Slide">Slide</option>
+      <option value="Rise">Rise</option>
+    </param>
+    
+    <param name="N" type="boolean" checked="true" truevalue="-n" falsevalue="" label="Output normalized values" />
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" />
+  </outputs>
+</tool>

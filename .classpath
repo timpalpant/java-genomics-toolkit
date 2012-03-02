@@ -12,6 +12,7 @@
 	<classpathentry kind="lib" path="lib/sam-1.56.jar"/>
 	<classpathentry kind="lib" path="lib/macify-1.4.jar" sourcepath="/macify/src"/>
 	<classpathentry kind="lib" path="lib/mg4j-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/dnaproperties-1732.jar" sourcepath="/Users/timpalpant/Documents/Workspace/dnaproperties/dnaproperties-1732-src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java-genomics-io"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
