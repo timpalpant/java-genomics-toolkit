@@ -60,6 +60,24 @@
     <param name="N" type="boolean" checked="true" truevalue="-n" falsevalue="" label="Output normalized values" />
   </inputs>
   <outputs>
-      <data format="wig" name="output" />
+      <data format="wig" name="output" label="Calculate ${property.value_label} for ${refGenomeSource.index.fields.}">
+        <actions>
+          <conditional name="refGenomeSource.genomeSource">
+            <when value="indexed">
+              <action type="metadata" name="dbkey">
+                <option type="from_data_table" name="sam_fa_indexes" column="1" offset="0">
+                  <filter type="param_value" column="0" value="#" compare="startswith" keep="False"/>
+                  <filter type="param_value" ref="refGenomeSource.index" column="0"/>
+                </option>
+              </action>
+            </when>
+            <when value="history">
+              <action type="metadata" name="dbkey">
+                <option type="from_param" name="refGenomeSource.ownFile" param_attribute="dbkey" />
+              </action>
+            </when>
+          </conditional>
+        </actions>
+      </data>
   </outputs>
 </tool>
