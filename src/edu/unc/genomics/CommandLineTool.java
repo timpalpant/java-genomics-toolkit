@@ -26,6 +26,7 @@ public abstract class CommandLineTool {
 		jc.addConverterFactory(new IntervalFileFactory());
 		jc.addConverterFactory(new WigFileFactory());
 		jc.addConverterFactory(new FastaFileFactory());
+		jc.addConverterFactory(new DNAPropertyFactory());
 		
 		// Set the program name to be the class name
 		jc.setProgramName(this.getClass().getSimpleName());
