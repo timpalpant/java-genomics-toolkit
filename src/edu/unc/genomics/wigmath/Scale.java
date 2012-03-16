@@ -27,6 +27,7 @@ public class Scale extends WigMathTool {
 		
 		if (multiplier == null || multiplier == 0) {
 			multiplier = inputFile.numBases() / inputFile.total();
+			log.info("Scaling to mean: "+inputFile.mean());
 		}
 	}
 	

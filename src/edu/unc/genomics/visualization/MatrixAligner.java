@@ -96,11 +96,18 @@ public class MatrixAligner extends CommandLineTool {
 			log.debug("Iterating over all intervals");
 			String[] row = new String[n];
 			for (BedEntry entry : loci) {
+			  Arrays.fill(row, "-");
 				Iterator<WigItem> result = null;
 				try {
 					result = inputFile.query(entry);
 				} catch (WigFileException e) {
 					skipped++;
+					String id = ((entry.getId() == null) ? entry.getId() : "Row "+(count++));
+  				writer.write(id);
+  				for (int i = leftBound; i <= rightBound; i++) {
+  					writer.write("\t"+row[i]);
+  				}
+  				writer.newLine();
 					continue;
 				}
 				
@@ -116,7 +123,6 @@ public class MatrixAligner extends CommandLineTool {
 				int n2 = alignmentPoint + Math.abs(entry.getValue().intValue()-entry.getStop());
 				assert data.length == n2-n1+1;
 				
-				Arrays.fill(row, "-");
 				for (int i = 0; i < data.length; i++) {
 					if (!Float.isNaN(data[i])) {
 						row[n1+i] = String.valueOf(data[i]);
@@ -134,8 +140,8 @@ public class MatrixAligner extends CommandLineTool {
 		}
 		
 		inputFile.close();
-		log.info(count + " intervals processed");
-		log.info(skipped + " intervals skipped");
+		log.debug(count + " intervals processed");
+		log.debug(skipped + " intervals skipped");
 	}
 	
 	public static void main(String[] args) {
