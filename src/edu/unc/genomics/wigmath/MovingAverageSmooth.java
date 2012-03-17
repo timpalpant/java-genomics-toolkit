@@ -21,7 +21,6 @@ public class MovingAverageSmooth extends WigMathTool {
 	@Parameter(names = {"-w", "--width"}, description = "Width of kernel (bp)")
 	public int width = 10;
 	
-	WigFile input;
 	DescriptiveStatistics stats;
 
 	@Override
@@ -37,9 +36,9 @@ public class MovingAverageSmooth extends WigMathTool {
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
 		log.debug("Smoothing chunk "+chr+":"+start+"-"+stop);
 		// Pad the query so that we can provide values for the ends
-		int queryStart = Math.max(start-width/2, input.getChrStart(chr));
-		int queryStop = Math.min(stop+width/2, input.getChrStop(chr));
-		Iterator<WigItem> result = input.query(chr, queryStart, queryStop);
+		int queryStart = Math.max(start-width/2, inputFile.getChrStart(chr));
+		int queryStop = Math.min(stop+width/2, inputFile.getChrStop(chr));
+		Iterator<WigItem> result = inputFile.query(chr, queryStart, queryStop);
 		float[] data = WigFile.flattenData(result, queryStart, queryStop);
 		
 		float[] smoothed = new float[stop-start+1];
