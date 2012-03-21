@@ -62,6 +62,7 @@ public class IntervalToWig extends CommandLineTool {
 							int entryStop = Math.min(stop, entry.getStop());
 							for (int i = entryStart; i <= entryStop; i++) {
 								sum[i-start] += entry.getValue().floatValue();
+								count[i-start]++;
 							}
 						}
 					}
