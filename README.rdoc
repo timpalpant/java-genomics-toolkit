@@ -6,13 +6,13 @@ Tools may be run from the command-line or from Galaxy (http://getgalaxy.org).
 
 == Loading the Tools into Galaxy
 
-One-click installation is available for your local Galaxy instance through the Galaxy Tool Shed (<a href="http://toolshed.g2.bx.psu.edu">toolshed.g2.bx.psu.edu</a>).
+One-click installation is available for your local Galaxy instance through the Galaxy Tool Shed (http://toolshed.g2.bx.psu.edu).
 	
 Configuration files are provided for loading the applications into Galaxy manually. Unzip or check out the java-genomics-toolkit distribution into Galaxy's "tools" folder, and add the supplied toolConf entries to your toolConf.xml file.
 
 == Command-Line Usage
 
-Applications can be run on the command-line, and the toolRunner.sh script is provided for convenience. Calling any script without arguments will display the help, as well as the missing mandatory arguments:
+Applications can be run on the command-line, and the toolRunner.sh script is provided for convenience. toolRunner.sh sets up the correct classpath and allows tools to be run using their short name (e.g. converters.IntervalToWig). Calling any script without arguments will display the help, as well as the missing mandatory arguments:
 
   $ > ./toolRunner.sh wigmath.AddWig
   $ Usage: <main class> [options] Input files
