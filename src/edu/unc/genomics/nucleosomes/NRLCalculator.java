@@ -56,7 +56,7 @@ public class NRLCalculator extends CommandLineTool {
 						Collections.reverse(intervalNucs);
 					}
 					
-					for (int i = 1; i < Math.min(intervalNucs.size(), 10); i++) {
+					for (int i = 1; i < intervalNucs.size(); i++) {
 						writer.write("\t" + Math.abs(intervalNucs.get(i).getDyad()-intervalNucs.get(i-1).getDyad()));
 					}
 				}

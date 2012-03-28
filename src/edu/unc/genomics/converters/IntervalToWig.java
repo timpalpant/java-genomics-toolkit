@@ -24,6 +24,8 @@ public class IntervalToWig extends CommandLineTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file (Bed/BedGraph)", required = true)
 	public IntervalFile<? extends Interval> intervalFile;
+	@Parameter(names = {"-z", "--zero"}, description = "Assume zero where there is no data (default = NaN)")
+	public boolean defaultZero = false;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public Assembly assembly;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wig)", required = true)
@@ -70,7 +72,11 @@ public class IntervalToWig extends CommandLineTool {
 					// Write the average at each base pair to the output file
 					for (int i = 0; i < sum.length; i++) {
 						if (count[i] == 0) {
-							writer.write(String.valueOf(Float.NaN));
+							if (defaultZero) {
+								writer.write("0");
+							} else {
+								writer.write(String.valueOf(Float.NaN));
+							}
 						} else {
 							writer.write(String.valueOf(sum[i]/count[i]));
 						}
