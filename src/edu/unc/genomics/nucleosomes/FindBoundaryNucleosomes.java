@@ -35,9 +35,11 @@ public class FindBoundaryNucleosomes extends CommandLineTool {
 	
 	private List<NucleosomeCall> getIntervalNucleosomes(Interval i) {
 		List<NucleosomeCall> intervalNucs = new ArrayList<>();
-		for (NucleosomeCall call : nucs.get(i.getChr())) {
-			if (call.getDyad() >= i.low() && call.getDyad() <= i.high()) {
-				intervalNucs.add(call);
+		if (nucs.containsKey(i.getChr())) {
+			for (NucleosomeCall call : nucs.get(i.getChr())) {
+				if (call.getDyad() >= i.low() && call.getDyad() <= i.high()) {
+					intervalNucs.add(call);
+				}
 			}
 		}
 		

@@ -5,20 +5,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
-import edu.ucsc.genome.TrackHeader;
-import edu.unc.genomics.Assembly;
 import edu.unc.genomics.GeneTrackEntry;
-import edu.unc.genomics.Interval;
 import edu.unc.genomics.CommandLineTool;
-import edu.unc.genomics.ValuedInterval;
 import edu.unc.genomics.io.GeneTrackFile;
-import edu.unc.genomics.io.IntervalFile;
 
 public class MergeGeneTrackStrands extends CommandLineTool {
 
