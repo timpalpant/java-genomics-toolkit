@@ -143,7 +143,7 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 	}
 	
 	public double occupancy() {
-		return value;
+		return value.doubleValue();
 	}
 	
 	public void setOccupancy(double value) {
