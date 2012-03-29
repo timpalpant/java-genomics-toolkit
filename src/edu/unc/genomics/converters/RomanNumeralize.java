@@ -29,7 +29,7 @@ public class RomanNumeralize extends CommandLineTool {
 	/**
 	 * Pattern for finding "chr12" tokens (will find "chr1" through "chr99")
 	 */
-	Pattern p = Pattern.compile("/chr[\\d]{1,2}/i");
+	Pattern p = Pattern.compile("chr[\\d]{1,2}");
 	
 	@Override
 	public void run() throws IOException {

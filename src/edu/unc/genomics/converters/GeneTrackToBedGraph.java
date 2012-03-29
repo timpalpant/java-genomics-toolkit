@@ -14,9 +14,9 @@ import edu.unc.genomics.GeneTrackEntry;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.io.GeneTrackFile;
 
-public class MergeGeneTrackStrands extends CommandLineTool {
+public class GeneTrackToBedGraph extends CommandLineTool {
 
-	private static final Logger log = Logger.getLogger(MergeGeneTrackStrands.class);
+	private static final Logger log = Logger.getLogger(GeneTrackToBedGraph.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file (GeneTrack format)", required = true)
 	public Path gtFile;
@@ -40,7 +40,7 @@ public class MergeGeneTrackStrands extends CommandLineTool {
 	}
 	
 	public static void main(String[] args) {
-		new MergeGeneTrackStrands().instanceMain(args);
+		new GeneTrackToBedGraph().instanceMain(args);
 	}
 
 }

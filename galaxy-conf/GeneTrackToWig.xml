@@ -1,0 +1,18 @@
+<tool id="GeneTrackToWig" name="GeneTrack to Wig" version="1.0.0">
+  <description>converter</description>
+  <command interpreter="sh">galaxyToolRunner.sh converters.GeneTrackToWig -i $input $zero -a ${chromInfo} -o $output</command>
+  <inputs>
+      <param name="input" type="data" format="genetrack" label="Input GeneTrack index" />
+  	  <param name="zero" type="boolean" checked="false" truevalue="-z" falsevalue="" label="Assume zero where there is no data (default is NaN)" />
+  </inputs>
+  <outputs>
+      <data name="output" format="wig" metadata_source="input" />
+  </outputs>
+	
+<help>
+
+.. class:: warningmark
+	
+This tool requires GeneTrack formatted data. If you have tabular data that was not correctly autodetected, change the metadata by clicking on the pencil icon for the dataset.
+</help>
+</tool>

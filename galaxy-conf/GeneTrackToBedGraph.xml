@@ -1,0 +1,21 @@
+<tool id="GeneTrackToBedGraph" name="GeneTrack to BedGraph" version="1.0.0">
+  <description>converter</description>
+  <command interpreter="sh">galaxyToolRunner.sh converters.GeneTrackToBedGraph -i $input -o $output</command>
+  <inputs>
+      <param name="input" type="data" format="genetrack" label="Input GeneTrack index" />
+  </inputs>
+  <outputs>
+      <data name="output" format="bedgraph" metadata_source="input" />
+  </outputs>
+	
+<help>
+
+.. class:: warningmark
+
+This tool will sum the counts from the forward and reverse strands in a GeneTrack index to create a BedGraph file.
+
+.. class:: warningmark
+	
+This tool requires GeneTrack formatted data. If you have tabular data that was not correctly autodetected, change the metadata by clicking on the pencil icon for the dataset.
+</help>
+</tool>
