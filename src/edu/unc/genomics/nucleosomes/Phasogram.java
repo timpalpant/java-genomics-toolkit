@@ -60,6 +60,8 @@ public class Phasogram extends CommandLineTool {
 		
 		log.debug("Writing output to disk");
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+			writer.write("#Phase\tCount");
+			writer.newLine();
 			for (int i = 0; i < phaseCounts.length; i++) {
 				writer.write(i+"\t"+phaseCounts[i]);
 				writer.newLine();

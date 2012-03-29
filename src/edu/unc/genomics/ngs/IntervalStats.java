@@ -53,7 +53,7 @@ public class IntervalStats extends CommandLineTool {
 		log.debug("Initializing output file");
 		int count = 0, skipped = 0;
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-			writer.write("#Chr\tStart\tStop\tID\tValue\tStrand");
+			writer.write("#Chr\tStart\tStop\tID\tAlignment\tStrand");
 			for (String inputFile : inputFiles) {
 				Path p = Paths.get(inputFile);
 				writer.write("\t" + p.getFileName().toString());

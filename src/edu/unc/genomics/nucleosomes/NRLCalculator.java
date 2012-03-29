@@ -38,6 +38,10 @@ public class NRLCalculator extends CommandLineTool {
 		log.debug("Initializing output file");
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			log.debug("Calculating nucleosome spacing for each interval");
+			// Write header
+			writer.write("#chr\tlow\thigh\tid\talignment\tstrand\tSpacing: +1 to +2 (etc)");
+			writer.newLine();
+					
 			NucleosomeCall.DyadComparator comparator = new NucleosomeCall.DyadComparator();
 			for (Interval interval : lociFile) {
 				writer.write(interval.toBed());

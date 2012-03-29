@@ -63,6 +63,10 @@ public class PowerSpectrum extends CommandLineTool {
 	
 	public void run() throws IOException {		
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+			// Write header
+			writer.write("#chr\tlow\thigh\tid\talignment\tstrand\tPower Spectrum Values");
+			writer.newLine();
+					
 			log.debug("Computing power spectrum for each window");
 			int skipped = 0;
 			for (Interval interval : loci) {
