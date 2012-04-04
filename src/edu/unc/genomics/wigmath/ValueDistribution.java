@@ -33,6 +33,10 @@ public class ValueDistribution extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file")
 	public Path outputFile;
 	
+	private double mean;
+	private double stdev;
+	private long N;
+	
 	public void run() throws IOException {
 		log.debug("Generating histogram of Wig values");
 		if (min == null) {
@@ -42,6 +46,14 @@ public class ValueDistribution extends CommandLineTool {
 			max = (float) inputFile.max();
 		}
 		FloatHistogram hist = new FloatHistogram(numBins, min, max);
+		
+		N = inputFile.numBases();
+		mean = inputFile.mean();
+		stdev = inputFile.stdev();
+		
+		// Also compute the skewness and kurtosis while going through the values
+		double sumOfCubeOfDeviances = 0;
+		double sumOfFourthOfDeviances = 0;
 		
 		for (String chr : inputFile.chromosomes()) {
 			int start = inputFile.getChrStart(chr);
@@ -67,6 +79,10 @@ public class ValueDistribution extends CommandLineTool {
 					for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
 						if (i >= chunkStart && i <= chunkStop) {
 							hist.addValue(item.getWigValue());
+							double deviance = item.getWigValue() - mean;
+							double cubeOfDeviance = Math.pow(deviance, 3);
+							sumOfCubeOfDeviances += cubeOfDeviance;
+							sumOfFourthOfDeviances += deviance*cubeOfDeviance;
 						}
 					}
 				}
@@ -75,9 +91,23 @@ public class ValueDistribution extends CommandLineTool {
 			}
 		}
 		
+		double skewness = (sumOfCubeOfDeviances/N) / Math.pow(stdev,3);
+		double kurtosis = (sumOfFourthOfDeviances/N) / Math.pow(stdev,4);
+		
 		if (outputFile != null) {
 			log.debug("Writing to output file");
 			try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+				// Output the moments of the distribution
+				writer.write("Moments:\t<w> = " + inputFile.mean());
+				writer.newLine();
+				writer.write("\tvar(w) = " + inputFile.stdev()*inputFile.stdev());
+				writer.newLine();
+				writer.write("\tskew(w) = " + skewness);
+				writer.newLine();
+				writer.write("\tkur(w) = " + kurtosis);
+				writer.newLine();
+				writer.write("Histogram:");
+				writer.newLine();
 				writer.write(hist.toString());
 			}
 		} else {
