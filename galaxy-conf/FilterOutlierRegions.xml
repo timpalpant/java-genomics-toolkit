@@ -1,0 +1,12 @@
+<tool id="WigFilterOutliers" name="Filter outlier regions" version="1.0.0">
+  <description>in a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.FilterOutlierRegions -i $input -w $window -t $threshold -o $output</command>
+  <inputs>
+      <param format="bigwig,wig" name="input" type="data" label="Filter outlier regions in" />
+      <param name="window" type="integer" value="150" label="Window size" />
+      <param name="threshold" type="float" value="3" label="Threshold (fold times the mean)" />
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+</tool>
