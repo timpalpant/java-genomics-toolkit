@@ -6,7 +6,7 @@
       <param name="N" type="integer" value="147" optional="true" label="Assumed nucleosome size" />
   </inputs>
   <outputs>
-      <data name="output" format="tabular" />
+      <data name="output" format="wig" />
   </outputs>
   
 <help>
