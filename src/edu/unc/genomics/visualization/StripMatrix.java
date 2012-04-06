@@ -26,10 +26,7 @@ public class StripMatrix extends CommandLineTool {
 	public void run() throws IOException {		
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.defaultCharset())) {
 			try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-				String line = reader.readLine();
-				// Always copy the first (header) line
-				writer.write(line);
-				writer.newLine();
+				String line;
 				while ((line = reader.readLine()) != null) {
 					String[] row = line.split("\t");
 					for (int i = 1; i < row.length; i++) {
@@ -40,7 +37,7 @@ public class StripMatrix extends CommandLineTool {
 							writer.write(cell);
 						}
 						
-						if (i > 1) {
+						if (i < row.length-1) {
 							writer.write("\t");
 						}
 					}
