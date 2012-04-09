@@ -1,0 +1,110 @@
+<tool id="matrix2png" name="Make heatmap" version="1.0.0">
+  <description>using matrix2png</description>
+  <requirement type='package'>matrix2png</requirement>
+  <command>matrix2png -data $input 
+    #if str( $range ) != ''
+      -range $range
+    #end if
+    
+    -con $con
+    -size $size
+    -numcolors $numcolors
+    -minsize $minsize
+    -mincolor $mincolor
+    -maxcolor $maxcolor
+    -bkgcolor $bkgcolor
+    -missingcolor $missingcolor
+    
+    #if str( $map ) != ''
+      -map $map
+    #end if
+    
+    #if str( $discrete_color_maps.discrete ) != 'false'
+      -discrete
+      -dmap $dmap
+    #end if
+    
+    #if str( $numr ) != ''
+      -numr $numr
+    #end if
+    
+    #if str( $numc ) != ''
+      -numc $numc
+    #end if
+    
+    -startrow $startrow
+    -startcol $startcol
+    
+    #if str( $trim ) != '0'
+      -trim $trim
+    #end if
+    
+    #if str( $title ) != ''
+      -title '$title'
+    #end if
+    
+    $z $b $d $s $r $c $f $e $l $u
+    
+    > $output</command>
+  <inputs>
+    <param name="input" type="data" format="tabular" label="Input data" />
+    <param name="title" type="text" optional="true" size="30" label="Add a title" />
+    <param name="size" type="text" optional="true" value="1:1" label="Pixel dimensions per value as x:y" />
+    <param name="minsize" type="text" optional="true" value="800:600" label="Minimum image size as x:y pixels" />
+    <!-- Not sure what this is, so exclude for now
+    <param name="desctext" type="data" label="Description Text?" /> -->
+    <param name="range" type="text" optional="true" label="Values assigned to mincolor and maxcolor as min:max (default is data range)" />
+    <param name="con" type="float" optional="true" value="1.0" label="Contrast (only applies when not using -range option)" />
+    <param name="numcolors" type="integer" optional="true" value="64" label="Number of colors" />
+    <param name="mincolor" type="text" optional="true" value="blue" label="Color used at lowest value (name or r:g:b triplet)" />
+    <param name="maxcolor" type="text" optional="true" value="yellow" label="Color used at highest value (name or r:g:b triplet)" />
+    <param name="bkgcolor" type="text" optional="true" value="white" label="Color used as background (name or r:g:b triplet)" />
+    <param name="missingcolor" type="text" optional="true" value="grey" label="Color used for missing values (name or r:g:b triplet)" />
+    <param name="map" type="text" optional="true" label="Color choices from preset maps: overrides min/max colors and -b (default = 0 (none))" />
+    <conditional name="discrete_color_maps">
+      <param name="discrete" type="select" label="Use discretized mapping of values to colors">
+        <option value="true">Yes</option>
+        <option value="false" selected="true">No</option>
+      </param>
+      <when value="true">
+        <param name="dmap" type="data" label="Discrete color mapping file to use for discrete mapping (default = preset)" />
+      </when>
+      <when value="false">
+        <!-- No values here -->
+      </when>
+    </conditional>
+    <param name="numr" type="text" optional="true" label="Number of rows to process (default = all)" />
+    <param name="numc" type="text" optional="true" label="Number of columns to process (default = all)" />
+    <param name="startrow" type="integer" optional="true" value="1" label="Index of the first row to be processed" />
+    <param name="startcol" type="integer" optional="true" value="1" label="Index of the first column to be processed" />
+    <param name="trim" type="integer" optional="true" value="0" label="Trim this percent of data extremes when determining data range (only without the -range option)" />
+    <param name="z" type="boolean" checked="false" truevalue="-z" falsevalue="" label="Row-normalize the data to mean 0 and variance 1" />
+    <param name="b" type="boolean" checked="true" truevalue="-b" falsevalue="" label="Middle of color range is black" />
+    <param name="d" type="boolean" checked="false" truevalue="-d" falsevalue="" label="Add cell dividers" />
+    <param name="s" type="boolean" checked="true" truevalue="-s" falsevalue="" label="Add scale bar" />
+    <param name="r" type="boolean" checked="false" truevalue="-r" falsevalue="" label="Add row names" />
+    <param name="c" type="boolean" checked="false" truevalue="-c" falsevalue="" label="Add column names" />
+    <param name="f" type="boolean" checked="false" truevalue="-f" falsevalue="" label="Data file has a format line" />
+    <param name="e" type="boolean" checked="false" truevalue="-e" falsevalue="" label="Draw ellipses instead of rectangles" />
+    <param name="l" type="boolean" checked="false" truevalue="-l" falsevalue="" label="Log transform the data (base 2)" />
+    <param name="u" type="boolean" checked="false" truevalue="-u" falsevalue="" label="Put the column labels under the picture instead of above (ignored unless column names)" />
+    <param name="g" type="boolean" checked="false" truevalue="-g" falsevalue="" label="Put the row labels to the left instead of the right (ignored unless row names)" />
+  </inputs>
+  <outputs>
+    <data name="output" format="png" />
+  </outputs>
+  
+  <help>
+    .. class:: warningmark
+    
+    This tool requires that matrix2png be available in Galaxy's PATH.
+    
+    .. class:: warningmark
+    
+    This tool requires tabular data with column AND row headers. For more information about the required format and usage instructions, see http://bioinformatics.ubc.ca/matrix2png/dataformat.html
+    
+    .. class:: warningmark
+    
+    It is recommended to specify the colorspace range.
+  </help>
+</tool>

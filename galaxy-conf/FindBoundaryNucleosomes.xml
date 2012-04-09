@@ -12,6 +12,6 @@
   <help>
     .. class:: warningmark
     
-    Use the Greedy Caller tool to create a file of called nucleosomes, then use this tool to identify the first nucleosome's dyad position from the 5' or 3' end.
+    Use the Call Nucleosomes tool to create a file of called nucleosomes, then use this tool to identify the first nucleosome's dyad position from the 5' or 3' end.
   </help>
 </tool>

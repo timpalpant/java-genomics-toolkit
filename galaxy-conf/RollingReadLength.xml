@@ -12,9 +12,5 @@
 .. class:: warningmark
 
 This tool requires paired-end SAM, BAM, or Bed formatted data. Using single-end data will result in a constant read length.
-
-.. class:: warningmark
-
-This tool was contributed by Timothy Palpant.
 </help>
 </tool>

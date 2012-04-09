@@ -5,7 +5,7 @@
     <param format="tabular" name="input" type="data" label="Aligned matrix" />
     <param name="K" type="integer" value="10" label="Number of clusters" />
     <param name="min" type="integer" value="1" label="Minimum column to use for clustering" />
-    <param name="min" type="integer" value="-1" label="Maximum column to use for clustering (-1 to end)" />
+    <param name="max" type="integer" value="-1" label="Maximum column to use for clustering (-1 to end)" />
   </inputs>
   <outputs>
     <data format="tabular" name="output" metadata="input" />

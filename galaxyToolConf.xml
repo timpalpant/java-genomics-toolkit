@@ -42,6 +42,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/IntervalAverager.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/KMeans.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/MatrixAligner.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/matrix2png.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/StripMatrix.xml" />
   </section>
   <section name="DNA Properties" id="java-genomics-toolkit-dnaproperty">

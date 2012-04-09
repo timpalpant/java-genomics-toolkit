@@ -14,9 +14,5 @@
 .. class:: warningmark
 
 This tool requires dyad counts and smoothed dyad counts.
-
-.. class:: warningmark
-
-This tool was contributed by Timothy Palpant.
 </help>
 </tool>
