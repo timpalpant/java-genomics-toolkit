@@ -1,0 +1,11 @@
+<tool id="PredictFAIRE" name="Predict FAIRE signal" version="1.0.0">
+  <description>from nucleosome occupancy</description>
+  <command interpreter="sh">galaxyToolRunner.sh nucleosome.PredictFAIRESignal -i $input -s $sonication -o $output</command>
+  <inputs>
+      <param format="bigwig,wig" name="input" type="data" label="Nucleosome occupancy data" />
+      <param format="tabular" name="sonication" type="data" label="Sonication fragment length distribution" />
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+</tool>
