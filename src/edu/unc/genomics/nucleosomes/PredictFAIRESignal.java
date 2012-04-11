@@ -27,9 +27,12 @@ public class PredictFAIRESignal extends WigMathTool {
 	public WigFile inputFile;
 	@Parameter(names = {"-s", "--sonication"}, description = "Sonication distribution", required = true, validateWith = ReadablePathValidator.class)
 	public Path sonicationFile;
+	@Parameter(names = {"-c", "--crosslinking"}, description = "FAIRE efficiency / crosslinking coefficient")
+	public double crosslink = 1;
 
 	double[] sonication = new double[100];
 	int L;
+	double maxOcc;
 	
 	@Override
 	public void setup() {
@@ -40,11 +43,16 @@ public class PredictFAIRESignal extends WigMathTool {
 		try(BufferedReader reader = Files.newBufferedReader(sonicationFile, Charset.defaultCharset())) {
 			String line;
 			while ((line = reader.readLine()) != null) {
+				// Parse the line
 				String[] entry = line.split("\t");
 				int length = Integer.parseInt(entry[0]);
 				double percent = Double.parseDouble(entry[1]);
+				// Expand the sonication distribution array if necessary
 				if (length >= sonication.length) {
 					sonication = Arrays.copyOf(sonication, Math.max(sonication.length+100, length+1));
+				}
+				if (length > L) {
+					L = length;
 				}
 				sonication[length] = percent;
 				total += percent;
@@ -54,45 +62,53 @@ public class PredictFAIRESignal extends WigMathTool {
 			e.printStackTrace();
 			throw new CommandLineToolException("Error loading sonication fragment length distribution");
 		}
+		// Truncate the array to the minimum possible size
+		sonication = Arrays.copyOfRange(sonication, 0, L);
+		log.debug("Loaded sonication distribution for lengths: 0-"+L+"bp");
 		
 		// Normalize the sonication distribution so that it has total 1
 		for (int i = 0; i < sonication.length; i++) {
 			sonication[i] /= total;
 		}
 		
-		L = sonication.length-1;
-		log.debug("Loaded sonication distribution for lengths: 0-"+L+"bp");
+		// Store the maximum occupancy
+		maxOcc = inputFile.max();
 	}
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
 		int paddedStart = Math.max(start-L, inputFile.getChrStart(chr));
-		int paddedStop = Math.min(start+L, inputFile.getChrStop(chr));
+		int paddedStop = Math.min(stop+L, inputFile.getChrStop(chr));
 		
 		Iterator<WigItem> data = inputFile.query(chr, paddedStart, paddedStop);
 		float[] result = WigFile.flattenData(data, start-L, stop+L, 0);
 		
+		// Scale the occupancy by the maximum occupancy so that it represents
+		// the probability that a base pair is occupied by a nucleosome
+		for (int i = 0; i < result.length; i++) {
+			result[i] /= maxOcc;
+		}
+		
 		log.debug("Computing forward sums");
-		float[][] fsums = new float[L+1][result.length];
-		for (int i = 1; i <= L; i++) {
+		float[][] fsums = new float[sonication.length][result.length];
+		// TODO Compute this more efficiently
+		for (int i = 1; i < sonication.length; i++) {
 			for (int x = 0; x < result.length-i+1; x++) {
 				for (int k = 0; k < i; k++) {
-					fsums[i][x] += result[x+k];
+					fsums[i][x] += crosslink*result[x+k];
 				}
+				fsums[i][x] = 1 - Math.min(fsums[i][x], 1);
 			}
 		}
 		
 		log.debug("Computing FAIRE prediction");
 		float[] prediction = new float[stop-start+1];
+		// TODO Compute this more efficiently
 		for (int x = 0; x < prediction.length; x++) {
 			for (int i = 1; i <= L; i++) {
 				for (int j = -i+1; j <= 0; j++) {
-					// Probability that this state is occupied by a nucleosome
-          float pOcc = Math.min(fsums[i][x+j+L], 1);
-          // Probability that this state survives FAIRE
-          float pFaire = 1 - pOcc;
           // Add to total and weight by relative abundance of this fragment length
-          prediction[i] += sonication[i] * pFaire;
+          prediction[x] += sonication[i] * fsums[i][x+j+L];
 				}
 			}
 		}
