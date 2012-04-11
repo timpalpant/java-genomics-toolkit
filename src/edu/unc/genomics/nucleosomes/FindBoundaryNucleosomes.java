@@ -65,7 +65,7 @@ public class FindBoundaryNucleosomes extends CommandLineTool {
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			log.debug("Finding boundary nucleosomes for each interval");
 			// Write header
-			writer.write("#chr\tlow\thigh\tid\talignment\tstrand\t5' Dyad Position\t3' Dyad Position");
+			writer.write("#chr\tlow\thigh\tid\talignment\tstrand\tlow boundary dyad\thigh boundary dyad");
 			writer.newLine();
 			NucleosomeCall.DyadComparator comparator = new NucleosomeCall.DyadComparator();
 			for (Interval interval : lociFile) {
@@ -77,13 +77,9 @@ public class FindBoundaryNucleosomes extends CommandLineTool {
 				if (intervalNucs.size() > 0) {
 					// Sort the list by nucleosome position
 					Collections.sort(intervalNucs, comparator);
-					if (interval.isCrick()) {
-						Collections.reverse(intervalNucs);
-					}
-					
-					int fivePrime = intervalNucs.get(0).getDyad();
-					int threePrime = intervalNucs.get(intervalNucs.size()-1).getDyad();
-					writer.write("\t"+fivePrime+"\t"+threePrime);
+					int low = intervalNucs.get(0).getDyad();
+					int high = intervalNucs.get(intervalNucs.size()-1).getDyad();
+					writer.write("\t"+low+"\t"+high);
 				} else {
 					skipped++;
 					writer.write("\tNA\tNA");
