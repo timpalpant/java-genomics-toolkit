@@ -2,7 +2,7 @@
   <description>in windows</description>
   <command interpreter="sh">galaxyToolRunner.sh nucleosomes.FindBoundaryNucleosomes -i $input -l $loci -o $output</command>
   <inputs>
-    <param name="input" type="data" format="nukes" label="Nucleosome calls" />
+    <param name="input" type="data" format="tabular" label="Nucleosome calls" />
     <param name="loci" type="data" format="bed" label="List of intervals" />
   </inputs>
   <outputs>

@@ -112,10 +112,6 @@ public class MatrixAligner extends CommandLineTool {
 				}
 				
 				float[] data = WigFile.flattenData(result, entry.getStart(), entry.getStop());
-				// Reverse if on the crick strand
-				if (entry.isCrick()) {
-					ArrayUtils.reverse(data);
-				}
 				
 				// Position the data in the matrix
 				// Locus alignment point (entry value) should be positioned over the matrix alignment point

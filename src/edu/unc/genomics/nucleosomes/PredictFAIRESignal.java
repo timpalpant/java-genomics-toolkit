@@ -105,7 +105,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		float[] prediction = new float[stop-start+1];
 		// TODO Compute this more efficiently
 		for (int x = 0; x < prediction.length; x++) {
-			for (int i = 1; i <= L; i++) {
+			for (int i = 1; i < sonication.length; i++) {
 				for (int j = -i+1; j <= 0; j++) {
           // Add to total and weight by relative abundance of this fragment length
           prediction[x] += sonication[i] * fsums[i][x+j+L];

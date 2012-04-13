@@ -75,10 +75,6 @@ public class IntervalAverager extends CommandLineTool {
 			}
 			
 			float[] data = WigFile.flattenData(result, entry.getStart(), entry.getStop());
-			// Reverse if on the Crick strand
-			if (entry.isCrick()) {
-				ArrayUtils.reverse(data);
-			}
 			
 			// Locus alignment point (entry value) should be positioned over the global alignment point
 			int n1 = alignmentPoint - Math.abs(entry.getValue().intValue()-entry.getStart());
