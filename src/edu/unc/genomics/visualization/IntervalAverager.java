@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 

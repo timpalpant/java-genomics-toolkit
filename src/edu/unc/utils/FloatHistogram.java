@@ -1,28 +1,25 @@
 package edu.unc.utils;
 
-////********************************************************************
-// Histogram.java 
-// Adapted from: http://www.particle.kth.se/~fmi/kurs/PhysicsSimulation/Lectures/11B/Examples/Experiment/Histogram.java
-//
-// A simple histogram class. The setData(float f) finds in which bin
-// the value falls for nBins between the given minimum and maximum
-// values. An integer array keeps track of the number of times the input
-// value fell into a particular bin.
-// The DataChart class is used to display the histogram. This class
-// in turn uses the BarChart tool which needs the data passed as a 
-// string array. This is not optimal but OK for demonstration purposes.
-//
-//********************************************************************
+import java.util.Arrays;
+
+/**
+ * @author timpalpant
+ * Adapted from: http://www.particle.kth.se/~fmi/kurs/PhysicsSimulation/Lectures/11B/Examples/Experiment/Histogram.java
+ * A simple histogram class. The setData(float f) finds in which bin
+ * the value falls for nBins between the given minimum and maximum
+ * values. An integer array keeps track of the number of times the input
+ * value fell into a particular bin.
+ */
 public class FloatHistogram {
 
 	int[] bins = null;
 	int nBins;
-	float xLow, xHigh;
-	float delBin;
+	double xLow, xHigh;
+	double delBin;
 
 	int overFlows = 0, underFlows = 0;
 
-	public FloatHistogram(int nBins, float xLow, float xHigh) {
+	public FloatHistogram(int nBins, double xLow, double xHigh) {
 
 		this.nBins = nBins;
 		this.xLow = xLow;
@@ -34,15 +31,7 @@ public class FloatHistogram {
 		reset();
 	}
 
-	public FloatHistogram(int nBins, double xLow, double xHigh) {
-		this(nBins, (float) xLow, (float) xHigh);
-	}
-
 	public void addValue(double data) {
-		addValue((float) data);
-	}
-
-	public void addValue(float data) {
 		if (data < xLow) {
 			underFlows++;
 		} else if (data >= xHigh) {
@@ -59,14 +48,14 @@ public class FloatHistogram {
 		return bins;
 	}
 	
-	public float getBinSize() {
+	public double getBinSize() {
 		return delBin;
 	}
 
 	public void reset() {
-		for (int i = 0; i < nBins; i++) {
-			bins[i] = 0;
-		}
+		Arrays.fill(bins, 0);
+		underFlows = 0;
+		overFlows = 0;
 	}
 	
 	public String toString() {

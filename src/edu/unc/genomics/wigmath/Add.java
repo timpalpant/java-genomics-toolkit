@@ -43,8 +43,6 @@ public class Add extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Computing sum for chunk "+chr+":"+start+"-"+stop);
-		
 		int length = stop - start + 1;
 		float[] sum = new float[length];
 		

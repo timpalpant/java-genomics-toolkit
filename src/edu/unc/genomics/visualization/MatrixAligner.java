@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
@@ -96,42 +95,34 @@ public class MatrixAligner extends CommandLineTool {
 			log.debug("Iterating over all intervals");
 			String[] row = new String[n];
 			for (BedEntry entry : loci) {
+				count++;
 			  Arrays.fill(row, "-");
-				Iterator<WigItem> result = null;
 				try {
-					result = inputFile.query(entry);
+					Iterator<WigItem> result = inputFile.query(entry);
+					float[] data = WigFile.flattenData(result, entry.getStart(), entry.getStop());
+					
+					// Position the data in the matrix
+					// Locus alignment point (entry value) should be positioned over the matrix alignment point
+					int n1 = alignmentPoint - Math.abs(entry.getValue().intValue()-entry.getStart());
+					int n2 = alignmentPoint + Math.abs(entry.getValue().intValue()-entry.getStop());
+					assert data.length == n2-n1+1;
+					
+					for (int i = 0; i < data.length; i++) {
+						if (!Float.isNaN(data[i])) {
+							row[n1+i] = String.valueOf(data[i]);
+						}
+					}
 				} catch (WigFileException e) {
 					skipped++;
-					String id = ((entry.getId() == null) ? entry.getId() : "Row "+(count++));
-  				writer.write(id);
-  				for (int i = leftBound; i <= rightBound; i++) {
-  					writer.write("\t"+row[i]);
-  				}
-  				writer.newLine();
-					continue;
-				}
-				
-				float[] data = WigFile.flattenData(result, entry.getStart(), entry.getStop());
-				
-				// Position the data in the matrix
-				// Locus alignment point (entry value) should be positioned over the matrix alignment point
-				int n1 = alignmentPoint - Math.abs(entry.getValue().intValue()-entry.getStart());
-				int n2 = alignmentPoint + Math.abs(entry.getValue().intValue()-entry.getStop());
-				assert data.length == n2-n1+1;
-				
-				for (int i = 0; i < data.length; i++) {
-					if (!Float.isNaN(data[i])) {
-						row[n1+i] = String.valueOf(data[i]);
+				} finally {
+					// Write to output
+					String id = ((entry.getId() == null) ? entry.getId() : "Row "+count);
+					writer.write(id);
+					for (int i = leftBound; i <= rightBound; i++) {
+						writer.write("\t"+row[i]);
 					}
+					writer.newLine();
 				}
-				
-				// Write to output
-				String id = ((entry.getId() == null) ? entry.getId() : "Row "+(count++));
-				writer.write(id);
-				for (int i = leftBound; i <= rightBound; i++) {
-					writer.write("\t"+row[i]);
-				}
-				writer.newLine();
 			}
 		}
 		
