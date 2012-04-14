@@ -1,6 +1,6 @@
 <tool id="DynaPro" name="Compute equilibrium nucleosome positions" version="1.0.0">
   <description>using DynaPro</description>
-  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.PredictFAIRESignal -i $input -n $N -m $mean -v $variance -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.DynaPro -i $input -n $N -m $mean -v $variance -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Energy landscape" />
       <param name="N" type="integer" value="147" label="Nucleosome size (bp)" />
@@ -11,10 +11,14 @@
       <data format="wig" name="output" metadata_source="input" />
   </outputs>
   <help>
+
   .. class:: warningmark
+  
   At present, this tool is only suitable for small genomes (yeast).
   
   .. class:: warningmark
+
   See Morozov AV, Fortney K, Gaykalova DA, Studitsky VM, Widom J and Siggia ED (2009) Using DNA mechanics to predict in vitro nucleosome positions and formation energies. Nucleic Acids Res 37: 4707–4722.
+
   </help>
 </tool>
