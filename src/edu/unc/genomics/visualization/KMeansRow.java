@@ -3,7 +3,7 @@ package edu.unc.genomics.visualization;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.commons.math.stat.clustering.Clusterable;
+import org.apache.commons.math3.stat.clustering.Clusterable;
 
 /**
  * @author timpalpant

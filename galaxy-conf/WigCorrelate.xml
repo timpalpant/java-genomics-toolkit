@@ -1,0 +1,25 @@
+<tool id="WigCorrelate" name="Correlate" version="1.0.0">
+  <description>multiple (Big)Wig files</description>
+  <command interpreter="sh">
+    galaxyToolRunner.sh wigmath.WigCorrelate -w $window -t $type -o $output
+      #for $input in $inputs
+        ${input.file}
+      #end for
+  </command>
+  <inputs>
+      <repeat name="inputs" title="(Big)Wig file">
+        <param name="file" type="data" format="bigwig,wig" />
+      </repeat>
+      <param name="window" type="integer" value="100" label="Window size (bp)" />
+      <param name="type" type="select" label="Correlation metric">
+      	<option value="pearson">Pearson</option>
+      	<option value="spearman">Spearman</option>
+      </param>
+  </inputs>
+  <outputs>
+      <data format="tabular" name="output" />
+  </outputs>
+  
+<help>
+</help>
+</tool>

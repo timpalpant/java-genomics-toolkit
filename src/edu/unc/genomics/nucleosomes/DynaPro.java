@@ -37,12 +37,12 @@ public class DynaPro extends CommandLineTool {
 	@Override
 	public void run() throws IOException {
 		if (newMean != null) {
-			log.debug("Shifting mean of energy landscape to "+newMean);
+			log.debug("Shifting mean of energy landscape from "+inputFile.mean()+" to "+newMean);
 			shift = (float) (newMean - inputFile.mean());
 		}
 		
 		if (newVar != null) {
-			log.debug("Rescaling variance of energy landscape to "+newVar);
+			log.debug("Rescaling variance of energy landscape from "+Math.pow(inputFile.stdev(),2)+" to "+newVar);
 			scale = (float) Math.sqrt(newVar / Math.pow(inputFile.stdev(), 2));
 		}
 		

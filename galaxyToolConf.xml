@@ -13,6 +13,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/NRLCalculator.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Phasogram.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/PercusDecomposition.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/DynaPro.xml" />
   </section>
   <section name="NGS" id="java-genomics-toolkit-ngs">
     <tool file="java-genomics-toolkit/other-tools/Autocorrelation.xml" />
@@ -27,13 +28,14 @@
     <tool file="java-genomics-toolkit/galaxy-conf/Add.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Average.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Divide.xml" />
-    <tool file="java-genomics-toolkit/galaxy-conf/FilterOutlierRegions.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/FindOutlierRegions.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GaussianSmooth.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/LogTransform.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/MovingAverageSmooth.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Multiply.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Scale.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Subtract.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/WigCorrelate.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/WigSummary.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/ValueDistribution.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/ZScore.xml" />

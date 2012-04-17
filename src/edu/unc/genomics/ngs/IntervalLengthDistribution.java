@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.math.stat.Frequency;
+import org.apache.commons.math3.stat.Frequency;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;

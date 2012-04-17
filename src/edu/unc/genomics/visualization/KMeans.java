@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math.stat.clustering.Cluster;
-import org.apache.commons.math.stat.clustering.KMeansPlusPlusClusterer;
+import org.apache.commons.math3.stat.clustering.Cluster;
+import org.apache.commons.math3.stat.clustering.KMeansPlusPlusClusterer;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;

@@ -3,7 +3,7 @@ package edu.unc.genomics.nucleosomes;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
