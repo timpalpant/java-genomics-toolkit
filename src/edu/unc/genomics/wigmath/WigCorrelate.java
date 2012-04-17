@@ -8,9 +8,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
@@ -18,7 +20,7 @@ import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.utils.Correlation;
+import edu.unc.utils.FloatCorrelation;
 
 public class WigCorrelate extends CommandLineTool {
 
@@ -35,6 +37,9 @@ public class WigCorrelate extends CommandLineTool {
 	
 	private Correlation corr;
 	private List<WigFile> wigs = new ArrayList<>();
+	private List<String> chromosomes;
+	int[] chrStarts, chrStops, chrLengths, nBins;
+	int totalNumBins = 0;
 	private float[][] correlationMatrix;
 	
 	@Override
@@ -63,10 +68,10 @@ public class WigCorrelate extends CommandLineTool {
 		correlationMatrix = new float[wigs.size()][wigs.size()];
 		
 		// Get the maximum extent for each chromosome
-		List<String> chromosomes = new ArrayList<>(WigMathTool.getCommonChromosomes(wigs));
-		int[] chrStarts = new int[chromosomes.size()];
+		chromosomes = new ArrayList<>(WigMathTool.getCommonChromosomes(wigs));
+		chrStarts = new int[chromosomes.size()];
 		Arrays.fill(chrStarts, Integer.MAX_VALUE);
-		int[] chrStops = new int[chromosomes.size()];
+		chrStops = new int[chromosomes.size()];
 		Arrays.fill(chrStops, Integer.MIN_VALUE);
 		for (int i = 0; i < chromosomes.size(); i++) {
 			String chr = chromosomes.get(i);
@@ -80,9 +85,8 @@ public class WigCorrelate extends CommandLineTool {
 			}
 		}
 		// Calculate the number of bins for each chromosome
-		int[] chrLengths = new int[chromosomes.size()];
-		int[] nBins = new int[chromosomes.size()];
-		int totalNumBins = 0;
+		chrLengths = new int[chromosomes.size()];
+		nBins = new int[chromosomes.size()];
 		for (int i = 0; i < chromosomes.size(); i++) {
 			chrLengths[i] = chrStops[i] - chrStarts[i] + 1;
 			nBins[i] = (int) Math.ceil(((double)chrLengths[i])/windowSize);
@@ -92,15 +96,26 @@ public class WigCorrelate extends CommandLineTool {
 		
 		// Compute the pairwise correlations between all files
 		// only keeping two files in memory at any one time
-		for (int i = 0; i < wigs.size(); i++) {
-			// Get the data for file i
-			float[] binsI = new float[totalNumBins];
+		for (int i = 0; i < wigs.size()-1; i++) {
+			log.debug("Loading data from file "+i);
+			float[] binsI = getDataVector(wigs.get(i));
 			
 			for (int j = i+1; j < wigs.size(); j++) {
-				// Get the data for file j
+				log.debug("Loading data from file "+j);
+				float[] binsJ = getDataVector(wigs.get(j));
 				
-				// Correlate (i,j)
-				//correlationMatrix[i][j] = corr.compute(binsi, binsj);
+				log.debug("Correlating ("+i+","+j+")");
+				switch (corr) {
+				case PEARSON:
+					correlationMatrix[i][j] = FloatCorrelation.pearson(binsI, binsJ);
+					break;
+				case SPEARMAN:
+					correlationMatrix[i][j] = FloatCorrelation.spearman(binsI, binsJ);
+					break;
+				}
+				
+				// Copy the correlation to the symmetric point in the matrix
+				correlationMatrix[j][i] = correlationMatrix[i][j];
 			}
 		}
 		
@@ -129,12 +144,85 @@ public class WigCorrelate extends CommandLineTool {
 	}
 	
 	/**
+	 * Get a collapsed data vector from w
+	 * @param w
+	 * @return
+	 * @throws IOException 
+	 * @throws WigFileException 
+	 */
+	private float[] getDataVector(WigFile w) {
+		float[] sum = new float[totalNumBins];
+		int[] counts = new int[totalNumBins];
+		
+		int binOffset = 0;
+		for (int i = 0; i < chromosomes.size(); i++) {
+			String chr = chromosomes.get(i);
+			try {
+				Iterator<WigItem> result = w.query(chr, w.getChrStart(chr), w.getChrStop(chr));
+				while (result.hasNext()) {
+					WigItem item = result.next();
+					for (int bp = item.getStartBase(); bp <= item.getEndBase(); bp++) {
+						int bin = (bp-chrStarts[i]) / windowSize;
+						sum[bin+binOffset] += item.getWigValue();
+						counts[bin+binOffset]++;
+					}
+				}
+			} catch (WigFileException | IOException e) {
+				log.error("Error getting data from wig file: "+w.getPath());
+				throw new CommandLineToolException(e.getMessage());
+			}
+			
+			binOffset += nBins[i];
+		}
+		
+		// Compute the average
+		float[] avg = new float[totalNumBins];
+		for (int i = 0; i < totalNumBins; i++) {
+			if (counts[i] > 0) {
+				avg[i] = sum[i] / counts[i];
+			} else {
+				avg[i] = Float.NaN;
+			}
+		}
+		
+		return avg;
+	}
+	
+	/**
 	 * @param args
 	 * @throws WigFileException 
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
 		new WigCorrelate().instanceMain(args);
+	}
+	
+	public enum Correlation {
+		PEARSON("pearson"),
+		SPEARMAN("spearman");
+		
+		private String name;
+		
+		Correlation(final String name) {
+			this.name = name;
+		}
+		
+		public static Correlation fromName(final String name) {
+			for (Correlation c : Correlation.values()) {
+				if (c.getName().equalsIgnoreCase(name)) {
+					return c;
+				}
+			}
+			
+			return null;
+		}
+
+		/**
+		 * @return the name
+		 */
+		public String getName() {
+			return name;
+		}
 	}
 
 }

@@ -7,7 +7,7 @@ package edu.unc.utils;
  *
  */
 public class SortUtils {
-	public static int[] indexSort(float[] main) {
+	public static int[] rank(float[] main) {
 		int[] index = new int[main.length];
 		for (int i = 0; i < index.length; i++) {
 			index[i] = i;
@@ -19,7 +19,7 @@ public class SortUtils {
 	}
 
 	// quicksort a[left] to a[right]
-	public static void quicksort(float[] a, int[] index, int left, int right) {
+	private static void quicksort(float[] a, int[] index, int left, int right) {
 		if (right <= left)
 			return;
 		int i = partition(a, index, left, right);

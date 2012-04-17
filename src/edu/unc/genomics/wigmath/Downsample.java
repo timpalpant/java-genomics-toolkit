@@ -7,8 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.apache.commons.math3.stat.correlation.SpearmansCorrelation;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
@@ -18,7 +16,7 @@ import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.utils.Correlation;
+import edu.unc.utils.DownsamplingMetric;
 
 public class Downsample extends CommandLineTool {
 
@@ -101,35 +99,6 @@ public class Downsample extends CommandLineTool {
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
 		new Downsample().instanceMain(args);
-	}
-	
-	public enum DownsamplingMetric {
-		MEAN("mean"),
-		MIN("min"),
-		MAX("max");
-		
-		private String name;
-		
-		DownsamplingMetric(final String name) {
-			this.name = name;
-		}
-		
-		public static DownsamplingMetric fromName(final String name) {
-			for (DownsamplingMetric dsm : DownsamplingMetric.values()) {
-				if (dsm.getName().equalsIgnoreCase(name)) {
-					return dsm;
-				}
-			}
-			
-			return null;
-		}
-
-		/**
-		 * @return the name
-		 */
-		public String getName() {
-			return name;
-		}
 	}
 
 }
