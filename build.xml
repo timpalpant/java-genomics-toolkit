@@ -12,7 +12,6 @@
   <!-- directory variables -->
   <property name="src" location="src"/>
   <property name="test" location="test"/>
-  <property name="gui" location="gui"/>
   <property name="build" location="build"/>
   <property name="dist" location="dist"/>
   <property name="lib" location="lib"/>
@@ -30,15 +29,6 @@
 	    </path>
 	  </classpath>
     </javac>
-    
-    <!-- Compile the java code from ${gui} into ${build} -->
-    <javac srcdir="${gui}" destdir="${build}" source="1.7" target="1.7" debug="true">
-      <classpath>
-  	    <path id="lib.path.ref">
-  	      <fileset dir="lib" includes="*.jar"/>
-  	    </path>
-  	  </classpath>
-	</javac>
   </target>
 
   <!-- package all Java code into a JAR file -->
@@ -50,59 +40,6 @@
     <jar jarfile="${dist}/${ant.project.name}.jar" manifest="META-INF/MANIFEST.MF">
       <fileset dir="${build}" />
     </jar>
-  </target>
-
-  <!-- Package the jar file into a Mac OS X application with jarbundler -->
-  <target name="package-osx" depends="jar" description="Build the application for OS X">
-    <taskdef name="jarbundler"
-             classpath="${lib}/jarbundler-2.2.0.jar" 
-             classname="net.sourceforge.jarbundler.JarBundler"/>
-
-    <jarbundler dir="${dist}" verbose="false" showPlist="false"
-                name="Genomics Toolkit"
-                mainclass="edu.unc.genomics.ToolRunner"
-      			jvmversion="1.7+"
-      			stubfile="stubFile.sh"
-                version="${version}"
-                infostring="${ant.project.name}, ${copyright}"
-                build="${buildnumber}"
-                bundleid="edu.unc.genomics.GenomicsToolkit">
-      
-        <jarfilelist dir="${dist}" files="${ant.project.name}.jar"/>
-        <jarfileset dir="${lib}">
-          <include name="*.jar" />
-          <exclude name="launch4j.jar" />
-          <exclude name="xstream.jar" />
-          <exclude name="jarbundler-2.2.0.jar" />
-        </jarfileset>
-
-	    <!-- Adjust the look, feel and behavior -->
-	    <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
-	    <javaproperty name="apple.awt.brushMetal" value="true"/>
-	    <javaproperty name="apple.awt.showGrowBox" value="false"/>
-      	<javaproperty name="apple.awt.textantialiasing" value="true"/>
-        <javaproperty name="apple.awt.antialiasing" value="true"/>
-	
-	    <!-- Associate document types with this application -->
-	    <documenttype name="Assembly files"
-	      			  extensions="len" 
-	                  role="Viewer" />
-	
-	    <!-- Include resource files -->                
-	    <resourcefilelist dir="." files="README.rdoc"/>
-        <resourcefilelist dir="." files="toolConf.xml"/>
-	    <resourcefileset dir="." includes="resources/assemblies/*.len"/>
-        <javafilelist dir="." files="log4j.properties"/>
-    </jarbundler>
-  </target>
-  
-  <!-- Package the jar file into a Windows application with launch4j -->
-  <target name="package-win" depends="jar" description="Build the application for Windows">
-    <taskdef name="launch4j"
-        classname="net.sf.launch4j.ant.Launch4jTask"
-        classpath="${lib}/launch4j.jar:${lib}/xstream.jar" />
-    
-    <launch4j configFile="launch4j.xml" />
   </target>
 
   <target name="clean" description="clean up" >
