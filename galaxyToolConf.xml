@@ -28,6 +28,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/Add.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Average.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Divide.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/Downsample.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/FindOutlierRegions.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GaussianSmooth.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/LogTransform.xml" />

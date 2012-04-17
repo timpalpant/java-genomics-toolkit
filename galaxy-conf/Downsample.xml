@@ -1,0 +1,11 @@
+<tool id="WigDownsample" name="Downsample" version="1.0.0">
+  <description>a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.Downsample -i $input -w $window -o $output</command>
+  <inputs>
+      <param format="bigwig,wig" name="input" type="data" label="Original data" />
+      <param name="window" type="integer" value="100" label="Window size (bp)" />
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+</tool>

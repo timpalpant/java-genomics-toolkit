@@ -7,10 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
@@ -35,7 +34,7 @@ public class WigCorrelate extends CommandLineTool {
 	public Path outputFile;
 	
 	private Correlation corr;
-	private List<WigFile> wigs;
+	private List<WigFile> wigs = new ArrayList<>();
 	private float[][] correlationMatrix;
 	
 	@Override
@@ -63,10 +62,39 @@ public class WigCorrelate extends CommandLineTool {
 		log.debug("Initialized " + wigs.size() + " input files");
 		correlationMatrix = new float[wigs.size()][wigs.size()];
 		
+		// Get the maximum extent for each chromosome
+		List<String> chromosomes = new ArrayList<>(WigMathTool.getCommonChromosomes(wigs));
+		int[] chrStarts = new int[chromosomes.size()];
+		Arrays.fill(chrStarts, Integer.MAX_VALUE);
+		int[] chrStops = new int[chromosomes.size()];
+		Arrays.fill(chrStops, Integer.MIN_VALUE);
+		for (int i = 0; i < chromosomes.size(); i++) {
+			String chr = chromosomes.get(i);
+			for (WigFile w : wigs) {
+				if (w.getChrStart(chr) < chrStarts[i]) {
+					chrStarts[i] = w.getChrStart(chr);
+				}
+				if (w.getChrStop(chr) > chrStops[i]) {
+					chrStops[i] = w.getChrStop(chr);
+				}
+			}
+		}
+		// Calculate the number of bins for each chromosome
+		int[] chrLengths = new int[chromosomes.size()];
+		int[] nBins = new int[chromosomes.size()];
+		int totalNumBins = 0;
+		for (int i = 0; i < chromosomes.size(); i++) {
+			chrLengths[i] = chrStops[i] - chrStarts[i] + 1;
+			nBins[i] = (int) Math.ceil(((double)chrLengths[i])/windowSize);
+			totalNumBins += nBins[i];
+		}
+		log.debug("Total number of bins for all chromosomes = "+totalNumBins);
+		
 		// Compute the pairwise correlations between all files
 		// only keeping two files in memory at any one time
 		for (int i = 0; i < wigs.size(); i++) {
 			// Get the data for file i
+			float[] binsI = new float[totalNumBins];
 			
 			for (int j = i+1; j < wigs.size(); j++) {
 				// Get the data for file j

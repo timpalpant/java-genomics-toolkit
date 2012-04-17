@@ -120,7 +120,7 @@ public abstract class WigMathTool extends CommandLineTool {
 		}
 	}
 	
-	public int getMaxChrStart(List<WigFile> wigs, String chr) {
+	public static int getMaxChrStart(List<WigFile> wigs, String chr) {
 		int max = -1;
 		for (WigFile wig : wigs) {
 			if (wig.getChrStart(chr) > max) {
@@ -131,7 +131,7 @@ public abstract class WigMathTool extends CommandLineTool {
 		return max;
 	}
 	
-	public int getMinChrStop(List<WigFile> wigs, String chr) {
+	public static int getMinChrStop(List<WigFile> wigs, String chr) {
 		if (wigs.size() == 0) {
 			return -1;
 		}
@@ -146,7 +146,7 @@ public abstract class WigMathTool extends CommandLineTool {
 		return min;
 	}
 	
-	public Set<String> getCommonChromosomes(List<WigFile> wigs) {
+	public static Set<String> getCommonChromosomes(List<WigFile> wigs) {
 		if (wigs.size() == 0) {
 			return new HashSet<String>();
 		}
