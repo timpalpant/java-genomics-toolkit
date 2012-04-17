@@ -35,6 +35,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/MovingAverageSmooth.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Multiply.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Scale.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/Shift.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Subtract.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/WigCorrelate.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/WigSummary.xml" />

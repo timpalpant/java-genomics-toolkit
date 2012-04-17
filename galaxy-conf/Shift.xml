@@ -1,0 +1,13 @@
+<tool id="WigShift" name="Mean shift" version="1.0.0">
+  <description>a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.Shift -i $input -m $M -o $output</command>
+  <inputs>
+    <param format="bigwig,wig" name="input" type="data" label="Shift the data in" />
+    <param name="M" type="float" value="0" label="To have mean" />
+  </inputs>
+  <outputs>
+    <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+  <help>
+  </help>
+</tool>

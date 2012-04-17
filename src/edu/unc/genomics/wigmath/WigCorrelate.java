@@ -52,6 +52,8 @@ public class WigCorrelate extends CommandLineTool {
 		if (corr == null) {
 			log.error("Unknown correlation metric: "+type);
 			throw new CommandLineToolException("Unknown correlation metric: "+type+". Options are pearson, spearman");
+		} else {
+			log.debug("Computing "+type+" correlation");
 		}
 		
 		log.debug("Initializing input files");
