@@ -50,6 +50,7 @@ public class FindOutlierRegions extends CommandLineTool {
 				// Process the chromosome in chunks
 				int bp = start;
 				Integer outlierStart = null;
+				stats.clear();
 				while (bp < stop) {
 					int chunkStart = bp;
 					int chunkStop = Math.min(bp+DEFAULT_CHUNK_SIZE-1, stop);

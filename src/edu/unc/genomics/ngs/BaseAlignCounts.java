@@ -64,16 +64,16 @@ public class BaseAlignCounts extends CommandLineTool {
 						int entryStop = entry.getStop();
 						if (extend != null && extend != -1) {
 							if (entry.isWatson()) {
-								entryStop = entry.getStart() + extend;
+								entryStop = entry.getStart() + extend - 1;
 							} else {
-								entryStop = entry.getStart() - extend;
+								entryStop = entry.getStart() - extend + 1;
 							}
 						}
 						
 						// Clamp to the current chunk
-						int entryStart = Math.max(entry.getStart(), start);
-						entryStop = Math.min(entryStop, stop);
-						for (int i = entryStart; i <= entryStop; i++) {
+						int low = Math.max(Math.min(entry.getStart(), entryStop), start);
+						int high = Math.min(Math.max(entry.getStart(), entryStop), stop);
+						for (int i = low; i <= high; i++) {
 							count[i-start]++;
 						}
 					}
