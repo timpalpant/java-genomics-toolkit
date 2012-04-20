@@ -1,18 +1,18 @@
 package edu.unc.utils;
 
-public enum DownsamplingMetric {
+public enum WigStatistic {
 	MEAN("mean"),
 	MIN("min"),
 	MAX("max");
 	
 	private String name;
 	
-	DownsamplingMetric(final String name) {
+	WigStatistic(final String name) {
 		this.name = name;
 	}
 	
-	public static DownsamplingMetric fromName(final String name) {
-		for (DownsamplingMetric dsm : DownsamplingMetric.values()) {
+	public static WigStatistic fromName(final String name) {
+		for (WigStatistic dsm : WigStatistic.values()) {
 			if (dsm.getName().equalsIgnoreCase(name)) {
 				return dsm;
 			}

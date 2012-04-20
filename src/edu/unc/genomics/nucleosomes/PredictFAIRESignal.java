@@ -23,12 +23,16 @@ public class PredictFAIRESignal extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(PredictFAIRESignal.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
+	@Parameter(names = {"-i", "--input"}, description = "Input (nucleosome occupancy)", required = true)
 	public WigFile inputFile;
 	@Parameter(names = {"-s", "--sonication"}, description = "Sonication distribution", required = true, validateWith = ReadablePathValidator.class)
 	public Path sonicationFile;
 	@Parameter(names = {"-c", "--crosslinking"}, description = "FAIRE efficiency / crosslinking coefficient")
-	public double crosslink = 1;
+	public float crosslink = 1;
+	@Parameter(names = {"-n", "--nucSize"}, description = "Nucleosome size (bp)")
+	public int nucSize = 147;
+	@Parameter(names = {"-x", "--extend"}, description = "In silico read extension (bp)")
+	public int extend = 250;
 
 	double[] sonication = new double[100];
 	int L;
@@ -89,26 +93,40 @@ public class PredictFAIRESignal extends WigMathTool {
 			result[i] /= maxOcc;
 		}
 		
-		log.debug("Computing forward sums");
-		float[][] fsums = new float[sonication.length][result.length];
-		// TODO Compute this more efficiently
+		log.debug("Computing FAIRE prediction");
+		float[] watson = new float[result.length];
+		float[] crick = new float[result.length];
+		// Consider all possible fragment lengths
 		for (int i = 1; i < sonication.length; i++) {
-			for (int x = 0; x < result.length-i+1; x++) {
-				for (int k = 0; k < i; k++) {
-					fsums[i][x] += crosslink*result[x+k];
+			// Starting at each base pair in the chunk
+			for (int j = 0; j < result.length-i; j++) {
+				// Calculate the probability that this fragment is occupied by a nucleosome
+				// using the inclusion-exclusion principle with nucleosome width = 147bp;
+				float pOccupied = 0;
+				for (int k = j; k < j+i; k++) {
+					pOccupied += result[k];
 				}
-				fsums[i][x] = 1 - Math.min(fsums[i][x], 1);
+				// Calculate the probability that this fragment survives FAIRE
+				float pFAIRE = crosslink*(1-pOccupied);
+				
+				// Add its probability at the +/- ends, weighted by fragment abundance
+				watson[j] += sonication[i]*pFAIRE;
+				crick[j+i-1] += sonication[i]*pFAIRE;
 			}
 		}
 		
-		log.debug("Computing FAIRE prediction");
+		log.debug("Extending reads from the +/- strands");
 		float[] prediction = new float[stop-start+1];
-		// TODO Compute this more efficiently
-		for (int x = 0; x < prediction.length; x++) {
-			for (int i = 1; i < sonication.length; i++) {
-				for (int j = -i+1; j <= 0; j++) {
-          // Add to total and weight by relative abundance of this fragment length
-          prediction[x] += sonication[i] * fsums[i][x+j+L];
+		for (int i = 0; i < result.length; i++) {
+			for (int j = 0; j < extend; j++) {
+				// Extend on the + strand
+				if (i+j-L > 0 && i+j-L < prediction.length) {
+					prediction[i+j-L] += watson[i];
+				}
+				
+				// Extend on the - strand
+				if (i-j-L > 0 && i-j-L < prediction.length) {
+					prediction[i-j-L] += crick[i];
 				}
 			}
 		}

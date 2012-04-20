@@ -19,6 +19,7 @@
     <tool file="java-genomics-toolkit/other-tools/Autocorrelation.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/BaseAlignCounts.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/FindAbsoluteMaxima.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/FindOutlierRegions.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/IntervalLengthDistribution.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/IntervalStats.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/PowerSpectrum.xml" />

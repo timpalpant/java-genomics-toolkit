@@ -1,7 +1,7 @@
 <tool id="IntervalStats" name="Compute window statistics" version="1.0.0">
   <description>on data in a Wiggle file</description>
   <command interpreter="sh">
-    galaxyToolRunner.sh ngs.IntervalStats -l $windows -o $output
+    galaxyToolRunner.sh ngs.IntervalStats -l $windows -s $stat -o $output
       #for $input in $inputs
         ${input.file}
       #end for
@@ -11,13 +11,12 @@
         <param name="file" type="data" format="bigwig,wig" />
       </repeat>
       <param format="bed,bedgraph,gff" name="windows" type="data" label="List of intervals" />
-      <!-- TODO: Implement other statistics
       <param name="stat" type="select" optional="true" label="For each window, compute the">
         <option value="mean">Mean</option>
-        <option value="median">Median</option>
+        <!-- TODO <option value="median">Median</option> -->
         <option value="max">Max</option>
         <option value="min">Min</option>
-      </param> -->
+      </param>
   </inputs>
   <outputs>
       <data format="tabular" name="output" />

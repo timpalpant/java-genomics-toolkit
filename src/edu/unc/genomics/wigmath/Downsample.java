@@ -16,7 +16,7 @@ import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.utils.DownsamplingMetric;
+import edu.unc.utils.WigStatistic;
 
 public class Downsample extends CommandLineTool {
 
@@ -33,7 +33,7 @@ public class Downsample extends CommandLineTool {
 		
 	@Override
 	public void run() throws IOException {
-		DownsamplingMetric dsm = DownsamplingMetric.fromName(metric);
+		WigStatistic dsm = WigStatistic.fromName(metric);
 		if (dsm == null) {
 			log.error("Unknown downsampling metric: "+metric);
 			throw new CommandLineToolException("Unknown downsampling metric: "+metric+". Options are mean, min, max");
