@@ -1,6 +1,6 @@
 <tool id="WigFindOutliers" name="Find outlier regions" version="1.0.0">
   <description>in a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.FindOutlierRegions -i $input -w $window -t $threshold -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh ngs.FindOutlierRegions -i $input -w $window -t $threshold -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Filter outlier regions in" />
       <param name="window" type="integer" value="150" label="Window size" />
