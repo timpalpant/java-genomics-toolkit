@@ -1,5 +1,7 @@
 package edu.unc.utils;
 
+import java.util.Arrays;
+
 /**
  * Custom sorting utilities
  * see: http://stackoverflow.com/questions/951848/java-array-sort-quick-way-to-get-a-sorted-list-of-indices-of-an-array
@@ -49,10 +51,6 @@ public class SortUtils {
 
 	// exchange a[i] and a[j]
 	private static void exch(float[] a, int[] index, int i, int j) {
-		// Don't swap the data
-		// float swap = a[i];
-		// a[i] = a[j];
-		// a[j] = swap;
 		int b = index[i];
 		index[i] = index[j];
 		index[j] = b;

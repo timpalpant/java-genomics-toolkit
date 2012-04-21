@@ -33,8 +33,6 @@ public class Scale extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Computing difference for chunk "+chr+":"+start+"-"+stop);
-		
 		Iterator<WigItem> data = inputFile.query(chr, start, stop);
 		float[] result = WigFile.flattenData(data, start, stop);
 		

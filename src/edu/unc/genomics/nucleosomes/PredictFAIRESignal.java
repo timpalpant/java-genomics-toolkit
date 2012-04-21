@@ -18,6 +18,7 @@ import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.genomics.wigmath.WigMathTool;
+import edu.unc.utils.InclusionExclusion;
 
 public class PredictFAIRESignal extends WigMathTool {
 
@@ -102,10 +103,7 @@ public class PredictFAIRESignal extends WigMathTool {
 			for (int j = 0; j < result.length-i; j++) {
 				// Calculate the probability that this fragment is occupied by a nucleosome
 				// using the inclusion-exclusion principle with nucleosome width = 147bp;
-				float pOccupied = 0;
-				for (int k = j; k < j+i; k++) {
-					pOccupied += result[k];
-				}
+				float pOccupied = InclusionExclusion.independent(result, j, j+i);
 				// Calculate the probability that this fragment survives FAIRE
 				float pFAIRE = crosslink*(1-pOccupied);
 				

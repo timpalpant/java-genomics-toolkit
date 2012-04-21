@@ -1,6 +1,7 @@
 bin
 build
 dist
+reports
 *.class
 *.log
 .DS_Store

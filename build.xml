@@ -3,47 +3,92 @@
   <description>
     build the toolkit
   </description>
-  
+
   <!-- set global properties for this build -->
-  <property name="version" value="1.1.0"/>
-  <property name="buildnumber" value="1"/>
-  <property name="copyright" value="Copyright &#xa9; 2011 Timothy Palpant"/>
-  
+  <property name="version" value="1.1.0" />
+  <property name="buildnumber" value="1" />
+  <property name="copyright" value="Copyright &#xa9; 2011 Timothy Palpant" />
+  <property name="reports"   location="reports"/>
+  <property name="reports.junit"   location="${reports}/junit"/>
+  <property name="reports.junit.xml"   location="${reports.junit}/xml"/>
+
   <!-- directory variables -->
-  <property name="src" location="src"/>
-  <property name="test" location="test"/>
-  <property name="build" location="build"/>
-  <property name="dist" location="dist"/>
-  <property name="lib" location="lib"/>
+  <property name="src" location="src" />
+  <property name="test" location="test" />
+  <property name="build" location="build" />
+  <property name="dist" location="dist" />
+  <property name="lib" location="lib" />
+
+  <path id="classpath">
+    <fileset dir="${lib}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
 
   <!-- compile all Java code -->
   <target name="compile" description="compile the scripts">
     <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
-    
+    <mkdir dir="${build}" />
+
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}" source="1.7" target="1.7" debug="true">
-	  <classpath>
-	    <path id="lib.path.ref">
-	      <fileset dir="lib" includes="*.jar"/>
-	    </path>
-	  </classpath>
+      <classpath refid="classpath" />
+    </javac>
+
+    <!-- Compile the java code from ${test} into ${build} -->
+    <javac srcdir="${test}" destdir="${build}" source="1.7" target="1.7" debug="true">
+      <classpath location="${build}" />
+      <classpath refid="classpath" />
     </javac>
   </target>
 
   <!-- package all Java code into a JAR file -->
   <target name="jar" depends="compile" description="generate the jarfile">
     <!-- Create the distribution directory -->
-    <mkdir dir="${dist}"/>
+    <mkdir dir="${dist}" />
 
     <!-- Put everything in ${build} into the jar file -->
     <jar jarfile="${dist}/${ant.project.name}.jar" manifest="META-INF/MANIFEST.MF">
-      <fileset dir="${build}" />
+      <fileset dir="${build}">
+        <!--
+			Include all the application classes, but
+			don't include the test classes.
+		-->
+        <include name="**/*.class" />
+        <exclude name="**/*Test.class" />
+      </fileset>
     </jar>
   </target>
 
-  <target name="clean" description="clean up" >
-    <delete dir="${build}"/>
+  <target name="test" depends="compile">
+    <mkdir dir="${reports}" />
+    <mkdir dir="${reports.junit}" />
+    <mkdir dir="${reports.junit.xml}" />
+
+    <junit fork="true" forkmode="once" dir="${basedir}" failureProperty="test.failed">
+      <classpath location="${build}" />
+      <classpath refid="classpath" />
+
+      <formatter type="xml" />
+      <batchtest todir="${reports.junit.xml}">
+        <fileset dir="${test}">
+          <include name="**/*Test.java" />
+          <exclude name="**/Abstract*Test.java" />
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <junitreport todir="${reports.junit.xml}">
+      <fileset dir="${reports.junit.xml}">
+        <include name="TEST-*.xml" />
+      </fileset>
+      <report format="frames" todir="${reports.junit}" />
+    </junitreport>
+  </target>
+
+  <target name="clean" description="clean up">
+    <delete dir="${build}" />
     <delete dir="${dist}"/>
+    <delete dir="${reports}"/>
   </target>
 </project>
