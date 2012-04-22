@@ -1,7 +1,5 @@
 package edu.unc.utils;
 
-import java.util.Arrays;
-
 /**
  * Custom sorting utilities
  * see: http://stackoverflow.com/questions/951848/java-array-sort-quick-way-to-get-a-sorted-list-of-indices-of-an-array

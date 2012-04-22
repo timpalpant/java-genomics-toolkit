@@ -65,7 +65,7 @@ public class Average extends WigMathTool {
 		}
 		
 		for (int i = 0; i < avg.length; i++) {
-			avg[i] = avg[i] / numFiles;
+			avg[i] /= numFiles;
 		}
 		
 		return avg;

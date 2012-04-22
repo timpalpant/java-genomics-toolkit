@@ -68,6 +68,10 @@ public class WigCorrelate extends CommandLineTool {
 		}
 		log.debug("Initialized " + wigs.size() + " input files");
 		correlationMatrix = new float[wigs.size()][wigs.size()];
+		// Put ones down the diagonal
+		for (int i = 0; i < correlationMatrix.length; i++) {
+			correlationMatrix[i][i] = 1;
+		}
 		
 		// Get the maximum extent for each chromosome
 		chromosomes = new ArrayList<>(WigMathTool.getCommonChromosomes(wigs));
