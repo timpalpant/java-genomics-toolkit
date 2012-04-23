@@ -30,8 +30,6 @@ public class PredictFAIRESignal extends WigMathTool {
 	public Path sonicationFile;
 	@Parameter(names = {"-c", "--crosslinking"}, description = "FAIRE efficiency / crosslinking coefficient")
 	public float crosslink = 1;
-	@Parameter(names = {"-n", "--nucSize"}, description = "Nucleosome size (bp)")
-	public int nucSize = 147;
 	@Parameter(names = {"-x", "--extend"}, description = "In silico read extension (bp)")
 	public int extend = 250;
 
@@ -105,6 +103,11 @@ public class PredictFAIRESignal extends WigMathTool {
 		float[] crick = new float[result.length];
 		// Consider all possible fragment lengths
 		for (int i = minL; i < sonication.length; i++) {
+			// No need to count if there are no fragments of this length
+			if (sonication[i] == 0) {
+				continue;
+			}
+			
 			// Starting at each base pair in the chunk
 			for (int j = 0; j < result.length-i; j++) {
 				// Calculate the probability that this fragment is occupied by a nucleosome
