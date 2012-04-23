@@ -1,12 +1,11 @@
 <tool id="PredictFAIRE" name="Predict FAIRE signal" version="1.0.0">
   <description>from nucleosome occupancy</description>
-  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.PredictFAIRESignal -i $input -s $sonication -c $crosslinking -x $extend -n $nsize -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.PredictFAIRESignal -i $input -s $sonication -c $crosslinking -x $extend -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Nucleosome occupancy data" />
       <param format="tabular" name="sonication" type="data" label="Sonication fragment length distribution" />
       <param name="crosslinking" type="float" value="1.0" label="Crosslinking coefficient" />
       <param name="extend" type="integer" value="250" label="In silico read extension (bp)" />
-      <param name="nsize" type="integer" value="147" label="Nucleosome size (bp)" />
   </inputs>
   <outputs>
       <data format="wig" name="output" metadata_source="input" />
