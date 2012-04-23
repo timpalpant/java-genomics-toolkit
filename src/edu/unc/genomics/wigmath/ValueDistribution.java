@@ -77,8 +77,9 @@ public class ValueDistribution extends CommandLineTool {
 				while (iter.hasNext()) {
 					WigItem item = iter.next();
 					for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
-						if (i >= chunkStart && i <= chunkStop) {
-							hist.addValue(item.getWigValue());
+					  float value = item.getWigValue();
+						if (i >= chunkStart && i <= chunkStop && !Float.isNaN(value) && !Float.isInfinite(value)) {
+							hist.addValue(value);
 							double deviance = item.getWigValue() - mean;
 							double cubeOfDeviance = Math.pow(deviance, 3);
 							sumOfCubeOfDeviances += cubeOfDeviance;
@@ -100,11 +101,11 @@ public class ValueDistribution extends CommandLineTool {
 				// Output the moments of the distribution
 				writer.write("Moments:\t<w> = " + inputFile.mean());
 				writer.newLine();
-				writer.write("\tvar(w) = " + inputFile.stdev()*inputFile.stdev());
+				writer.write("\t\tvar(w) = " + inputFile.stdev()*inputFile.stdev());
 				writer.newLine();
-				writer.write("\tskew(w) = " + skewness);
+				writer.write("\t\tskew(w) = " + skewness);
 				writer.newLine();
-				writer.write("\tkur(w) = " + kurtosis);
+				writer.write("\t\tkur(w) = " + kurtosis);
 				writer.newLine();
 				writer.write("Histogram:");
 				writer.newLine();
