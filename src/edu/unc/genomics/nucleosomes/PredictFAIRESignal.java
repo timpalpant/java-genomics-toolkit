@@ -36,7 +36,7 @@ public class PredictFAIRESignal extends WigMathTool {
 	public int extend = 250;
 
 	double[] sonication = new double[100];
-	int L;
+	int minL = Integer.MAX_VALUE, maxL = 0;
 	double maxOcc;
 	
 	@Override
@@ -50,14 +50,20 @@ public class PredictFAIRESignal extends WigMathTool {
 			while ((line = reader.readLine()) != null) {
 				// Parse the line
 				String[] entry = line.split("\t");
+				if (entry.length != 2) {
+					throw new CommandLineToolException("Invalid format for sonication distribution file");
+				}
 				int length = Integer.parseInt(entry[0]);
 				double percent = Double.parseDouble(entry[1]);
 				// Expand the sonication distribution array if necessary
 				if (length >= sonication.length) {
 					sonication = Arrays.copyOf(sonication, Math.max(sonication.length+100, length+1));
 				}
-				if (length > L) {
-					L = length;
+				if (length < minL) {
+					minL = length;
+				}
+				if (length > maxL) {
+					maxL = length;
 				}
 				sonication[length] = percent;
 				total += percent;
@@ -68,8 +74,8 @@ public class PredictFAIRESignal extends WigMathTool {
 			throw new CommandLineToolException("Error loading sonication fragment length distribution");
 		}
 		// Truncate the array to the minimum possible size
-		sonication = Arrays.copyOfRange(sonication, 0, L);
-		log.debug("Loaded sonication distribution for lengths: 0-"+L+"bp");
+		sonication = Arrays.copyOfRange(sonication, 0, maxL);
+		log.debug("Loaded sonication distribution for lengths: 0-"+maxL+"bp");
 		
 		// Normalize the sonication distribution so that it has total 1
 		for (int i = 0; i < sonication.length; i++) {
@@ -82,11 +88,11 @@ public class PredictFAIRESignal extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		int paddedStart = Math.max(start-L, inputFile.getChrStart(chr));
-		int paddedStop = Math.min(stop+L, inputFile.getChrStop(chr));
+		int paddedStart = Math.max(start-maxL, inputFile.getChrStart(chr));
+		int paddedStop = Math.min(stop+maxL, inputFile.getChrStop(chr));
 		
 		Iterator<WigItem> data = inputFile.query(chr, paddedStart, paddedStop);
-		float[] result = WigFile.flattenData(data, start-L, stop+L, 0);
+		float[] result = WigFile.flattenData(data, start-maxL, stop+maxL, 0);
 		
 		// Scale the occupancy by the maximum occupancy so that it represents
 		// the probability that a base pair is occupied by a nucleosome
@@ -98,7 +104,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		float[] watson = new float[result.length];
 		float[] crick = new float[result.length];
 		// Consider all possible fragment lengths
-		for (int i = 1; i < sonication.length; i++) {
+		for (int i = minL; i < sonication.length; i++) {
 			// Starting at each base pair in the chunk
 			for (int j = 0; j < result.length-i; j++) {
 				// Calculate the probability that this fragment is occupied by a nucleosome
@@ -118,13 +124,13 @@ public class PredictFAIRESignal extends WigMathTool {
 		for (int i = 0; i < result.length; i++) {
 			for (int j = 0; j < extend; j++) {
 				// Extend on the + strand
-				if (i+j-L > 0 && i+j-L < prediction.length) {
-					prediction[i+j-L] += watson[i];
+				if (i+j-maxL > 0 && i+j-maxL < prediction.length) {
+					prediction[i+j-maxL] += watson[i];
 				}
 				
 				// Extend on the - strand
-				if (i-j-L > 0 && i-j-L < prediction.length) {
-					prediction[i-j-L] += crick[i];
+				if (i-j-maxL > 0 && i-j-maxL < prediction.length) {
+					prediction[i-j-maxL] += crick[i];
 				}
 			}
 		}
