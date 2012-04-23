@@ -7,16 +7,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.log4j.Logger;
-
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.ReadablePathValidator;
 
 public class StripMatrix extends CommandLineTool {
-	
-	private static final Logger log = Logger.getLogger(StripMatrix.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file (matrix2png format)", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
@@ -26,7 +22,8 @@ public class StripMatrix extends CommandLineTool {
 	public void run() throws IOException {		
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, Charset.defaultCharset())) {
 			try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-				String line;
+				// Skip the first (header) line
+				String line = reader.readLine();
 				while ((line = reader.readLine()) != null) {
 					String[] row = line.split("\t");
 					for (int i = 1; i < row.length; i++) {

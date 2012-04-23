@@ -16,6 +16,7 @@ import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.BedEntry;
 import edu.unc.genomics.CommandLineTool;
+import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.BedFile;
 import edu.unc.genomics.io.WigFile;
@@ -47,6 +48,9 @@ public class MatrixAligner extends CommandLineTool {
 		int leftMax = Integer.MIN_VALUE;
 		int rightMax = Integer.MIN_VALUE;
 		for (BedEntry entry : loci) {
+			if (entry.getValue() == null) {
+				throw new CommandLineToolException("You must specify an alignment point for each interval in column 5");
+			}
 			int left = Math.abs(entry.getValue().intValue()-entry.getStart());
 			int right = Math.abs(entry.getValue().intValue()-entry.getStop());
 			if (left > leftMax) {
