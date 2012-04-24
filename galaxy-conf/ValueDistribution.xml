@@ -1,6 +1,16 @@
 <tool id="ValueDistribution" name="Compute the value distribution" version="1.0.0">
   <description>of a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.ValueDistribution -i $input --max $max --min $min -n $bins -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.ValueDistribution -i $input 
+    #if str( $min ) != ''
+      --min $min
+    #end if
+    
+    #if str( $max ) != ''
+      --max $max
+    #end if
+    
+    -n $bins -o $output
+  </command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="(Big)Wig file" />
       <param name="min" type="float" optional="true" label="Minimum bin value (optional)" />
