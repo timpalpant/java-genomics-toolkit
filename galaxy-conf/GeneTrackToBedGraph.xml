@@ -10,12 +10,13 @@
 	
 <help>
 
-.. class:: warningmark
+This tool will sum the counts from the forward and reverse strands in a GeneTrack_ index to create a BedGraph file.
 
-This tool will sum the counts from the forward and reverse strands in a GeneTrack index to create a BedGraph file.
+.. _GeneTrack: http://atlas.bx.psu.edu/genetrack/docs/genetrack.html
 
 .. class:: warningmark
 	
 This tool requires GeneTrack formatted data. If you have tabular data that was not correctly autodetected, change the metadata by clicking on the pencil icon for the dataset.
+
 </help>
 </tool>

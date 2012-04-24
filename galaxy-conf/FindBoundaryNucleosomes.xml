@@ -3,15 +3,28 @@
   <command interpreter="sh">galaxyToolRunner.sh nucleosomes.FindBoundaryNucleosomes -i $input -l $loci -o $output</command>
   <inputs>
     <param name="input" type="data" format="tabular" label="Nucleosome calls" />
-    <param name="loci" type="data" format="bed" label="List of intervals" />
+    <param name="loci" type="data" format="bed,bedgraph,gff" label="List of intervals" />
   </inputs>
   <outputs>
     <data name="output" format="bed" metadata_source="loci" />
   </outputs>
   
   <help>
-    .. class:: warningmark
     
-    Use the Call Nucleosomes tool to create a file of called nucleosomes, then use this tool to identify the first nucleosome's dyad position from the 5' or 3' end.
+.. class:: infomark
+    
+Use the Call Nucleosomes tool to create a file of called nucleosomes, then use this tool to identify the first nucleosome's dyad position (peak maximum) from the 5' and 3' end of the gene.
+
+.. class:: infomark
+
+**TIP:** Nucleosome calls must be in tabular format of the kind produced by the Nucleosomes -> Call nucleosomes tool. Intervals must be in either Bed, BedGraph, or GFF format.
+
+-----
+
+**Syntax**
+
+- **Nucleosome calls** is a list of stereotypic nucleosome position calls.
+- **List of intervals:** The 5' and 3' boundary nucleosomes will be found for each interval in this list
+
   </help>
 </tool>

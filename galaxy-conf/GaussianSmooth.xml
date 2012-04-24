@@ -54,5 +54,14 @@
   </tests>
   
 <help>
+  
+This tool smooths genomic data with an area-preserving Gaussian_ filter. The Gaussian filter is computed out to +/- 3 standard deviations.
+
+.. _Gaussian: http://en.wikipedia.org/wiki/Gaussian_filter
+  
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
 </help>
 </tool>

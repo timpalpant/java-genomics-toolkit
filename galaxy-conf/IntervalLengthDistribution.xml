@@ -9,5 +9,12 @@
   </outputs>
   
 <help>
+  
+This tool calculates the distribution of interval lengths from a list of intervals or reads in SAM, BAM, Bed, BedGraph, or GFF format.
+
+.. class:: warningmark
+
+For paired-end sequencing reads, the length is the length of the fragment (5' end of read 1 to 5' end of read 2)
+
 </help>
 </tool>

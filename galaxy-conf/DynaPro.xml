@@ -1,6 +1,15 @@
 <tool id="DynaPro" name="Compute equilibrium nucleosome positions" version="1.0.0">
   <description>using DynaPro</description>
-  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.DynaPro -i $input -n $N -m $mean -v $variance -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.DynaPro -i $input -n $N 
+    #if str( $mean ) != ''
+      -m $mean 
+    #end if
+    
+    #if str( $variance ) != ''
+      -v $variance
+    #end if
+    -o $output
+  </command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Energy landscape" />
       <param name="N" type="integer" value="147" label="Nucleosome size (bp)" />
@@ -12,13 +21,28 @@
   </outputs>
   <help>
 
-  .. class:: warningmark
-  
-  At present, this tool is only suitable for small genomes (yeast).
-  
-  .. class:: warningmark
+.. class:: warningmark
 
-  See Morozov AV, Fortney K, Gaykalova DA, Studitsky VM, Widom J and Siggia ED (2009) Using DNA mechanics to predict in vitro nucleosome positions and formation energies. Nucleic Acids Res 37: 4707–4722.
+At present, this tool is only suitable for small genomes (yeast) since entire chromosomes must be loaded into memory.
+
+-----
+
+Equilibrium nucleosome distribution is modeled as a one-dimensional fluid of hard rods adsorbing and moving within an external potential. This tool provides a simplified version of the DynaPro_ algorithm for a single factor interacting with hard-core repulsion.
+
+.. _DynaPro: http://nucleosome.rutgers.edu/nucleosome/
+
+-----
+
+**Syntax**
+
+- **Energy landscape** is the external potential function for each genomic base pair, and must be in Wig format.
+- **Nucleosome size** is the hard-core interaction size.
+
+-----
+
+**Citation**
+
+Morozov AV, Fortney K, Gaykalova DA, Studitsky VM, Widom J and Siggia ED (2009) Using DNA mechanics to predict in vitro nucleosome positions and formation energies. Nucleic Acids Res 37: 4707–4722.
 
   </help>
 </tool>

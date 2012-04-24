@@ -1,21 +1,10 @@
 <tool id="MatrixAligner" name="Align values in a matrix" version="1.0.0">
   <description>for a heatmap</description>
-  <command interpreter="sh">
-    galaxyToolRunner.sh visualization.MatrixAligner -i $input -l $loci -m $M -o $output
-  </command>
+  <command interpreter="sh">galaxyToolRunner.sh visualization.MatrixAligner -i $input -l $loci -m $M -o $output</command>
   <inputs>
       <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
       <param format="bed" name="loci" type="data" label="List of intervals (with alignment points)" />
       <param type="integer" name="M" value="4000" label="Maximum row length" />
-      <!--  TODO: Bring back optional markers
-      <conditional name="ladder">
-        <param name="draw" type="boolean" checked="false" falsevalue="false" truevalue="true" label="Include marker ladder across X-axis"/>
-        <when value="true">
-          <param name="spacing" type="integer" value="200" label="Draw marker every N base pairs" />
-        </when>
-        <when value="false">
-        </when>
-      </conditional> -->
   </inputs>
   <outputs>
       <data format="tabular" name="output" />
@@ -60,8 +49,30 @@
   </tests>-->
   
 <help>
+  
+This tool aligns sequencing data into a rectangular matrix for creating a heatmap with matrix2png. Data from each interval is lined up on the specified alignment point (column 5 in the Bed file), and flipped if on the - strand so that all intervals are 5'-to-3' from left-to-right.
+
+Intervals with alignment points must be provided in the following extended Bed format ::
+
+  chr  low  high  id  alignment  strand
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
+-----
+
+**Syntax**
+
+- **Sequencing data** is the genomic data used to create the average
+- **List of intervals** is a list of intervals in Bed format with alignment points
+- **Maximum row length** is the maximum allowed width of the matrix. If aligned intervals extend outside of this width, they will be truncated.
+
+-----
+
 .. class:: warningmark
 
 Large heatmap matrices may require a long time to generate. To reduce the size of an MxN matrix with large M, rows (N) can be truncated using the maximum row length parameter. Rows are truncated from the alignment point (symmetrically) if possible, or as nearly symmetrically as possible.
+
 </help>
 </tool>

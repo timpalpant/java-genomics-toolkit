@@ -1,4 +1,4 @@
-<tool id="BaseAlignCounts" name="Map coverage" version="1.0.0">
+<tool id="BaseAlignCounts" name="Calculate coverage" version="1.0.0">
   <description>of sequencing reads</description>
   <command interpreter="sh">galaxyToolRunner.sh ngs.BaseAlignCounts -i $input -a ${chromInfo} -x $X -o $output</command>
   <inputs>
@@ -10,8 +10,23 @@
   </outputs>
   
   <help>
-    .. class:: warningmark
     
-    This tool requires sequencing reads in SAM, BAM, or Bed format.
+.. class:: warningmark
+
+This tool requires sequencing reads in SAM, BAM, Bed, or BedGraph format. If you are artificially extending reads, ensure that the strand is set correctly in SAM, BAM, and Bed files.
+
+.. class:: infomark
+
+**TIP:** If you are going to be using reads in SAM format for multiple analyses, it is often more efficient to first convert it into BAM format using NGS: SAM Tools -> SAM-to-BAM.
+
+-----
+
+**Syntax**
+
+- **Sequencing reads** are mapped reads from a high-throughput sequencing experiment.
+- **In silico extension:** Reads will be artificially extended from their 5' end to be this length.
+
+This tool produces a new Wig file with the number of reads overlapping each base pair. Reads can be artificially extended to match known fragment lengths. If you wish to count the number of reads starting at each base pair, set the read extension to 1.
+
   </help>
 </tool>

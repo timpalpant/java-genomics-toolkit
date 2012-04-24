@@ -47,8 +47,6 @@ public class Average extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Computing average for chunk "+chr+":"+start+"-"+stop);
-		
 		int length = stop - start + 1;
 		float[] avg = new float[length];
 		

@@ -42,8 +42,6 @@ public class GaussianSmooth extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Smoothing chunk "+chr+":"+start+"-"+stop);
-		
 		// Pad the query for smoothing
 		int paddedStart = Math.max(start-3*stdev, inputFile.getChrStart(chr));
 		int paddedStop = Math.min(stop+3*stdev, inputFile.getChrStop(chr));

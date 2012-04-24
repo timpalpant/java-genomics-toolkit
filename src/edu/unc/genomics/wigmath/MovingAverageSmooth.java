@@ -34,7 +34,6 @@ public class MovingAverageSmooth extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Smoothing chunk "+chr+":"+start+"-"+stop);
 		// Pad the query so that we can provide values for the ends
 		int queryStart = Math.max(start-width/2, inputFile.getChrStart(chr));
 		int queryStop = Math.min(stop+width/2, inputFile.getChrStop(chr));

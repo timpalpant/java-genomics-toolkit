@@ -80,4 +80,18 @@
         </actions>
       </data>
   </outputs>
+  
+  <help>
+
+This tool will create a new Wig file with genome-wide calculations of sequence-specific DNA properties determined from local n-nucleotide sequences. DNA properties are calculated using AJT_.
+
+.. _AJT: http://www.abeel.be/ajt
+
+-----
+
+**Example**
+
+To calculate GC-content, choose your genome assembly and select "GC" as the property. This will create a new Wig file in which G and C nucleotides are represented by 1, while A and T nucleotides are represented by -1. If you would like to compute GC-content in 10-bp windows, use the WigMath -> Moving average tool to compute a moving average with 10bp windows.
+
+  </help>
 </tool>

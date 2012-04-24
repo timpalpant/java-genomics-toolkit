@@ -114,7 +114,7 @@ public class PredictFAIRESignal extends WigMathTool {
 				// using the inclusion-exclusion principle with nucleosome width = 147bp;
 				float pOccupied = InclusionExclusion.independent(result, j, j+i);
 				// Calculate the probability that this fragment survives FAIRE
-				float pFAIRE = crosslink*(1-pOccupied);
+				float pFAIRE = 1 - crosslink*pOccupied;
 				
 				// Add its probability at the +/- ends, weighted by fragment abundance
 				watson[j] += sonication[i]*pFAIRE;

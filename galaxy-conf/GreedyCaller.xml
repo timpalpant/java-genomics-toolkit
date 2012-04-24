@@ -11,8 +11,39 @@
   </outputs>
   
 <help>
+  
+Stereotypic nucleosome positions are identified from dyad density maps using an approach similar to the previously reported greedy algorithm in GeneTrack_ (Albert, et al. 2008). Nucleosome calls are identified at peak maxima (p) in the smoothed dyad density map, and then excluded in the surrounding window [p–N, p+N], where N is the assumed nucleosome size in base pairs. This process is continued until all possible sterically hindered nucleosome positions are identified.
+
+.. _GeneTrack: http://atlas.bx.psu.edu/genetrack/docs/genetrack.html
+
 .. class:: warningmark
 
-This tool requires dyad counts and smoothed dyad counts.
+This tool requires dyad counts and smoothed dyad counts in Wig or BigWig format. Smoothed dyad counts can be generated from dyad counts using the WigMath -> Gaussian smooth tool.
+
+-----
+
+**Syntax**
+
+- **Dyad counts** is the relative number of nucleosomes positioned at each base pair.
+- **Smoothed dyad counts** should correspond to a smoothed version of the **Dyad counts**  
+- **Assumed nucleosome size** is the window size used while identifying maxima to restrict overlapping calls.  
+
+-----
+
+**Output**
+
+The output format has 10 columns defined as follows
+
+- 1. **Chromosome:** the chromosome of this nucleosome call
+- 2. **Start:** the lower coordinate of the call window, equal to the dyad position - N/2
+- 3. **Stop:** the higher coordinate of the call window, equal to the dyad position + N/2
+- 4. **Length:** the window size (N) of the nucleosome call, equal to the value specified when the tool was run
+- 5. **Length standard deviation:** the standard deviation of the nucleosome call length (equal to 0 because it is not currently calculated)
+- 6. **Dyad:** the location of the peak maximum (p) in the smoothed dyad density data
+- 7. **Dyad standard deviation:** the standard deviation of dyad density around the dyad mean in the dyad counts data
+- 8. **Conditional position:** the probability that a nucleosome is at this exact dyad location as opposed to anywhere else in the nucleosome call window [p-N/2, p+N/2]
+- 9. **Dyad mean:** the mean of the dyad counts in the window [p-N/2, p+N/2]
+- 10. **Occupancy:** the sum of the dyad counts in the window [p-N/2, p+N/2]
+
 </help>
 </tool>

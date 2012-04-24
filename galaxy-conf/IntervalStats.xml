@@ -11,7 +11,7 @@
         <param name="file" type="data" format="bigwig,wig" />
       </repeat>
       <param format="bed,bedgraph,gff" name="windows" type="data" label="List of intervals" />
-      <param name="stat" type="select" optional="true" label="For each window, compute the">
+      <param name="stat" type="select" optional="true" label="For each interval, compute the">
         <option value="mean">Mean</option>
         <!-- TODO <option value="median">Median</option> -->
         <option value="max">Max</option>
@@ -23,8 +23,16 @@
   </outputs>
   
 <help>
-.. class:: warningmark
+  
+This tool calculates the arithmetic mean, maximum, or minimum value for the Wig data in each interval. For each Wig file provided, an additional column is added to the output file in the order that they are added.
+  
+.. class:: infomark
 
-This tool requires Wiggle/BigWig input data.
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
 </help>
 </tool>

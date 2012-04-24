@@ -1,5 +1,5 @@
 <tool id="FindWigMaxima" name="Find absolute maxima" version="1.0.0">
-  <description>in windows</description>
+  <description>in intervals</description>
   <command interpreter="sh">
     galaxyToolRunner.sh ngs.FindAbsoluteMaxima -l $window -o $output
   	  #for $input in $inputs
@@ -10,15 +10,43 @@
     <repeat name="inputs" title="(Big)Wig file">
       <param name="file" type="data" format="bigwig,wig" />
     </repeat>
-    <param name="window" type="data" format="bed,bedgraph,gff" label="Windows to find maxima in" />
+    <param name="window" type="data" format="bed,bedgraph,gff" label="Intervals to find maxima in" />
   </inputs>
   <outputs>
     <data name="output" format="tabular" />
   </outputs>
   
   <help>
-    .. class:: warningmark
     
-    This tool requires input data in Wig format. Regions should be specified as Bed, BedGraph, or GFF format
+This tool can be used to find the maximum value in genomic intervals, such as finding the peak summit inside a set of peak calls.
+    
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly. Intervals must be provided in Bed, BedGraph, or GFF format.
+
+-----
+
+**Example**
+
+
+    if **Intervals** are genes ::
+
+      chr11 5203271 5204877 NM_000518 0 -
+      chr11 5210634 5212434 NM_000519 0 -
+      chr11 5226077 5227663 NM_000559 0 -
+
+    and **Wig files** are ::
+      
+      Data1.wig
+      Data2.wig
+
+    this tool will find the location of the maximum value in each interval for each of the provided Wig/BigWig files, and append them in columns in the order that they were added ::
+
+      chr11 5203271 5204877 NM_000518 0 - 5203374 5204300
+      chr11 5210634 5212434 NM_000519 0 - 5210638 5212450
+      chr11 5226077 5227663 NM_000559 0 - 5226800 5226241
+    
+    where column 7 is the location of the maximum value in that interval for Data1.wig, and column 7 is the location of the maximum value in that interval for Data2.wig.
+    
   </help>
 </tool>

@@ -95,16 +95,20 @@
   </outputs>
   
   <help>
-    .. class:: warningmark
     
-    This tool requires that matrix2png be available in Galaxy's PATH.
-    
-    .. class:: warningmark
-    
-    This tool requires tabular data with column AND row headers. For more information about the required format and usage instructions, see http://bioinformatics.ubc.ca/matrix2png/dataformat.html
-    
-    .. class:: warningmark
-    
-    It is recommended to specify the colorspace range.
+.. class:: warningmark
+
+This tool requires that matrix2png be installed and available in Galaxy's PATH.
+
+.. class:: warningmark
+
+This tool requires tabular data with column AND row headers. For more information about the required format and usage instructions, see the matrix2png_ website.
+
+.. _matrix2png: http://bioinformatics.ubc.ca/matrix2png/dataformat.html
+
+.. class:: warningmark
+
+It is recommended to specify the colorspace range since outliers will often skew it otherwise.
+
   </help>
 </tool>

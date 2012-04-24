@@ -16,11 +16,15 @@
 
 **TIP:** If your input data does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format. Similarly, the intervals must be in either Bed, BedGraph, or GFF format.
 
+-----
+
 **Syntax**
 
 - **Input data** is the genomic data on which to compute the autocorrelation.
-- **List of intervals:** The autocorrelation will be computed for each interval of data specified in this list.
-- **Maximum shift** In computing the autocorrelation, the data will be phase-shifted up to this limit.
+- **List of intervals:** The autocorrelation will be computed for each genomic interval specified in this list.
+- **Maximum shift:** In computing the autocorrelation, the data will be phase-shifted up to this limit.
+
+-----
 
 .. class:: infomark
 

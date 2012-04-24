@@ -30,8 +30,6 @@ public class Subtract extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Computing difference for chunk "+chr+":"+start+"-"+stop);
-		
 		Iterator<WigItem> minuendData = minuendFile.query(chr, start, stop);
 		Iterator<WigItem> subtrahendData = subtrahendFile.query(chr, start, stop);
 		

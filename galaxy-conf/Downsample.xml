@@ -13,4 +13,16 @@
   <outputs>
       <data format="wig" name="output" metadata_source="input" />
   </outputs>
+  
+  <help>
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
+-----
+
+This tool can be used to reduce the resolution and file size of Wig files for easier upload to UCSC. Data is downsampled in non-overlapping moving windows starting from the beginning of each chromosome. Each window can be downsampled as the arithmetic mean, minimum, or maximum value of the original data.
+
+  </help>
 </tool>

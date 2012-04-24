@@ -1,12 +1,32 @@
 <tool id="WigFindOutliers" name="Find outlier regions" version="1.0.0">
-  <description>in a (Big)Wig file</description>
+  <description>such as CNVs</description>
   <command interpreter="sh">galaxyToolRunner.sh ngs.FindOutlierRegions -i $input -w $window -t $threshold -o $output</command>
   <inputs>
-      <param format="bigwig,wig" name="input" type="data" label="Filter outlier regions in" />
+      <param format="bigwig,wig" name="input" type="data" label="Input data" />
       <param name="window" type="integer" value="150" label="Window size" />
       <param name="threshold" type="float" value="3" label="Threshold (fold times the mean)" />
   </inputs>
   <outputs>
       <data format="bed" name="output" metadata_source="input" />
   </outputs>
+  
+  <help>
+    
+This tool identifies regions of the genome that may be repetitive elements or CNVs by scanning for windows that have an exceptionally high mean relative to the genome-wide mean.
+
+-----
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
+-----
+
+**Syntax**
+
+- **Input data** is Wig or BigWig formatted data from a high-throughput sequencing experiment.
+- **Window size** is the size of the moving average to use.
+- **Threshold** is the fold times the genome-wide mean that a window's mean must be in order to be considered an outlier region.
+
+  </help>
 </tool>

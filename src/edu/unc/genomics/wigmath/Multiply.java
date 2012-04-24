@@ -39,8 +39,6 @@ public class Multiply extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Computing sum for chunk "+chr+":"+start+"-"+stop);
-		
 		int length = stop - start + 1;
 		float[] product = new float[length];
 		Arrays.fill(product, 1);

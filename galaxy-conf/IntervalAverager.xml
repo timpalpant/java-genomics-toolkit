@@ -1,8 +1,6 @@
 <tool id="IntervalAverager" name="Average intervals" version="1.0.0">
   <description>that have been aligned</description>
-  <command interpreter="sh">
-    galaxyToolRunner.sh visualization.IntervalAverager -i $input -l $loci -o $output
-  </command>
+  <command interpreter="sh">galaxyToolRunner.sh visualization.IntervalAverager -i $input -l $loci -o $output</command>
   <inputs>
       <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
       <param format="bed" name="loci" type="data" label="List of intervals (with alignment points)" />
@@ -12,5 +10,23 @@
   </outputs>
   
 <help>
+
+This tool calculates the average signal for a set of aligned intervals. Intervals are lined up on their alignment point (column 5 in the Bed file), flipped if on the - strand, and averaged. The output is equivalent to aligning the data in a matrix and then taking the columnwise average of the matrix.
+
+Intervals with alignment points must be provided in the following extended Bed format ::
+
+  chr  low  high  id  alignment  strand
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
+-----
+
+**Syntax**
+
+- **Sequencing data** is the genomic data used to create the average
+- **List of intervals** is a list of intervals in Bed format with alignment points
+
 </help>
 </tool>

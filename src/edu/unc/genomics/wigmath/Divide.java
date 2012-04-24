@@ -29,8 +29,6 @@ public class Divide extends WigMathTool {
 	
 	@Override
 	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		log.debug("Computing difference for chunk "+chr+":"+start+"-"+stop);
-		
 		Iterator<WigItem> dividendData = dividendFile.query(chr, start, stop);
 		Iterator<WigItem> divisorData = divisorFile.query(chr, start, stop);
 		
