@@ -24,14 +24,14 @@ This tool is intended to strip the column/row headers off of an aligned matrix (
 
 If the following tabular matrix is used as input ::
 
-  ID    col1  col2  col3
-  row1   2     4     5
-  row2   5     1     1
+    ID    col1  col2  col3
+    row1   2     4     5
+    row2   5     1     1
   
 then the following tabular matrix will be produced as output ::
 
-  2     4     5
-  5     1     1
+    2     4     5
+    5     1     1
 
   </help>
 </tool>

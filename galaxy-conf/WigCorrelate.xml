@@ -22,11 +22,11 @@
   
 <help>
   
-This tool will compute a correlation matrix between the supplied Wig or BigWig files. Each row/column in the matrix is added in the order that files are added above, starting from the top left. The Wig file is downsampled into non-overlapping windows with the specified size by computing the mean value in each window. These windows are then correlated using either  Pearson's Product-Moment correlation coefficient_ or Spearman's rank correlation coefficient_. If the window size is set to 1, the correlation is calculated between all base pairs in the genome.
+This tool will compute a correlation matrix between the supplied Wig or BigWig files. Each row/column in the matrix is added in the order that files are added above, starting from the top left. The Wig file is downsampled into non-overlapping windows with the specified size by computing the mean value in each window. These windows are then correlated using either  Pearson_'s Product-Moment correlation coefficient_ or Spearman_'s rank correlation coefficient. If the window size is set to 1, the correlation is calculated between all base pairs in the genome.
   
-.. _Pearson's Product-Moment correlation coefficient: http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
+.. _Pearson: http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
 
-.. _Spearman's rank correlation coefficient: http://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+.. _Spearman: http://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
   
 -----
 
