@@ -31,11 +31,11 @@ This tool computes a histogram of the values in a Wig file, as well as the momen
 The output is in 2-column tabular format, where the first column represents the lower edge of a bin inteval and the second column represents the number of values that fell in that bin. For example if the **minimum bin value** is 0, the **maximum bin value** is 0.3, and the **number of bins** is 3, then the following output might be produced ::
 
   bin       count
-  &lt;0     3
+  &lt;0        3
   0         1
   0.1       10
   0.2       4
-  &gt;0.3   12
+  &gt;0.3      12
   
 where there were 3 values in (-inf, 0), 1 value in [0, 0.1), 10 values in [0.1, 0.2), 4 values in [0.2, 0.3), and 12 values in [0.3, inf).
   
