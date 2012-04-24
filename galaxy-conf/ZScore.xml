@@ -39,4 +39,18 @@
 	    <output name="output" file="zscorer.output3"/>
 	  </test>-->
   </tests>
+  
+  <help>
+
+This tool will compute normal scores (Z-scores) for each of the values in a Wig file. For each base pair, the Z-scored value is equal to the deviance from the mean divided by the standard deviation (i.e. the number of standard deviations a value is away from the mean). The output file should have mean 0 and standard deviation 1.
+
+.. class:: infomark
+
+This tool is equivalent to using the **Mean Shift** tool to shift a Wig file to mean 0, then using the **Scale** tool to scale by 1/(standard deviation).
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
+  </help>
 </tool>

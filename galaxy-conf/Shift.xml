@@ -9,5 +9,12 @@
     <data format="wig" name="output" metadata_source="input" />
   </outputs>
   <help>
+
+This tool will shift all values in a Wig file by a scalar so that the output has the desired mean.
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
   </help>
 </tool>

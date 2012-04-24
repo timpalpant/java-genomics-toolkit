@@ -1,5 +1,5 @@
 <tool id="WigMultiply" name="Multiply" version="1.0.0">
-  <description>multiple (Big)Wig files</description>
+  <description>(Big)Wig files</description>
   <command interpreter="sh">
     galaxyToolRunner.sh wigmath.Multiply -o $output
       #for $input in $inputs
@@ -16,5 +16,12 @@
   </outputs>
   
 <help>
+
+This tool multiplies Wig or BigWig files base pair by base pair.
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
 </help>
 </tool>

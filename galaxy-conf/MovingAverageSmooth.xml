@@ -54,5 +54,18 @@
   </tests>
   
 <help>
+  
+This tool smooths genomic data with a mean_ filter of the specified width.
+
+.. _mean: http://en.wikipedia.org/wiki/Moving_average
+
+.. class:: warningmark
+
+Note that for the moving average to be perfectly symmetric, the window should be an odd number of base pairs.
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+  
 </help>
 </tool>

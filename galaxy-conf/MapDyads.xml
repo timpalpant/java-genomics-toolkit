@@ -26,12 +26,16 @@
   </outputs>
   
 <help>
+  
+This tool produces a Wig file with the number of dyads at each base pair. For paired-end MNase data, dyads are approximated using the center of the fragment. For Bed/BedGraph formatted input, this means the center of the interval; for SAM/BAM formatted input, this means the middle between the 5' end of mate 1 and the 5' end of mate 2. For single-end data, the estimated mononucleosome fragment length (N) must be specified, which will be used to offset reads from the + and - strands by +/- N/2.
+  
 .. class:: warningmark
 
-  This tool requires sequencing reads in SAM, BAM, Bed format.
+This tool requires sequencing reads in SAM, BAM, Bed, or BedGraph format.
 
 .. class:: warningmark
 
-For paired-end MNase data, read centers are approximated using the center of the read. For single-end data, the estimated mononucleosome fragment length must be specified, which will be used to offset reads from the + and - strands.
+Since BedGraph format does not contain strand information, all reads in BedGraph format are considered to be on the 5' strand.
+
 </help>
 </tool>

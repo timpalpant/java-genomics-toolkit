@@ -10,4 +10,33 @@
   <outputs>
       <data format="wig" name="output" metadata_source="input" />
   </outputs>
+  
+  <help>
+    
+This tool attempts to predict FAIRE signal from nucleosome occupancy by calculating the probability that a random sonicated fragment is occupied anywhere by a nucleosome.
+
+-----
+
+**Syntax**
+
+- **Nucleosome occupancy data** should be fragment coverage data from an MNase-seq experiment
+- **Sonication fragment length distribution:** The relative proportion of each size of fragment produced by sonication
+- **Crosslinking coefficient** is the efficiency of crosslinking (what fraction of the time is a nucleosome crosslinked)
+- **In silico read extension** is the length that single-end reads should be extended to match FAIRE-seq data
+
+-----
+
+Sonication fragment distribution must be provided in the following tabular format ::
+
+  length  proportion
+  
+So for example ::
+
+  1  0.1
+  2  0.2
+  3  0.3
+  4  0.2
+  5  0.2
+    
+  </help>
 </tool>

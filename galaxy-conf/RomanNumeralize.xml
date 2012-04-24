@@ -15,8 +15,8 @@
   </tests>
   
 <help>
-.. class:: warningmark
+  
+This tool scans any file with chromosomal coordinates of the form "chr5" and replaces them with "chrV".
 
-This tool will work for any genomic data with chromosomal coordinates of the form "chr5" by replacing them with "chrV"
 </help>
 </tool>

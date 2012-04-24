@@ -1,5 +1,5 @@
-<tool id="RollingReadLength" name="Compute read length" version="1.0.0">
-  <description>from paired-end sequencing reads</description>
+<tool id="RollingReadLength" name="Compute mean fragment length" version="1.0.0">
+  <description>over each locus</description>
   <command interpreter="sh">galaxyToolRunner.sh ngs.RollingReadLength -i $input -a ${chromInfo} -o $output</command>
   <inputs>
       <param format="sam,bam,bed,bedgraph" name="input" type="data" label="Mapped reads" />
@@ -9,8 +9,12 @@
   </outputs>
   
 <help>
+  
+This tool will compute the mean length of all fragments overlapping a given locus, and can be used to identify sites with exceptionally long or short reads.
+  
 .. class:: warningmark
 
-This tool requires paired-end SAM, BAM, or Bed formatted data. Using single-end data will result in a constant read length.
+This tool requires paired-end SAM, BAM, Bed, or BedGraph formatted data. Using single-end data will result in a constant read length.
+
 </help>
 </tool>

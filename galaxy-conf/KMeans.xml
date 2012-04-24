@@ -14,5 +14,28 @@
   </tests>
   
   <help>
+    
+.. class:: warningmark
+
+This tool requires tabular data in matrix2png format (with column AND row headers). For more information about the required format and usage instructions, see the matrix2png_ website.
+
+.. _matrix2png: http://bioinformatics.ubc.ca/matrix2png/dataformat.html
+
+.. class:: infomark
+
+You can use the "Align values in a matrix" tool to create a matrix, then use this tool to cluster the matrix with k-means.
+
+.. class:: infomark
+
+**TIP:** You can use the **min** and **max** columns to cluster a large matrix based on a subset of the columns. For example, you could cluster a 4000x4000 matrix on columns 200-300 by setting min = 200 and max = 300. This will greatly increase the efficiency of distance calculations during the k-means EM, and also allows you to cluster based on specific regions, such as promoters or coding sequences.
+
+-----
+
+This tool will cluster the rows in an aligned matrix with KMeans_. The implementation builds upon the KMeansPlusPlusClusterer available in commons-math3_.
+
+.. _KMeans: http://en.wikipedia.org/wiki/K-means_clustering
+
+.. _commons-math3: http://commons.apache.org/math/
+
   </help>
 </tool>

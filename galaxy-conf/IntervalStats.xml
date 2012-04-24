@@ -24,15 +24,21 @@
   
 <help>
   
-This tool calculates the arithmetic mean, maximum, or minimum value for the Wig data in each interval. For each Wig file provided, an additional column is added to the output file in the order that they are added.
+This tool calculates the arithmetic mean, maximum, or minimum value for the Wig data in each interval. For each Wig file provided, an additional column is added to the output file in the order that they are added above.
   
 .. class:: infomark
 
 **TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
 
-.. class:: infomark
+-----
 
-**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+**Example**
+
+Calculate the mean change in nucleosome occupancy for each gene in the yeast genome:
+
+- 1. Create a "change in occupancy" dataset by subtracting the normalized occupancy Wig files from your two conditions using the WigMath -> Subtract tool.
+- 2. Upload a list of intervals corresponding to the genes in the yeast genome, or pull the data from UCSC using Get Data -> UCSC Main.
+- 3. Calculate the mean change in occupancy for each gene using this tool and the datasets from (1) and (2).
 
 </help>
 </tool>

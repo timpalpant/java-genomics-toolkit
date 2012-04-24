@@ -17,6 +17,8 @@
   
 <help>
   
+This tool will add all values in the specified Wig files base pair by base pair.
+  
 .. class:: infomark
 
 **TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.

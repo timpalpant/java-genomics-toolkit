@@ -27,6 +27,8 @@ public class PowerSpectrum extends CommandLineTool {
 	public WigFile inputFile;
 	@Parameter(names = {"-l", "--loci"}, description = "Genomic loci (Bed format)", required = true)
 	public IntervalFile<? extends Interval> loci;
+	@Parameter(names = {"-m", "--max"}, description = "Only output this many frequencies")
+	public int max = 40;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (tabular)", required = true)
 	public Path outputFile;
 		
@@ -34,8 +36,8 @@ public class PowerSpectrum extends CommandLineTool {
 	 * Computes the power spectrum from FFT data
 	 * taking into account even/odd length arrays
 	 * refer to JTransforms documentation for layout of the FFT data
-	 * @param f
-	 * @return
+	 * @param f the DFT-transformed data from JTransforms.realForward()
+	 * @return the power spectrum of the complex frequency spectrum in f
 	 */
 	private float[] abs2(float[] f) {
 		int n = f.length;
@@ -95,7 +97,7 @@ public class PowerSpectrum extends CommandLineTool {
 					}
 		
 					writer.write(interval.toBed());
-					for (int i = 1; i < Math.min(ps.length, 40); i++) {
+					for (int i = 1; i < Math.min(ps.length, max); i++) {
 						writer.write("\t"+ps[i]);
 					}
 					writer.newLine();

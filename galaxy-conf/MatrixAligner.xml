@@ -56,23 +56,25 @@ Intervals with alignment points must be provided in the following extended Bed f
 
   chr  low  high  id  alignment  strand
 
-.. class:: infomark
-
-**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+The heatmap is created by taking each interval in the **List of Intervals**, retrieving the data for that interval from the Wig file, and adding it as a new row in the matrix. Intervals are processed in their original order.
 
 -----
 
 **Syntax**
 
-- **Sequencing data** is the genomic data used to create the average
+- **Sequencing data** is the genomic data used to create the matrix
 - **List of intervals** is a list of intervals in Bed format with alignment points
 - **Maximum row length** is the maximum allowed width of the matrix. If aligned intervals extend outside of this width, they will be truncated.
 
 -----
 
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
 .. class:: warningmark
 
-Large heatmap matrices may require a long time to generate. To reduce the size of an MxN matrix with large M, rows (N) can be truncated using the maximum row length parameter. Rows are truncated from the alignment point (symmetrically) if possible, or as nearly symmetrically as possible.
+Large heatmap matrices may require a long time to generate in Galaxy because it validates that the output is in correct tab-delimited format. To reduce the size of an MxN matrix with large M, rows (N) can be truncated using the maximum row length parameter. Rows are truncated from the alignment point (symmetrically) if possible, or as nearly symmetrically as possible.
 
 </help>
 </tool>

@@ -10,8 +10,26 @@
   </outputs>
   
 <help>
+  
+This tool calculates the distance between adjacent nucleosome calls (dyads) emanating from the 5' end of an interval. For each interval, the distance is calculated from the +1 to +2 nucleosome, +2 to +3 nucleosome, etc. These distances are appended as additional columns for each interval. ::
+
+  chr  start  stop  id  alignment  strand  +1-to-+2  +2-to-+3  ...
+  
+Each interval will have a different number of columns based on the number of nucleosome calls that were in that interval.
+  
+-----
+  
 .. class:: warningmark
 
-This tool requires a set of nucleosome calls as input.
+Because the distances are calculated from the 5' end of each gene, as you move into the gene body it becomes more likely that a nucleosome call will be skipped, resulting in an outlier distance (~320bp rather than ~165bp). In addition, nucleosome calls in fuzzy regions tend to be inaccurate, so the NRL distances will not be robust.
+  
+.. class:: warningmark
+
+This tool requires a set of nucleosome calls as input in the format created by the Nucleosomes -> Call Nucleosomes tool.
+
+.. class:: warningmark
+
+Intervals must be provided in Bed, BedGraph, or GFF format. BedGraph intervals are always considered to be on the + strand.
+
 </help>
 </tool>

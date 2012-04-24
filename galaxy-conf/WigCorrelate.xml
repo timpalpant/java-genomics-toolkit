@@ -21,5 +21,28 @@
   </outputs>
   
 <help>
+  
+This tool will compute a correlation matrix between the supplied Wig or BigWig files. Each row/column in the matrix is added in the order that files are added above, starting from the top left. The Wig file is downsampled into non-overlapping windows with the specified size by computing the mean value in each window. These windows are then correlated using either  Pearson's Product-Moment correlation coefficient_ or Spearman's rank correlation coefficient_. If the window size is set to 1, the correlation is calculated between all base pairs in the genome.
+  
+.. _Pearson's Product-Moment correlation coefficient: http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
+
+.. _Spearman's rank correlation coefficient: http://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+  
+-----
+
+.. class:: warningmark
+
+**WARN:** In order to calculate the correlation coefficient, the data is loaded into entirely into memory. For large genomes, this may require a lot of RAM unless comparably larger window sizes are used.
+
+-----
+
+**Citation**
+
+This tool was inspired by ACT_ from the Gerstein lab.
+
+.. _ACT: http://act.gersteinlab.org
+
+J Jee*, J Rozowsky*, KY Yip*, L Lochovsky, R Bjornson, G Zhong, Z Zhang, Y Fu, J Wang, Z Weng, M Gerstein. ACT: Aggregation and Correlation Toolbox for Analyses of Genome Tracks. (2011) Bioinformatics 27(8): 1152-4.
+  
 </help>
 </tool>

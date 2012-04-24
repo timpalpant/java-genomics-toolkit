@@ -60,9 +60,11 @@ public class FloatHistogram {
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("<"+xLow + "\t" + underFlows + "\n");
 		for (int i = 0; i < bins.length; i++) {
 			sb.append(xLow+i*delBin + "\t" + bins[i] + "\n");
 		}
+		sb.append(">"+xHigh + "\t" + overFlows);
 		return sb.toString();
 	}
 

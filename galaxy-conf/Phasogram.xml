@@ -10,8 +10,18 @@
   </outputs>
   
   <help>
-    .. class:: warningmark
-    
-    This tool requires mapped dyads in BigWig format.
+
+This tool calculates the phase distribution of sequencing data. It can be used to identify genome-wide periodicities. Phase counts are aggregated for each base pair across the genome. The tool is a reimplementation of the algorithm described in (Valouev et al. 2011).
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+
+-----
+
+**Citation**
+
+Valouev A, Johnson SM, Boyd SD, Smith CL, Fire AZ and Sidow A (2011) Determinants of nucleosome organization in primary human cells. Nature 474: 516–520
+
   </help>
 </tool>

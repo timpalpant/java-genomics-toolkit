@@ -36,5 +36,12 @@
   </tests>
   
   <help>
+    
+This tool will subtract the values in one Wig file from another, base pair by base pair.
+    
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+    
   </help>
 </tool>

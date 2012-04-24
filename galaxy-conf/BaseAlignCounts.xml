@@ -10,7 +10,11 @@
   </outputs>
   
   <help>
-    
+        
+This tool produces a new Wig file with the number of reads overlapping each base pair. Reads can be artificially extended to match known fragment lengths. If you wish to count the number of reads starting at each base pair, set the read extension to 1.
+
+-----
+  
 .. class:: warningmark
 
 This tool requires sequencing reads in SAM, BAM, Bed, or BedGraph format. If you are artificially extending reads, ensure that the strand is set correctly in SAM, BAM, and Bed files.
@@ -25,8 +29,6 @@ This tool requires sequencing reads in SAM, BAM, Bed, or BedGraph format. If you
 
 - **Sequencing reads** are mapped reads from a high-throughput sequencing experiment.
 - **In silico extension:** Reads will be artificially extended from their 5' end to be this length.
-
-This tool produces a new Wig file with the number of reads overlapping each base pair. Reads can be artificially extended to match known fragment lengths. If you wish to count the number of reads starting at each base pair, set the read extension to 1.
 
   </help>
 </tool>

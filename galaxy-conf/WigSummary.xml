@@ -1,5 +1,5 @@
-<tool id="WigStats" name="Compute basic statistics" version="1.0.0">
-  <description>on a (Big)Wig file</description>
+<tool id="WigStats" name="Output a summary" version="1.0.0">
+  <description>of a (Big)Wig file</description>
   <command interpreter="sh">galaxyToolRunner.sh wigmath.WigSummary -i $input -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="(Big)Wig file" />
@@ -9,5 +9,61 @@
   </outputs>
   
 <help>
+  
+This tool will output a summary of a Wig or BigWig file, including information about the chromosomes and types of contigs in the Wig file, as well as basic descriptive statistics.
+
+-----
+
+**Example:**
+
+The following is an example of the output of this tool ::
+
+ASCII Text Wiggle file: track type=wiggle_0
+Chromosomes:
+	2micron start=1 stop=6318
+	chrVI start=1 stop=270148
+	chrI start=1 stop=230208
+	chrIII start=1 stop=316617
+	chrXII start=1 stop=1078175
+	chrXV start=1 stop=1091289
+	chrXVI start=1 stop=948062
+	chrII start=1 stop=813178
+	chrVIII start=1 stop=562643
+	chrX start=1 stop=745742
+	chrXIII start=1 stop=924429
+	chrV start=1 stop=576869
+	chrXIV start=1 stop=784333
+	chrIV start=1 stop=1531919
+	chrXI start=1 stop=666454
+	chrIX start=1 stop=439885
+	chrM start=1 stop=85779
+	chrVII start=1 stop=1090947
+Contigs:
+	fixedStep chrom=2micron start=1 span=1 step=1
+	fixedStep chrom=chrVI start=1 span=1 step=1
+	fixedStep chrom=chrI start=1 span=1 step=1
+	fixedStep chrom=chrIII start=1 span=1 step=1
+	fixedStep chrom=chrXII start=1 span=1 step=1
+	fixedStep chrom=chrXVI start=1 span=1 step=1
+	fixedStep chrom=chrXV start=1 span=1 step=1
+	fixedStep chrom=chrII start=1 span=1 step=1
+	fixedStep chrom=chrVIII start=1 span=1 step=1
+	fixedStep chrom=chrXIII start=1 span=1 step=1
+	fixedStep chrom=chrX start=1 span=1 step=1
+	fixedStep chrom=chrV start=1 span=1 step=1
+	fixedStep chrom=chrXIV start=1 span=1 step=1
+	fixedStep chrom=chrIV start=1 span=1 step=1
+	fixedStep chrom=chrXI start=1 span=1 step=1
+	fixedStep chrom=chrIX start=1 span=1 step=1
+	fixedStep chrom=chrM start=1 span=1 step=1
+	fixedStep chrom=chrVII start=1 span=1 step=1
+Basic Statistics:
+	Mean:			1.000000164913575
+	Standard Deviation:	1.8843731523620193
+	Total:			1.2162997005843896E7
+	Bases Covered:		12162995
+	Min value:		0.0
+	Max value:		277.98996
+  
 </help>
 </tool>
