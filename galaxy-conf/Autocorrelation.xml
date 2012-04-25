@@ -1,5 +1,5 @@
-<tool id="Autocorrelation" name="Compute the autocorrelation" version="1.0.0">
-  <description>on data in a Wiggle file</description>
+<tool id="Autocovariance" name="Compute the autocovariance" version="2.0.0">
+  <description>of data in a Wiggle file</description>
   <command interpreter="sh">galaxyToolRunner.sh ngs.Autocorrelation -i $input -l $windows -m $max -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Input data" />
@@ -12,11 +12,9 @@
   
 <help>
   
-This tool computes the autocorrelation_ of intervals of data in a Wig file. This can be used to identify periodicities in the data. The autocorrelation is computed using the Wiener-Khinchin theorem, which states that the autocorrelation is equal to the inverse FFT of the power spectrum. The FFT implementation is from JTransforms_.
+This tool computes the unnormalized autocovariance_ of intervals of data in a Wig file.
 
-.. _autocorrelation: http://en.wikipedia.org/wiki/Autocorrelation
-
-.. _JTransforms: http://sites.google.com/site/piotrwendykier/software/jtransforms
+.. _autocovariance: http://en.wikipedia.org/wiki/Autocorrelation
 
 -----
 

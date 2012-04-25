@@ -7,13 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.IntervalFile;
@@ -39,13 +37,7 @@ public class Autocorrelation extends CommandLineTool {
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			log.debug("Computing autocorrelation for each window");
 			int skipped = 0;
-			for (Interval interval : loci) {
-				if (interval.length() < limit) {
-					log.debug("Skipping interval: " + interval.toString());
-					skipped++;
-					continue;
-				}
-				
+			for (Interval interval : loci) {				
 				Iterator<WigItem> wigIter;
 				try {
 					wigIter = wig.query(interval);
@@ -55,15 +47,15 @@ public class Autocorrelation extends CommandLineTool {
 					continue;
 				}
 				
+				// Compute the autocorrelation
 				float[] data = WigFile.flattenData(wigIter, interval.getStart(), interval.getStop());
-				
-				// Compute the autocorrelation with the Wiener-Khinchin theorem
-				FloatFFT_1D fft = new FloatFFT_1D(data.length);
-				fft.realForward(data);
-				data = FFTUtils.abs2(data);
-				fft.realInverse(data, true);
+				float[] auto = FFTUtils.autocorrelation(data, limit);
 	
-				writer.write(StringUtils.join(data, "\t"));
+				// Write to output
+				writer.write(interval.toBed());
+				for (int i = 0; i < auto.length; i++) {
+					writer.write("\t" + auto[i]);
+				}
 				writer.newLine();
 			}
 			

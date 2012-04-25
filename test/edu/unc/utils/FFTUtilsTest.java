@@ -16,4 +16,14 @@ public class FFTUtilsTest {
 		fail("Not yet implemented");
 	}
 
+	@Test
+	public void testAutocorrelationFloatArrayInt() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testAutocorrelationFloatArray() {
+		fail("Not yet implemented");
+	}
+
 }
