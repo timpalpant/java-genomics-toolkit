@@ -12,9 +12,11 @@
   
 <help>
   
-.. class:: infomark
+This tool computes the autocorrelation_ of intervals of data in a Wig file. This can be used to identify periodicities in the data. The autocorrelation is computed using the Wiener-Khinchin theorem, which states that the autocorrelation is equal to the inverse FFT of the power spectrum. The FFT implementation is from JTransforms_.
 
-**TIP:** If your input data does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format. Similarly, the intervals must be in either Bed, BedGraph, or GFF format.
+.. _autocorrelation: http://en.wikipedia.org/wiki/Autocorrelation
+
+.. _JTransforms: http://sites.google.com/site/piotrwendykier/software/jtransforms
 
 -----
 
@@ -31,6 +33,10 @@
 **TIP:** For more information, see Wikipedia_ (right click to open this link in another window).
 
 .. _Wikipedia: http://en.wikipedia.org/wiki/Autocorrelation
+
+.. class:: infomark
+
+**TIP:** If your input data does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format. Similarly, the intervals must be in either Bed, BedGraph, or GFF format.
 
 </help>
 </tool>

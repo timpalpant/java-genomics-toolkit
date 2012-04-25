@@ -12,7 +12,11 @@
   
 <help>
   
-This tool computes the power spectrum of intervals of sequencing data. For each interval provided, the normalized power spectrum is calculated, representing the relative power in each frequency. Power spectra are normalized to have total power 1, with the DC component (0 frequency) removed.
+This tool computes the power spectrum of intervals of sequencing data. For each interval provided, the normalized power spectrum is calculated, representing the relative power in each frequency. Power spectra are normalized to have total power 1, with the DC component (0 frequency) removed. Power spectra are computed using the FFT_ implementation in JTransforms_.
+
+.. _FFT: http://en.wikipedia.org/wiki/Fast_Fourier_transform
+
+.. _JTransforms: http://sites.google.com/site/piotrwendykier/software/jtransforms
 
 -----
 

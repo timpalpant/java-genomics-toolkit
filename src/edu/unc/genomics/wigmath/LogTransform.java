@@ -3,7 +3,6 @@ package edu.unc.genomics.wigmath;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
@@ -12,8 +11,6 @@ import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
 public class LogTransform extends WigMathTool {
-
-	private static final Logger log = Logger.getLogger(LogTransform.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
 	public WigFile inputFile;

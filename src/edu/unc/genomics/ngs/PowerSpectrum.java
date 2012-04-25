@@ -18,6 +18,7 @@ import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.IntervalFile;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.utils.FFTUtils;
 
 public class PowerSpectrum extends CommandLineTool {
 	
@@ -32,37 +33,6 @@ public class PowerSpectrum extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file (tabular)", required = true)
 	public Path outputFile;
 		
-	/**
-	 * Computes the power spectrum from FFT data
-	 * taking into account even/odd length arrays
-	 * refer to JTransforms documentation for layout of the FFT data
-	 * @param f the DFT-transformed data from JTransforms.realForward()
-	 * @return the power spectrum of the complex frequency spectrum in f
-	 */
-	private float[] abs2(float[] f) {
-		int n = f.length;
-		float[] ps = new float[n/2+1];
-		// DC component
-		ps[0] = (f[0]*f[0]) / (n*n); 
-		
-		// Even
-		if (n % 2 == 0) {
-			for (int k = 1; k < n/2; k++) {
-				ps[k] = f[2*k]*f[2*k] + f[2*k+1]*f[2*k+1];
-			}
-			ps[n/2] = f[1]*f[1];
-		// Odd
-		} else {
-			for (int k = 1; k < (n-1)/2; k++) {
-				ps[k] = f[2*k]*f[2*k] + f[2*k+1]*f[2*k+1];
-			}
-			
-			ps[(n-1)/2] = f[n-1]*f[n-1] + f[1]*f[1];
-		}
-		
-		return ps;
-	}
-	
 	public void run() throws IOException {		
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Write header
@@ -86,7 +56,7 @@ public class PowerSpectrum extends CommandLineTool {
 					// Compute the power spectrum
 					FloatFFT_1D fft = new FloatFFT_1D(data.length);
 					fft.realForward(data);
-					float[] ps = abs2(data);
+					float[] ps = FFTUtils.abs2(data);
 					// and normalize the power spectrum
 					float sum = 0;
 					for (int i = 1; i < ps.length; i++) {

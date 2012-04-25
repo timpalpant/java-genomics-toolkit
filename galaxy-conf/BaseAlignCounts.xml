@@ -11,13 +11,17 @@
   
   <help>
         
-This tool produces a new Wig file with the number of reads overlapping each base pair. Reads can be artificially extended to match known fragment lengths. If you wish to count the number of reads starting at each base pair, set the read extension to 1.
+This tool produces a new Wig file with the number of reads/intervals overlapping each base pair. Reads can be artificially extended to match known fragment lengths. If you wish to count the number of reads starting at each base pair, set the read extension to 1. If you wish to count the number of intervals overlapping each base pair, set the extension to -1.
 
 -----
   
 .. class:: warningmark
 
 This tool requires sequencing reads in SAM, BAM, Bed, or BedGraph format. If you are artificially extending reads, ensure that the strand is set correctly in SAM, BAM, and Bed files.
+
+.. class:: infomark
+
+If you would like to convert valued interval data (e.g. BedGraph files from microarrays) to Wig format, use the Converters -> Interval to Wig converter.
 
 .. class:: infomark
 

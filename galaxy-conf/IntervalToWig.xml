@@ -11,8 +11,11 @@
 	
 <help>
 
+This tool converts data from an interval format, such as Bed, BedGraph or GFF, to Wig format. This can be used to convert data from microarrays to Wig format. The value of each interval is mapped into the Wig file. Intervals that overlap in the original file (multiple-valued base pairs) are averaged, and bases without data in the original interval file are set to NaN.
+
 .. class:: warningmark
 	
 This tool requires Bed, BedGraph, or GFF formatted data. If you have tabular data that was not correctly autodetected, change the metadata by clicking on the pencil icon for the dataset.
+
 </help>
 </tool>

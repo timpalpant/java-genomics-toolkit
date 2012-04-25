@@ -19,6 +19,7 @@ import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.IntervalFile;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.utils.FFTUtils;
 
 public class Autocorrelation extends CommandLineTool {
 	
@@ -32,13 +33,6 @@ public class Autocorrelation extends CommandLineTool {
 	public Path outputFile;
 	@Parameter(names = {"-m", "--max"}, description = "Autocorrelation limit (bp)")
 	public int limit = 200;
-	
-	private void abs2(float[] data) {
-		for (int i = 0; i < data.length; i+=2) {
-			data[i] = data[i]*data[i] + data[i+1]*data[i+1];
-			data[i+1] = 0;
-		}
-	}
 	
 	@Override
 	public void run() throws IOException {
@@ -66,7 +60,7 @@ public class Autocorrelation extends CommandLineTool {
 				// Compute the autocorrelation with the Wiener-Khinchin theorem
 				FloatFFT_1D fft = new FloatFFT_1D(data.length);
 				fft.realForward(data);
-				abs2(data);
+				data = FFTUtils.abs2(data);
 				fft.realInverse(data, true);
 	
 				writer.write(StringUtils.join(data, "\t"));

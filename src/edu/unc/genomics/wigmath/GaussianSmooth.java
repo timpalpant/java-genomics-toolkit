@@ -27,6 +27,7 @@ public class GaussianSmooth extends WigMathTool {
 		inputs.add(inputFile);
 		
 		// Use a window size equal to +/- 3 SD's
+		log.debug("Initializing Gaussian filter");
 		filter = new float[6*stdev+1];
 		float sum = 0;
 		for (int i = 0; i < filter.length; i++) {
