@@ -11,7 +11,7 @@
   
   <help>
 
-This tool calculates the phase distribution of sequencing data. It can be used to identify genome-wide periodicities. Phase counts are aggregated for each base pair across the genome. The tool is a reimplementation of the algorithm described in (Valouev et al. 2011).
+This tool calculates the phase distribution of sequencing data. It can be used to identify genome-wide periodicities. Phase counts are aggregated for each base pair across the genome. This is equivalent to summing the autocovariance of a sliding window across the genome. The tool is a reimplementation of the algorithm described in (Valouev et al. 2011).
 
 .. class:: infomark
 

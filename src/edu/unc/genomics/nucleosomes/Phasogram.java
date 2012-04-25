@@ -42,8 +42,12 @@ public class Phasogram extends CommandLineTool {
 				try {
 					float[] data = WigFile.flattenData(inputFile.query(chr, start, paddedStop), start, paddedStop);
 					for (int i = 0; i < data.length-maxPhase; i++) {
-						for (int j = 0; j <= maxPhase; j++) {
-							phaseCounts[j] += data[i]*data[i+j];
+						if (!Float.isNaN(data[i]) && !Float.isInfinite(data[i])) {
+							for (int j = 0; j <= maxPhase; j++) {
+								if (!Float.isNaN(data[i+j]) && !Float.isInfinite(data[i+j])) {
+									phaseCounts[j] += data[i]*data[i+j];
+								}
+							}
 						}
 					}
 					
