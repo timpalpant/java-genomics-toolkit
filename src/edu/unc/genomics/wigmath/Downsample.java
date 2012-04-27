@@ -67,6 +67,12 @@ public class Downsample extends CommandLineTool {
 						// Do the downsampling
 						float value = Float.NaN;
 						switch (dsm) {
+						case COVERAGE:
+							value = WigFile.numBases(result, chunkStart, chunkStop);
+							break;
+						case TOTAL:
+							value = WigFile.total(result, chunkStart, chunkStop);
+							break;
 						case MEAN:
 							value = WigFile.mean(result, chunkStart, chunkStop);
 							break;

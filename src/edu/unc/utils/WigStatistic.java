@@ -1,6 +1,8 @@
 package edu.unc.utils;
 
 public enum WigStatistic {
+	COVERAGE("coverage"),
+	TOTAL("total"),
 	MEAN("mean"),
 	MIN("min"),
 	MAX("max");

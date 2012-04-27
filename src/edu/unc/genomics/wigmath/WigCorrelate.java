@@ -29,7 +29,9 @@ public class WigCorrelate extends CommandLineTool {
 	@Parameter(description = "Input files", required = true)
 	public List<String> inputFiles = new ArrayList<String>();
 	@Parameter(names = {"-w", "--window"}, description = "Window size (bp)")
-	public Integer windowSize = 100;
+	public int windowSize = 100;
+	@Parameter(names = {"-s", "--step"}, description = "Sliding shift step (bp)")
+	public int stepSize = 50;
 	@Parameter(names = {"-t", "--type"}, description = "Correlation metric to use (pearson/spearman)")
 	public String type = "pearson";
 	@Parameter(names = {"-o", "--output"}, description = "Output file")
@@ -95,7 +97,10 @@ public class WigCorrelate extends CommandLineTool {
 		nBins = new int[chromosomes.size()];
 		for (int i = 0; i < chromosomes.size(); i++) {
 			chrLengths[i] = chrStops[i] - chrStarts[i] + 1;
-			nBins[i] = (int) Math.ceil(((double)chrLengths[i])/windowSize);
+			nBins[i] = chrLengths[i] / stepSize;
+			if (nBins[i]*stepSize != chrLengths[i]) {
+				nBins[i]++;
+			}
 			totalNumBins += nBins[i];
 		}
 		log.debug("Total number of bins for all chromosomes = "+totalNumBins);
@@ -150,8 +155,7 @@ public class WigCorrelate extends CommandLineTool {
 	}
 	
 	/**
-	 * Get a collapsed data vector from w
-	 * This is the "binning" part of ACT
+	 * Get a binned data vector from w
 	 * @param w a WigFile
 	 * @return a vector of binned values from w in a consistent order
 	 * @throws IOException 
@@ -168,10 +172,20 @@ public class WigCorrelate extends CommandLineTool {
 				Iterator<WigItem> result = w.query(chr, w.getChrStart(chr), w.getChrStop(chr));
 				while (result.hasNext()) {
 					WigItem item = result.next();
-					for (int bp = item.getStartBase(); bp <= item.getEndBase(); bp++) {
-						int bin = (bp-chrStarts[i]) / windowSize;
-						values[bin+binOffset] += item.getWigValue();
-						counts[bin+binOffset]++;
+					// Add this WigItem to the appropriate bins
+					int bin = item.getStartBase() / stepSize;
+					int binStart = bin*stepSize + 1;
+					while (binStart <= item.getEndBase()) {
+						int binEnd = binStart + windowSize - 1;
+						int intersectStart = Math.max(binStart, item.getStartBase());
+						int intersectStop = Math.min(binEnd, item.getEndBase());
+						int overlap = intersectStop - intersectStart + 1;
+						values[bin+binOffset] += overlap * item.getWigValue();
+						counts[bin+binOffset] += overlap;
+						
+						// Move to the next bin
+						bin++;
+						binStart += stepSize;
 					}
 				}
 			} catch (WigFileException | IOException e) {
@@ -182,7 +196,7 @@ public class WigCorrelate extends CommandLineTool {
 			binOffset += nBins[i];
 		}
 		
-		// Compute the average
+		// Compute the average for each bin
 		for (int i = 0; i < totalNumBins; i++) {
 			if (counts[i] > 0) {
 				values[i] /= counts[i];
