@@ -73,7 +73,7 @@ public class ReadLengthDistributionMatrix extends CommandLineTool {
 				writer.write("\t"+bp);
 			}
 			
-			for (int i = 0; i < histLength; i++) {
+			for (int i = histLength-1; i >= 0; i--) {
 				writer.newLine();
 				writer.write(String.valueOf(min+i*binSize));
 				for (int j = 0; j < regionLength; j++) {

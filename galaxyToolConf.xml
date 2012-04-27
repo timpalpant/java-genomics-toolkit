@@ -24,6 +24,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/IntervalStats.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/PowerSpectrum.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/RollingReadLength.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/ReadLengthDistributionMatrix.xml" />
   </section>
   <section name="WigMath" id="java-genomics-toolkit-wigmath">
     <tool file="java-genomics-toolkit/galaxy-conf/Add.xml" />

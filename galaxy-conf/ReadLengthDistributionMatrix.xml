@@ -16,7 +16,7 @@
   
 <help>
   
-This tool will a matrix (in matrix2png_ format) with the distribution of read lengths over each base pair. Reads are binned by genomic location and length to create a matrix where each column represents the distribution of read lengths over that base pair. The resulting matrix can be turned into heatmap using the Visualization -> Make heatmap with matrix2png tool.
+This tool will create a matrix (in matrix2png_ format) with the distribution of read lengths over each base pair. Reads are binned by genomic location and length to create a matrix where each column represents the distribution of read lengths over that base pair. The resulting matrix can be turned into heatmap using the Visualization -> Make heatmap with matrix2png tool.
   
 .. _matrix2png: http://bioinformatics.ubc.ca/matrix2png/dataformat.html
   
@@ -28,7 +28,7 @@ This tool requires paired-end SAM, BAM, Bed, or BedGraph formatted data. Using s
 
 **Syntax**
 
-- **Mapped reads** are the paired-end reads used to make the histograms
+- **Mapped reads** are the mapped paired-end reads used to make the histograms
 - **Chromosome** a locus in the genome
 - **Start base pair** a locus in the genome
 - **Stop base pair** a locus in the genome
@@ -42,12 +42,12 @@ This tool requires paired-end SAM, BAM, Bed, or BedGraph formatted data. Using s
 
 Make a matrix with the read length distribution across the region chrI:5001-6000, looking at reads 100-200bp in length in bins of 1bp:
 
-- **Chromosome: ** chrI
-- **Start: ** 5001
-- **Stop: ** 6000
-- **Minimum fragment length: ** 100
-- **Maximum fragment length: ** 200
-- **Fragment length bin size: ** 1
+- **Chromosome:** chrI
+- **Start:** 5001
+- **Stop:** 6000
+- **Minimum fragment length:** 100
+- **Maximum fragment length:** 200
+- **Fragment length bin size:** 1
 
 The resulting matrix will be 1000x101, with each column representing a base pair and each row representing a read length. The column headers give the base pair and the row headers give the read length.
 
