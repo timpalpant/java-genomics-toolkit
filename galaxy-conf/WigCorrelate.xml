@@ -1,7 +1,7 @@
 <tool id="WigCorrelate" name="Correlate" version="1.0.0">
   <description>multiple (Big)Wig files</description>
   <command interpreter="sh">
-    galaxyToolRunner.sh wigmath.WigCorrelate -w $window -t $type -o $output
+    galaxyToolRunner.sh wigmath.WigCorrelate -w $window -s $step -t $type -o $output
       #for $input in $inputs
         ${input.file}
       #end for
@@ -11,6 +11,7 @@
         <param name="file" type="data" format="bigwig,wig" />
       </repeat>
       <param name="window" type="integer" value="100" label="Window size (bp)" />
+      <param name="step" type="integer" value="50" label="Sliding step size (bp)" />
       <param name="type" type="select" label="Correlation metric">
       	<option value="pearson">Pearson</option>
       	<option value="spearman">Spearman</option>
@@ -22,11 +23,20 @@
   
 <help>
   
-This tool will compute a correlation matrix between the supplied Wig or BigWig files. Each row/column in the matrix is added in the order that files are added above, starting from the top left. The Wig file is downsampled into non-overlapping windows with the specified size by computing the mean value in each window. These windows are then correlated using either  Pearson_'s Product-Moment correlation coefficient or Spearman_'s rank correlation coefficient. If the window size is set to 1, the correlation is calculated between all base pairs in the genome.
+This tool will compute a correlation matrix between the supplied Wig or BigWig files. Each row/column in the matrix is added in the order that files are added above, starting from the top left. The Wig file is downsampled into sliding windows with the specified bin size and shift by computing the mean value in each window. These windows are then correlated using either Pearson_'s Product-Moment correlation coefficient or Spearman_'s rank correlation coefficient. If the window size is set to 1, the correlation is calculated between all base pairs in the genome.
   
 .. _Pearson: http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
 
 .. _Spearman: http://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+  
+-----
+
+**Syntax**
+
+- **Inputs** are the genomic data to correlate
+- **Window size** is the size of the window to bin data into
+- **Sliding step size** is the shift step size of the sliding window used during binning
+- **Correlation metric** is the type of correlation to calculate
   
 -----
 
