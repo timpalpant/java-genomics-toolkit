@@ -6,9 +6,14 @@ then
   exit;
 fi
 
-if [ "$1" = "list" ]
-then
-  find src/edu/unc/genomics/**/*.java -exec basename -s .java {} \;
+# Verify that the user has Java 7 installed
+# Otherwise there will be an obscure UnsupportedClassVersion error
+VER=`java -version 2>&1 | grep "java version" | awk '{print $3}' | tr -d \" | awk '{split($0, array, ".")} END{print array[2]}'`
+if [[ $VER < 7 ]]; then
+    echo "This tool requires Java >= 7. You have Java $VER installed."
+    echo "Visit http://www.oracle.com/technetwork/java/javase/downloads/index.html"
+    java -version
+    exit
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
