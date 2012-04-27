@@ -126,7 +126,7 @@ public class WigCorrelate extends CommandLineTool {
 		}
 		
 		// Write the correlation matrix to output
-		StringBuilder output = new StringBuilder();
+		StringBuilder output = new StringBuilder(type);
 		// Header row
 		for (int i = 0; i < wigs.size(); i++) {
 			output.append("\t"+wigs.get(i).getPath().getFileName());
@@ -151,13 +151,14 @@ public class WigCorrelate extends CommandLineTool {
 	
 	/**
 	 * Get a collapsed data vector from w
-	 * @param w
-	 * @return
+	 * This is the "binning" part of ACT
+	 * @param w a WigFile
+	 * @return a vector of binned values from w in a consistent order
 	 * @throws IOException 
 	 * @throws WigFileException 
 	 */
 	private float[] getDataVector(WigFile w) {
-		float[] sum = new float[totalNumBins];
+		float[] values = new float[totalNumBins];
 		int[] counts = new int[totalNumBins];
 		
 		int binOffset = 0;
@@ -169,7 +170,7 @@ public class WigCorrelate extends CommandLineTool {
 					WigItem item = result.next();
 					for (int bp = item.getStartBase(); bp <= item.getEndBase(); bp++) {
 						int bin = (bp-chrStarts[i]) / windowSize;
-						sum[bin+binOffset] += item.getWigValue();
+						values[bin+binOffset] += item.getWigValue();
 						counts[bin+binOffset]++;
 					}
 				}
@@ -182,16 +183,15 @@ public class WigCorrelate extends CommandLineTool {
 		}
 		
 		// Compute the average
-		float[] avg = new float[totalNumBins];
 		for (int i = 0; i < totalNumBins; i++) {
 			if (counts[i] > 0) {
-				avg[i] = sum[i] / counts[i];
+				values[i] /= counts[i];
 			} else {
-				avg[i] = Float.NaN;
+				values[i] = Float.NaN;
 			}
 		}
 		
-		return avg;
+		return values;
 	}
 	
 	/**

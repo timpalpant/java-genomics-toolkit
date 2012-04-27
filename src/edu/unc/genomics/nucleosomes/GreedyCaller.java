@@ -61,7 +61,7 @@ public class GreedyCaller extends CommandLineTool {
 					
 					float[] dyads = WigFile.flattenData(dyadsIter, paddedStart, paddedStop);
 					float[] smoothed = WigFile.flattenData(smoothedIter, paddedStart, paddedStop);
-					int[] sortedIndices = SortUtils.rank(smoothed);
+					int[] sortedIndices = SortUtils.sortIndices(smoothed);
 
 					// Proceed through the data in descending order
 					for (int j = sortedIndices.length-1; j >= 0; j--) {

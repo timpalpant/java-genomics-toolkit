@@ -17,12 +17,12 @@ public class FFTUtilsTest {
 	}
 
 	@Test
-	public void testAutocorrelationFloatArrayInt() {
+	public void testAutocovariance() {
 		fail("Not yet implemented");
 	}
 
 	@Test
-	public void testAutocorrelationFloatArray() {
+	public void testAutocovariance2() {
 		fail("Not yet implemented");
 	}
 

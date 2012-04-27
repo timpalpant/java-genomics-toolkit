@@ -33,12 +33,12 @@ public class FFTUtils {
 	}
 
 	/**
-	 * Computes the autocorrelation of the data in f
+	 * Computes the autocovariance of the data in f
 	 * @param x a vector of real data
 	 * @param maxShift the maximum phase shift to calculate
-	 * @return the autocorrelation values, having length Math.min(x.length, maxShift)
+	 * @return the autocovariance values, having length Math.min(x.length, maxShift)
 	 */
-	public static float[] autocorrelation(float[] x, int maxShift) {
+	public static float[] autocovariance(float[] x, int maxShift) {
 		int stop = Math.min(x.length, maxShift);
 		float[] auto = new float[stop];
 
@@ -52,12 +52,12 @@ public class FFTUtils {
 	}
 	
 	/**
-	 * Computes the autocorrelation of the data in f for all possible shifts
+	 * Computes the autocovariance of the data in f for all possible shifts
 	 * @param x a vector of real data
-	 * @return the autocorrelation values, having length equal to x.length
+	 * @return the autocovariance values, having length equal to x.length
 	 */
-	public static float[] autocorrelation(float[] x) {
-		return autocorrelation(x, x.length);
+	public static float[] autocovariance(float[] x) {
+		return autocovariance(x, x.length);
 	}
 
 }

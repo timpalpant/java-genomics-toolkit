@@ -49,7 +49,7 @@ public class Autocorrelation extends CommandLineTool {
 				
 				// Compute the autocorrelation
 				float[] data = WigFile.flattenData(wigIter, interval.getStart(), interval.getStop());
-				float[] auto = FFTUtils.autocorrelation(data, limit);
+				float[] auto = FFTUtils.autocovariance(data, limit);
 	
 				// Write to output
 				writer.write(interval.toBed());
