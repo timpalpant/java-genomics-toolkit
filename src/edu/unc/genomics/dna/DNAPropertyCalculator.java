@@ -1,19 +1,15 @@
 package edu.unc.genomics.dna;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import net.sf.picard.reference.FastaSequenceFile;
 import net.sf.picard.reference.FastaSequenceIndex;
 import net.sf.picard.reference.FastaSequenceIndexEntry;
 import net.sf.picard.reference.IndexedFastaSequenceFile;
 import net.sf.picard.reference.ReferenceSequence;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
 import net.sf.samtools.util.StringUtil;
 
 import org.apache.log4j.Logger;
@@ -33,7 +29,7 @@ public class DNAPropertyCalculator extends CommandLineTool {
 	@Parameter(names = {"-p", "--property"}, description = "DNA property to calculate", required = true)
 	public String propertyName;
 	@Parameter(names = {"-n", "--normalize"}, description = "Output normalized values")
-	public boolean normalize = true;
+	public boolean normalize = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Wiggle)", required = true)
 	public Path outputFile;
 	

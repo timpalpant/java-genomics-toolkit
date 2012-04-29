@@ -16,7 +16,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/DynaPro.xml" />
   </section>
   <section name="NGS" id="java-genomics-toolkit-ngs">
-    <tool file="java-genomics-toolkit/other-tools/Autocorrelation.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/Autocorrelation.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/BaseAlignCounts.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/FindAbsoluteMaxima.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/FindOutlierRegions.xml" />

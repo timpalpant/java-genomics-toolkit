@@ -8,36 +8,30 @@
       <data format="wig" name="output" metadata_source="input" />
   </outputs>
   <tests>
-    <!--<test>
-	    <param name="input" value="wigmath.input1"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="zscorer.output1"/>
+	  <test>
+	    <param name="input" value="wigmath1.wig"/>
+	    <output name="output" file="zscorer1.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input1.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="zscorer.output1"/>
+	    <param name="input" value="wigmath2.wig"/>
+	    <output name="output" file="zscorer2.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input2"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="zscorer.output2"/>
+	    <param name="input" value="wigmath3.wig"/>
+	    <output name="output" file="zscorer3.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input2.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="zscorer.output2"/>
+	    <param name="input" value="wigmath1.bw"/>
+	    <output name="output" file="zscorer4.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input3"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="zscorer.output3"/>
+	    <param name="input" value="wigmath2.bw"/>
+	    <output name="output" file="zscorer5.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input3.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="zscorer.output3"/>
-	  </test>-->
+	    <param name="input" value="wigmath3.bw"/>
+	    <output name="output" file="zscorer6.wig"/>
+	  </test>
   </tests>
   
   <help>

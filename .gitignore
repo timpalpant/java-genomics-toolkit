@@ -5,3 +5,4 @@ reports
 *.class
 *.log
 .DS_Store
+*.wig.idx

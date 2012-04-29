@@ -7,6 +7,20 @@
   <outputs>
       <data format="txt" name="output" />
   </outputs>
+  <tests>
+      <test>
+      	<param name="input" value="wigmath1.wig"/>
+      	<output name="output" file="wigsummary1.txt"/>
+      </test>
+      <test>
+      	<param name="input" value="test.wig"/>
+      	<output name="output" file="wigsummary2.txt"/>
+      </test>
+      <test>
+      	<param name="input" value="test.bw"/>
+      	<output name="output" file="wigsummary3.txt"/>
+      </test>
+  </tests>
   
 <help>
   

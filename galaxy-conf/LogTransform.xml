@@ -9,42 +9,36 @@
     <data format="wig" name="output" metadata_source="input" />
   </outputs>
   <tests>
-    <!--<test>
-	    <param name="input" value="wigmath.input1"/>
+	  <test>
+	    <param name="input" value="wigmath1.wig"/>
 	    <param name="base" value="2"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="logger.output1"/>
+	    <output name="output" file="logger1.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input1.bw"/>
-	    <param name="base" value="2"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="logger.output1"/>
+	    <param name="input" value="wigmath2.wig"/>
+	    <param name="base" value="3"/>
+	    <output name="output" file="logger2.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input2"/>
-	    <param name="base" value="2"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="logger.output2"/>
-	  </test>
-	  <test>
-	    <param name="input" value="wigmath.input2.bw"/>
-	    <param name="base" value="2"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="logger.output2"/>
-	  </test>
-	  <test>
-	    <param name="input" value="wigmath.input3"/>
+	    <param name="input" value="wigmath3.wig"/>
 	    <param name="base" value="10"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="logger.output3"/>
+	    <output name="output" file="logger3.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="wigmath.input3.bw"/>
+	    <param name="input" value="wigmath1.bw"/>
+	    <param name="base" value="2"/>
+	    <output name="output" file="logger4.wig"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath2.bw"/>
+	    <param name="base" value="3"/>
+	    <output name="output" file="logger5.wig"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath3.bw"/>
 	    <param name="base" value="10"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="logger.output3"/>
-	  </test>-->
+	    <output name="output" file="logger6.wig"/>
+	  </test>
   </tests>
   
   <help>

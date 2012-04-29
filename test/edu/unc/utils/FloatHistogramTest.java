@@ -8,16 +8,15 @@ import org.junit.Test;
 public class FloatHistogramTest {
 	
 	private FloatHistogram hist;
+	private static final float[] values = {0.54f, 0.21f, 0.2f, 0.88f, 0.72f};
 	private static final int[] expected = {0, 0, 2, 0, 0, 1, 0, 1, 1, 0};
 
 	@Before
 	public void setUp() throws Exception {
 		hist = new FloatHistogram(10, 0, 1);
-		hist.addValue(0.54);
-		hist.addValue(0.21);
-		hist.addValue(0.2);
-		hist.addValue(0.88);
-		hist.addValue(0.72);
+		for (float value : values) {
+			hist.addValue(value);
+		}
 	}
 
 	@Test

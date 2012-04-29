@@ -81,6 +81,21 @@
       </data>
   </outputs>
   
+  <tests>
+    <test>
+      <param name="genomeSource" value="history"/>
+      <param name="ownFile" value="sacCer2.fasta"/>
+      <param name="N" value="false"/>
+      <output name="output" file="sacCer2.twist.wig"/>
+  	</test>
+  	<test>
+      <param name="genomeSource" value="history"/>
+      <param name="ownFile" value="sacCer2.fasta"/>
+      <param name="N" value="true"/>
+      <output name="output" file="sacCer2.twist.normalized.wig"/>
+  	</test>
+  </tests>
+  
   <help>
 
 This tool will create a new Wig file with genome-wide calculations of sequence-specific DNA properties determined from local n-nucleotide sequences. DNA properties are calculated using AJT_.

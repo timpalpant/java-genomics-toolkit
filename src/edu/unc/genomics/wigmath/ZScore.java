@@ -32,6 +32,9 @@ public class ZScore extends WigMathTool {
 			log.error("Cannot Z-score a file with stdev = 0!");
 			throw new CommandLineToolException("Cannot Z-score a file with stdev = 0!");
 		}
+		
+		log.info("Mean = "+Float.toString((float)mean));
+		log.info("StDev = "+Float.toString((float)stdev));
 	}
 	
 	@Override

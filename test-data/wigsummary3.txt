@@ -1,0 +1,10 @@
+BigWig file:
+Chromosome chrI, start=1, stop=230208
+Chromosome chrII, start=1, stop=813178
+Basic Statistics:
+	Mean:			0.016117967577435388
+	Standard Deviation:	0.9822535730029442
+	Total:			16817.26171875
+	Bases Covered:		1043386
+	Min value:		-4.420300006866455
+	Max value:		11.571000099182129

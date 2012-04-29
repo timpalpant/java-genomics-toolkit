@@ -1,0 +1,13 @@
+chrI	10	30	Spot1	10
+chrII	100	95	Spot2	13.2
+chrIII	20	50	Spot3	5.0	+
+chrXIV	15	20	Spot4	2.0	-
+illegal entry
+chrIV	100200	100220	Spot5	10.0	-
+chrV	1000000	1001000	Spot6	1
+chrVI	0	12	Spot7	12	+
+chrVII	1	10	Spot8	1.0	-
+chrVIII	15	20	Spot9	.	+
+chrIX	25	10	Spot1
+illegal entry
+chrXVI 1

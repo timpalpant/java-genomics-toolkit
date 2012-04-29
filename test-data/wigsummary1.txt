@@ -1,0 +1,16 @@
+ASCII Text Wiggle file: track type=wiggle_0 name='My Test Wig" description="Test Wig for Running Specs'
+Chromosomes:
+	chrXI start=20 stop=148
+	chrI start=1 stop=15
+	2micron start=100 stop=111
+Contigs:
+	fixedStep chrom=chrXI start=20 span=4 step=5
+	fixedStep chrom=chrI start=1 span=1 step=1
+	variableStep chrom=2micron span=1
+Basic Statistics:
+	Mean:			7.677419354838708
+	Standard Deviation:	8.413265626471143
+	Total:			952.0
+	Bases Covered:		124
+	Min value:		0.0
+	Max value:		44.0
