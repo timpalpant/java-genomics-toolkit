@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import net.sf.picard.reference.FastaSequenceFile;
+import net.sf.picard.reference.FastaSequenceIndex;
+import net.sf.picard.reference.FastaSequenceIndexEntry;
 import net.sf.picard.reference.IndexedFastaSequenceFile;
 import net.sf.picard.reference.ReferenceSequence;
 import net.sf.samtools.SAMSequenceDictionary;
@@ -44,32 +46,33 @@ public class DNAPropertyCalculator extends CommandLineTool {
 		}
 		
 		// TODO Generate the FASTA index if it is not already present (?)
-		IndexedFastaSequenceFile fasta = null;
-		try {
-			fasta = new IndexedFastaSequenceFile(inputFile.toFile());
-		} catch (FileNotFoundException e) {
+		if (!IndexedFastaSequenceFile.canCreateIndexedFastaReader(inputFile.toFile())) {
 			log.error("Could not find FASTA index. You must first index your FASTA file with 'samtools faidx'");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException("Could not find FASTA index. You must first index your FASTA file with 'samtools faidx'");
 		}
+		
+		// Open the FASTA file and its index
+		IndexedFastaSequenceFile fasta = new IndexedFastaSequenceFile(inputFile.toFile());
+		Path indexFile = inputFile.resolveSibling(inputFile.getFileName()+".fai");
+		FastaSequenceIndex faidx = new FastaSequenceIndex(indexFile.toFile());
 		
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Write the Wiggle track header
-			writer.write("track type=wiggle_0");
+			writer.write("track type=wiggle_0 name='"+propertyName+"' description='"+propertyName+"'");
 			writer.newLine();
 			
 			// Process each entry in the FASTA file in chunks
-			SAMSequenceDictionary dict = fasta.getSequenceDictionary();
-			for (SAMSequenceRecord contig : dict.getSequences()) {
-				log.debug("Processing FASTA entry "+contig.getSequenceName());
+			for (FastaSequenceIndexEntry contig : faidx) {
+				log.debug("Processing FASTA entry "+contig.getContig()+" (length = "+contig.getSize()+")");
 				// Write the contig header to output
-				writer.write("fixedStep chrom="+contig.getSequenceName()+" start=1 step=1 span=1");
+				writer.write("fixedStep chrom="+contig.getContig()+" start=1 step=1 span=1");
 				writer.newLine();
 				
 				long start = 1;
-				while (start <= contig.getSequenceLength()) {
-					long stop = start + DEFAULT_CHUNK_SIZE - 1;
-					ReferenceSequence seq = fasta.getSubsequenceAt(contig.getSequenceName(), start, stop);
+				while (start <= contig.getSize()) {
+					long stop = Math.min(start + DEFAULT_CHUNK_SIZE - 1, contig.getSize());
+					log.debug("Processing chunk "+contig.getContig()+":"+start+"-"+stop);
+					ReferenceSequence seq = fasta.getSubsequenceAt(contig.getContig(), start, stop);
 					
 					double[] values;
 					if (normalize) {
