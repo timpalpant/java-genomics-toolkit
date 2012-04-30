@@ -84,8 +84,10 @@ public class IntervalAverager extends CommandLineTool {
 			int n2 = alignmentPoint + Math.abs(entry.getValue().intValue()-entry.getStop());
 			assert data.length == n2-n1+1;
 			for (int bp = n1; bp <= n2; bp++) {
-				sum[bp] += data[bp-n1];
-				counts[bp]++;
+				if (!Float.isNaN(data[bp-n1]) && !Float.isInfinite(data[bp-n1])) {
+					sum[bp] += data[bp-n1];
+					counts[bp]++;
+				}
 			}
 			
 			count++;
