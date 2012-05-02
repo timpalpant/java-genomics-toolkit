@@ -44,6 +44,7 @@ public class BaseAlignCounts extends CommandLineTool {
 			// Process each chromosome in the assembly
 			for (String chr : intervalFile.chromosomes()) {
 				if (!assembly.includes(chr)) {
+					log.info("Skipping chromosome "+chr+" because it is not in assembly "+assembly);
 					continue;
 				}
 				

@@ -8,7 +8,8 @@
   <outputs>
     <data name="output" format="wig" />
   </outputs>
-  
+  <tests>
+  </tests>
   <help>
         
 This tool produces a new Wig file with the number of reads/intervals overlapping each base pair. Reads can be artificially extended to match known fragment lengths. If you wish to count the number of reads starting at each base pair, set the read extension to 1. If you wish to count the number of intervals overlapping each base pair, set the extension to -1.
@@ -18,6 +19,10 @@ This tool produces a new Wig file with the number of reads/intervals overlapping
 .. class:: warningmark
 
 This tool requires sequencing reads in SAM, BAM, Bed, or BedGraph format. If you are artificially extending reads, ensure that the strand is set correctly in SAM, BAM, and Bed files.
+
+.. class:: warningmark
+
+Paired-end reads are considered to be the entire fragment (the distance from the 5' end of mate 1 to the 5' end of mate 2) if the extension is set to -1.
 
 .. class:: infomark
 

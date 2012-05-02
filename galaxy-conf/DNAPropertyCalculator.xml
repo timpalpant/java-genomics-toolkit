@@ -84,15 +84,15 @@
   <tests>
     <test>
       <param name="genomeSource" value="history"/>
-      <param name="ownFile" value="sacCer2.fasta"/>
+      <param name="ownFile" value="test.fasta"/>
       <param name="N" value="false"/>
-      <output name="output" file="sacCer2.twist.wig"/>
+      <output name="output" file="twist.wig"/>
   	</test>
   	<test>
       <param name="genomeSource" value="history"/>
-      <param name="ownFile" value="sacCer2.fasta"/>
+      <param name="ownFile" value="test.fasta"/>
       <param name="N" value="true"/>
-      <output name="output" file="sacCer2.twist.normalized.wig"/>
+      <output name="output" file="twist.normalized.wig"/>
   	</test>
   </tests>
   

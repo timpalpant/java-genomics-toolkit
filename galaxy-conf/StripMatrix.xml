@@ -9,8 +9,8 @@
   </outputs>
   <tests>
     <test>
-      <param name="input" value="stripMatrix.input"/>
-	    <output name="output" file="stripMatrix.output"/>
+      <param name="input" value="test.matrix2png.txt"/>
+	    <output name="output" file="stripMatrix.txt"/>
     </test>
   </tests>
   

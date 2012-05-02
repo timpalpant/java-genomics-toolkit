@@ -1,0 +1,2 @@
+track type=wiggle_0 name='Converted test.sam' description='Converted test.sam'
+fixedStep chrom=2micron start=1 step=1 span=1

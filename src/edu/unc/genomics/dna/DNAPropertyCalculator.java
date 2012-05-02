@@ -41,10 +41,20 @@ public class DNAPropertyCalculator extends CommandLineTool {
 			throw new CommandLineToolException("Unknown DNA property: "+propertyName);
 		}
 		
-		// TODO Generate the FASTA index if it is not already present (?)
 		if (!IndexedFastaSequenceFile.canCreateIndexedFastaReader(inputFile.toFile())) {
-			log.error("Could not find FASTA index. You must first index your FASTA file with 'samtools faidx'");
-			throw new CommandLineToolException("Could not find FASTA index. You must first index your FASTA file with 'samtools faidx'");
+			// Try to generate the FASTA index by calling samtools
+			try {
+				log.debug("Attempting to generate FASTA index by calling 'samtools faidx'");
+				Process p = new ProcessBuilder("samtools", "faidx", inputFile.toString()).start();
+				p.waitFor();
+			} catch (Exception e) {
+				log.error("Error attempting to automatically call 'samtools faidx'");
+			} finally {
+				if (!IndexedFastaSequenceFile.canCreateIndexedFastaReader(inputFile.toFile())) {
+					log.error("Could not find FASTA index. You must first index your FASTA file with 'samtools faidx'");
+					throw new CommandLineToolException("Could not find FASTA index. You must first index your FASTA file with 'samtools faidx'");
+				}
+			}
 		}
 		
 		// Open the FASTA file and its index

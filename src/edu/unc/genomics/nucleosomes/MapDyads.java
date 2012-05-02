@@ -45,6 +45,7 @@ public class MapDyads extends CommandLineTool {
 			// Process each chromosome in the assembly
 			for (String chr : inputFile.chromosomes()) {
 				if (!assembly.includes(chr)) {
+					log.info("Skipping chromosome "+chr+" because it is not in assembly "+assembly);
 					continue;
 				}
 				
