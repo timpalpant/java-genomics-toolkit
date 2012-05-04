@@ -1,5 +1,10 @@
 package edu.unc.utils;
 
+/**
+ * Routines for working with Fourier transforms and frequency spectrum data
+ * @author timpalpant
+ *
+ */
 public class FFTUtils {
 	/**
 	 * Computes the power spectrum from FFT data
@@ -39,12 +44,17 @@ public class FFTUtils {
 	 * @return the autocovariance values, having length Math.min(x.length, maxShift)
 	 */
 	public static float[] autocovariance(float[] x, int maxShift) {
+		float total = 0;
+		for (int i = 0; i < x.length; i++) {
+			total += x[i];
+		}
+		float mean = total / x.length;
+		
 		int stop = Math.min(x.length, maxShift);
 		float[] auto = new float[stop];
-
 		for (int i = 0; i < stop; i++) {
 			for (int j = 0; j < x.length - i; j++) {
-				auto[i] += x[j] * x[j + i];
+				auto[i] += (x[j]-mean) * (x[j + i]-mean);
 			}
 		}
 		

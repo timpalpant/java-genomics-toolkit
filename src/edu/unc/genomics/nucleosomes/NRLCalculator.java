@@ -27,7 +27,7 @@ public class NRLCalculator extends CommandLineTool {
 	public Path inputFile;
 	@Parameter(names = {"-l", "--loci"}, description = "Genomic loci (Bed format)", required = true)
 	public IntervalFile<? extends Interval> lociFile;
-	@Parameter(names = {"-o", "--output"}, description = "Output file (NRL for each gene)", required = true)
+	@Parameter(names = {"-o", "--output"}, description = "Output file (NRLs for each gene)", required = true)
 	public Path outputFile;
 	
 	@Override

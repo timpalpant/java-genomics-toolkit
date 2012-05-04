@@ -1,0 +1,21 @@
+<tool id="WaveletTransform" name="Wavelet analysis" version="1.0.0">
+  <description>across a genomic interval</description>
+  <command interpreter="sh">galaxyToolRunner.sh ngs.WaveletTransform -i $input -w $wavelet --chr $chr --start $start --stop $stop --min $min --max $max --step $N -o $output</command>
+  <inputs>
+      <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
+      <param format="tabular" name="wavelet" type="data" label="Wavelet" />
+      <param name="chr" type="text" label="Chromosome" />
+      <param name="start" type="integer" value="1" label="Start base pair" />
+      <param name="stop" type="integer" value="1000" label="Stop base pair" />
+      <param name="min" type="float" value="10" label="Minimum wavelet size (bp)" />
+      <param name="max" type="float" value="400" label="Maximum wavelet size (bp)" />
+      <param name="N" type="integer" value="1" label="Step size (bp)" />
+  </inputs>
+  <outputs>
+      <data format="tabular" name="output" />
+  </outputs>
+  
+<help>
+  
+</help>
+</tool>

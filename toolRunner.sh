@@ -4,6 +4,7 @@
 if [ $# -eq 0 ]
 then
   echo "USAGE: toolRunner.sh APPNAME [ARGS]";
+  echo "To list available tools: toolRunner.sh list";
   exit
 fi
 

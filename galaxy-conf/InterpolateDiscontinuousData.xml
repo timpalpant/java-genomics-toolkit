@@ -1,0 +1,40 @@
+<tool id="WigInterpolate" name="Interpolate" version="1.0.0">
+  <description>missing values in a (Big)Wig file</description>
+  <command interpreter="sh">galaxyToolRunner.sh converters.InterpolateDiscontinousData -i $input -t $type -m $max -o $output</command>
+  <inputs>
+      <param format="bigwig,wig" name="input" type="data" label="Interpolate missing values in" />
+      <param name="type" type="select" label="Interpolation type">
+      	<option value="nearest">Nearest</option>
+      	<option value="linear">Linear</option>
+      	<option value="cubic">Cubic</option>
+      </param>
+      <param name="max" type="integer" value="1000" label="Maximum span of missing values to interpolate (bp)"/>
+  </inputs>
+  <outputs>
+      <data format="wig" name="output" metadata_source="input" />
+  </outputs>
+  
+  <help>
+
+This tool will attempt to interpolate missing values (NaN) in a Wig file that result when converting discontinous microarray probe data to Wig format. Stretches of missing data that extend longer than the allowed maximum will be left as NaN.
+
+-----
+
+**Interpolation types**
+
+- **Nearest** uses the value of the nearest base pair that has data
+- **Linear** uses a linear interpolant between the values of the nearest two probes
+- **Cubic** uses cubic interpolant between the values of the nearest two probes
+
+For more information, see Wikipedia_.
+
+.. _Wikipedia: http://en.wikipedia.org/wiki/Interpolation
+
+-----
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use the Converters -> IntervalToWig tool to convert Bed, BedGraph, or GFF-formatted microarray data to Wig format, then use this tool to interpolate the missing values between probes.
+
+  </help>
+</tool>

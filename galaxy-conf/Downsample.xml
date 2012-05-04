@@ -6,8 +6,10 @@
       <param name="window" type="integer" value="100" label="Window size (bp)" />
       <param name="metric" type="select" label="Downsampling method">
       	<option value="mean">Mean</option>
-      	<option value="min">Min</option>
-      	<option value="max">Max</option>
+      	<option value="min">Minimum</option>
+      	<option value="max">Maximum</option>
+      	<option value="coverage">Coverage</option>
+      	<option value="total">Total</option>
       </param>
   </inputs>
   <outputs>
@@ -16,13 +18,23 @@
   
   <help>
 
-.. class:: infomark
-
-**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
+This tool can be used to reduce the resolution and file size of Wig files for easier upload to UCSC. Data is downsampled in non-overlapping windows starting from the beginning of each chromosome. Each window can be downsampled as the mean, minimum, maximum, total, or coverage of the original data.
 
 -----
 
-This tool can be used to reduce the resolution and file size of Wig files for easier upload to UCSC. Data is downsampled in non-overlapping moving windows starting from the beginning of each chromosome. Each window can be downsampled as the arithmetic mean, minimum, or maximum value of the original data.
+**Downsampling Methods**
+
+- **Mean:** the arithmetic mean of the values in the original data window
+- **Minimum:** the least value in the original data window
+- **Maximum:** the greatest value in the original data window
+- **Coverage:** the fraction of bases with values in the original window
+- **Total:** the sum of all values in the original data window
+
+-----
+
+.. class:: infomark
+
+**TIP:** If your dataset does not appear in the pulldown menu, it means that it is not in Wig or BigWig format. Use "edit attributes" to set the correct format if it was not detected correctly.
 
   </help>
 </tool>

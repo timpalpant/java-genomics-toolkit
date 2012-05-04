@@ -29,14 +29,8 @@ public class FloatCorrelation {
 				sumXY += x[i] * y[i];
 			}
 		}
-
-		double eXY = sumXY / N;
-		double eX = sumX / N;
-		double eY = sumY / N;
-		double eXSq = sumSqX / N;
-		double eYSq = sumSqY / N;
-		return (float) ((eXY - eX*eY) / Math.sqrt(eXSq - eX*eX) / Math.sqrt(eYSq - eY*eY));
-		//return (float) ((N*sumXY - sumX*sumY) / Math.sqrt(N*sumSqX - sumX*sumX) / Math.sqrt(N*sumSqY - sumY*sumY));
+		
+		return (float) ((N*sumXY - sumX*sumY) / Math.sqrt(N*sumSqX - sumX*sumX) / Math.sqrt(N*sumSqY - sumY*sumY));
 	}
 	
 	public static float spearman(float[] x, float[] y) {

@@ -2,6 +2,7 @@
   <label name="Java Genomics Toolkit" />
   <section name="Converters" id="java-genomics-toolkit-converters">
   	<tool file="java-genomics-toolkit/galaxy-conf/IntervalToWig.xml" />
+  	<tool file="java-genomics-toolkit/galaxy-conf/InterpolateDiscontinuousData.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/RomanNumeralize.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GeneTrackToWig.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GeneTrackToBedGraph.xml" />

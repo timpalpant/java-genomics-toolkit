@@ -26,7 +26,7 @@ public class Downsample extends CommandLineTool {
 	public WigFile inputFile;
 	@Parameter(names = {"-w", "--window"}, description = "Window size (bp)")
 	public int windowSize = 100;
-	@Parameter(names = {"-m", "--metric"}, description = "Downsampling metric (mean/min/max)")
+	@Parameter(names = {"-m", "--metric"}, description = "Downsampling metric (coverage/total/mean/min/max)")
 	public String metric = "mean";
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
