@@ -7,8 +7,8 @@
       <param name="chr" type="text" label="Chromosome" />
       <param name="start" type="integer" value="1" label="Start base pair" />
       <param name="stop" type="integer" value="1000" label="Stop base pair" />
-      <param name="min" type="float" value="10" label="Minimum wavelet size (bp)" />
-      <param name="max" type="float" value="400" label="Maximum wavelet size (bp)" />
+      <param name="min" type="integer" value="10" label="Minimum wavelet size (bp)" />
+      <param name="max" type="integer" value="400" label="Maximum wavelet size (bp)" />
       <param name="N" type="integer" value="1" label="Step size (bp)" />
   </inputs>
   <outputs>

@@ -21,6 +21,8 @@ public class IntervalLengthDistribution extends CommandLineTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Interval file", required = true)
 	public IntervalFile<? extends Interval> inputFile;
+	@Parameter(names = {"-f", "--freq"}, description = "Output frequencies rather than counts")
+	public boolean outputFreq = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
 	
@@ -46,7 +48,11 @@ public class IntervalLengthDistribution extends CommandLineTool {
 		log.debug("Writing histogram output");
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			for (int i = min; i <= max; i++) {
-				writer.write(i+"\t"+freq.getPct(i));
+				if (outputFreq) {
+					writer.write(i+"\t"+freq.getPct(i));
+				} else {
+					writer.write(i+"\t"+freq.getCount(i));
+				}
 				writer.newLine();
 			}
 		}

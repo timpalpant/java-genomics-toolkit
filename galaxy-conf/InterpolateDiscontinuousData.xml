@@ -16,7 +16,7 @@
   
   <help>
 
-This tool will attempt to interpolate missing values (NaN) in a Wig file that result when converting discontinous microarray probe data to Wig format. Stretches of missing data that extend longer than the allowed maximum will be left as NaN.
+This tool will attempt to interpolate missing values (NaN) in a Wig file that result when converting discontinuous microarray probe data to Wig format. Stretches of missing data that extend longer than the allowed maximum will be left as NaN.
 
 -----
 
@@ -24,7 +24,7 @@ This tool will attempt to interpolate missing values (NaN) in a Wig file that re
 
 - **Nearest** uses the value of the nearest base pair that has data
 - **Linear** uses a linear interpolant between the values of the nearest two probes
-- **Cubic** uses cubic interpolant between the values of the nearest two probes
+- **Cubic** uses a cubic interpolant between the values of the nearest two probes
 
 For more information, see Wikipedia_.
 

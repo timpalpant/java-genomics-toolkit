@@ -18,6 +18,7 @@
   <property name="build" location="build" />
   <property name="dist" location="dist" />
   <property name="lib" location="lib" />
+  <property name="docs" location="docs" />
 
   <path id="classpath">
     <fileset dir="${lib}">
@@ -85,10 +86,16 @@
       <report format="frames" todir="${reports.junit}" />
     </junitreport>
   </target>
+  
+  <target name="docs">
+    <mkdir dir="${docs}" />
+    
+  </target>
 
   <target name="clean" description="clean up">
     <delete dir="${build}" />
     <delete dir="${dist}"/>
     <delete dir="${reports}"/>
+    <delete dir="${docs}"/>
   </target>
 </project>
