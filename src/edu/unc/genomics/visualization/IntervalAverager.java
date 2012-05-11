@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
@@ -25,17 +25,33 @@ public class IntervalAverager extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(IntervalAverager.class);
 	
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true)
-	public WigFile inputFile;
+	@Parameter(description = "Input files", required = true)
+	public List<String> inputFiles = new ArrayList<String>();
 	@Parameter(names = {"-l", "--loci"}, description = "Loci file (Bed)", required = true, validateWith = ReadablePathValidator.class)
 	public Path lociFile;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (matrix2png format)", required = true)
 	public Path outputFile;
 	
+	private List<WigFile> wigs;
+	private int numFiles;
 	private List<BedEntry> loci;
 	
 	@Override
-	public void run() throws IOException {		
+	public void run() throws IOException {
+		log.debug("Initializing input files");
+		for (String inputFile : inputFiles) {
+			try {
+				WigFile wig = WigFile.autodetect(Paths.get(inputFile));
+				wigs.add(wig);
+			} catch (IOException | WigFileException e) {
+				log.error("Error initializing input Wig file: " + inputFile);
+				e.printStackTrace();
+				throw new CommandLineToolException(e.getMessage());
+			}
+		}
+		numFiles = wigs.size();
+		log.debug("Initialized " + numFiles + " input files");
+		
 		log.debug("Loading alignment intervals");
 		try (BedFile bed = new BedFile(lociFile)) {
 			loci = bed.loadAll();
@@ -64,55 +80,71 @@ public class IntervalAverager extends CommandLineTool {
 		log.info("Intervals aligned into: " + m+"x"+n + " matrix");
 		log.info("Alignment point: " + alignmentPoint);
 				
-		float[] sum = new float[n];
-		int[] counts = new int[n];
+		float[][] sum = new float[numFiles][n];
+		int[][] counts = new int[numFiles][n];
 		int count = 0, skipped = 0;	
 		log.debug("Iterating over all intervals");
 		for (BedEntry entry : loci) {
-			Iterator<WigItem> result = null;
-			try {
-				result = inputFile.query(entry);
-			} catch (WigFileException e) {
-				skipped++;
-				continue;
-			}
-			
-			float[] data = WigFile.flattenData(result, entry.getStart(), entry.getStop());
-			
 			// Locus alignment point (entry value) should be positioned over the global alignment point
 			int n1 = alignmentPoint - Math.abs(entry.getValue().intValue()-entry.getStart());
 			int n2 = alignmentPoint + Math.abs(entry.getValue().intValue()-entry.getStop());
-			assert data.length == n2-n1+1;
-			for (int bp = n1; bp <= n2; bp++) {
-				if (!Float.isNaN(data[bp-n1]) && !Float.isInfinite(data[bp-n1])) {
-					sum[bp] += data[bp-n1];
-					counts[bp]++;
+			
+			for (int i = 0; i < numFiles; i++) {
+				WigFile w = wigs.get(i);
+				try {
+					float[] data = WigFile.flattenData(w.query(entry), entry.getStart(), entry.getStop());
+					assert data.length == n2-n1+1;
+					for (int bp = n1; bp <= n2; bp++) {
+						if (!Float.isNaN(data[bp-n1]) && !Float.isInfinite(data[bp-n1])) {
+							sum[i][bp] += data[bp-n1];
+							counts[i][bp]++;
+						}
+					}
+				} catch (WigFileException e) {
+					log.debug("Error getting data from wig file "+w.getPath().getFileName()+" for interval "+entry.toString());
+					skipped++;
 				}
 			}
 			
 			count++;
 		}
-		
-		inputFile.close();
 		log.info(count + " intervals processed");
 		log.info(skipped + " intervals skipped");
 		
-		log.debug("Computing average");
-		float[] avg = new float[n];
-		for (int i = 0; i < n; i++) {
-			if (counts[i] == 0) {
-				avg[i] = Float.NaN;
-			} else {
-				avg[i] = sum[i] / counts[i];
+		log.debug("Computing average(s)");
+		float[][] avg = new float[numFiles][n];
+		for (int i = 0; i < numFiles; i++) {
+			for (int j = 0; j < n; j++) {
+				if (counts[i][j] == 0) {
+					avg[i][j] = Float.NaN;
+				} else {
+					avg[i][j] = sum[i][j] / counts[i][j];
+				}
 			}
 		}
 		
-		log.debug("Writing average to output");
+		log.debug("Writing average profile(s) to output");
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+			// Header
+			writer.write("Position");
+			for (WigFile w : wigs) {
+				writer.write("\t"+w.getPath().getFileName());
+			}
+			writer.newLine();
+			
+			// Average values
 			for (int i = 0; i < n; i++) {
-				writer.write(i-alignmentPoint + "\t" + avg[i]);
+				writer.write(i-alignmentPoint);
+				for (int j = 0; j < numFiles; j++) {
+					writer.write("\t" + avg[j][i]);
+				}
 				writer.newLine();				
 			}
+		}
+		
+		// Close the input files
+		for (WigFile w : wigs) {
+			w.close();
 		}
 	}
 	
