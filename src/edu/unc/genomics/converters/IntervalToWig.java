@@ -22,7 +22,7 @@ public class IntervalToWig extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(IntervalToWig.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Bed/BedGraph)", required = true)
+	@Parameter(names = {"-i", "--input"}, description = "Input file (Bed/BedGraph/GFF)", required = true)
 	public IntervalFile<? extends Interval> intervalFile;
 	@Parameter(names = {"-z", "--zero"}, description = "Assume zero where there is no data (default = NaN)")
 	public boolean defaultZero = false;

@@ -15,6 +15,11 @@ import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 
+/**
+ * This tool will add all values in the specified Wig files base pair by base pair.
+ * @author timpalpant
+ *
+ */
 public class Add extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(Add.class);

@@ -23,14 +23,19 @@ import edu.unc.genomics.io.WigFileException;
  * Abstract class for writing programs to do computation on Wig files
  * Concrete subclasses must implement the compute method
  * 
+ * WigMathTool takes all input Wig files, finds the intersecting set
+ * of chromosomes with data, and then iterates through the inputs in a chunk-by-chunk
+ * fashion, calling compute() on each chunk's coordinates.
+ * 
+ * The compute method must return the output values for that chunk (one value for each base pair)
+ * which will then be written into a new Wig file.
+ * 
  * @author timpalpant
  *
  */
 public abstract class WigMathTool extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(WigMathTool.class);
-	
-	// TODO: Variable resolution output?
 	
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
@@ -146,6 +151,11 @@ public abstract class WigMathTool extends CommandLineTool {
 		return min;
 	}
 	
+	/**
+	 * Get the set of chromosomes that are held in common by all input files
+	 * @param wigs a list of Wig files to get the common chromosomes of
+	 * @return the set of chromosomes held in common by all Wig files in wigs
+	 */
 	public static Set<String> getCommonChromosomes(List<WigFile> wigs) {
 		if (wigs.size() == 0) {
 			return new HashSet<String>();

@@ -2,7 +2,9 @@ bin
 build
 dist
 reports
+docs
 *.class
 *.log
 .DS_Store
 *.wig.idx
+*.tbi

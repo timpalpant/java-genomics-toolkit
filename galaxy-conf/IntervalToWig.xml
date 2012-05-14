@@ -2,7 +2,7 @@
   <description>converter</description>
   <command interpreter="sh">galaxyToolRunner.sh converters.IntervalToWig -i $input $zero -a ${chromInfo} -o $output</command>
   <inputs>
-      <param name="input" type="data" format="bed,bedGraph,gff" label="Input Bed/BedGraph/GFF file" />
+      <param name="input" type="data" format="bed,bedgraph,gff" label="Input Bed/BedGraph/GFF file" />
   	  <param name="zero" type="boolean" checked="false" truevalue="-z" falsevalue="" label="Assume zero where there is no data (default is NaN)" />
   </inputs>
   <outputs>

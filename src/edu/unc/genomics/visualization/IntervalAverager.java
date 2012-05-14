@@ -32,7 +32,7 @@ public class IntervalAverager extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file (matrix2png format)", required = true)
 	public Path outputFile;
 	
-	private List<WigFile> wigs;
+	private List<WigFile> wigs = new ArrayList<>();
 	private int numFiles;
 	private List<BedEntry> loci;
 	

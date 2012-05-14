@@ -19,6 +19,20 @@ import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.utils.FFTUtils;
 
+/**
+ * <p>This tool computes the unnormalized autocovariance of intervals of data in a Wig file.</p>
+ * 
+ * <p>Syntax<br/>
+ * <b>Input data:</b> is the genomic data on which to compute the autocorrelation.<br/>
+ * <b>List of intervals:</b> The autocorrelation will be computed for each genomic interval specified in this list.<br/>
+ * <b>Maximum shift:</b> In computing the autocorrelation, the data will be phase-shifted up to this limit.<br/>
+ * </p>
+ *
+ * <p>For more information, see: <a href="http://en.wikipedia.org/wiki/Autocorrelation">Wikipedia</a></p>
+ *
+ * @author timpalpant
+ *
+ */
 public class Autocorrelation extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(Autocorrelation.class);

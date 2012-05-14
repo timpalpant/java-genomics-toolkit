@@ -61,7 +61,7 @@
     </jar>
   </target>
 
-  <target name="test" depends="compile">
+  <target name="test" depends="compile" description="run the unit tests">
     <mkdir dir="${reports}" />
     <mkdir dir="${reports.junit}" />
     <mkdir dir="${reports.junit.xml}" />
@@ -87,9 +87,11 @@
     </junitreport>
   </target>
   
-  <target name="docs">
+  <target name="javadoc" description="generate javadocs">
     <mkdir dir="${docs}" />
-    
+    <javadoc destdir="${docs}">
+	  <fileset dir="${src}" includes="**/*.java" />
+	</javadoc>
   </target>
 
   <target name="clean" description="clean up">

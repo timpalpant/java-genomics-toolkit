@@ -1,5 +1,11 @@
 package edu.unc.utils;
 
+/**
+ * An enumeration of the statistics that we know how to compute on Wig data
+ * These correspond to the statistics that are built into the UCSC BigWig tools
+ * @author timpalpant
+ *
+ */
 public enum WigStatistic {
 	COVERAGE("coverage"),
 	TOTAL("total"),

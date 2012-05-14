@@ -1,9 +1,12 @@
 package edu.unc.utils;
 
-// Rudimentary Class for doing Arabic Integer -> Roman Numeral conversion
-// Adapted by Timothy Palpant
-// Description: A static method for converting binary integers to Roman numbers.
-// Author : Fred Swartz - 2006-12-29 - Placed in public domain.
+/**
+ * Rudimentary Class for doing Arabic Integer -> Roman Numeral conversion
+ * 
+ * @author timpalpant
+ * @author Fred Swartz
+ *
+ */
 public class RomanNumeral {
 
 	final static RomanValue[] ROMAN_VALUE_TABLE = {
@@ -22,6 +25,11 @@ public class RomanNumeral {
 		new RomanValue(   1, "I")
 	};
 
+	/**
+	 * Convert an int to Roman numeral
+	 * @param n an integer between 1-3999
+	 * @return n as a Roman numeral
+	 */
 	public static String int2roman(int n) {
 		if (n >= 4000 || n < 1) {
 			throw new NumberFormatException("Numbers must be in range 1-3999");

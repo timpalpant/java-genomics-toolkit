@@ -9,6 +9,12 @@ package edu.unc.utils;
  *
  */
 public class FloatCorrelation {
+	/**
+	 * Calculate Pearson's product-moment correlation coefficient (R) between x,y data
+	 * @param x a vector of values
+	 * @param y a vector of values
+	 * @return the Pearson correlation between the values in x and the values in y
+	 */
 	public static float pearson(float[] x, float[] y) {
 		if (x.length != y.length) {
 			throw new RuntimeException("Length of x ("+x.length+") does not equal length of y ("+y.length+")");
@@ -33,6 +39,13 @@ public class FloatCorrelation {
 		return (float) ((N*sumXY - sumX*sumY) / Math.sqrt(N*sumSqX - sumX*sumX) / Math.sqrt(N*sumSqY - sumY*sumY));
 	}
 	
+	/**
+	 * Calculate Spearman's rank correlation coefficient between x,y data
+	 * defined to be the Pearson correlation between the ranks of the data
+	 * @param x a vector of values
+	 * @param y a vector of values
+	 * @return the Spearman correlation between the values in x and the values in y
+	 */
 	public static float spearman(float[] x, float[] y) {
 		if (x.length != y.length) {
 			throw new RuntimeException("Length of x ("+x.length+") does not equal length of y ("+y.length+")");

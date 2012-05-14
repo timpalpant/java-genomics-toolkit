@@ -7,7 +7,6 @@
       #end for
   </command>
   <inputs>
-      <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
       <param name="file1" label="Sequencing data" type="data" format="bigwig,wig" />
       <repeat name="inputs" title="Additional sequencing data">
         <param name="file" type="data" format="bigwig,wig" />

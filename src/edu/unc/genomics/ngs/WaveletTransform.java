@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
-import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
 
@@ -23,6 +20,7 @@ import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.utils.ArrayScaler;
 
 public class WaveletTransform extends CommandLineTool {
 	
@@ -47,7 +45,7 @@ public class WaveletTransform extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file (tabular)", required = true)
 	public Path outputFile;
 	
-	private UnivariateFunction interp;
+	private ArrayScaler scaler;
 	
 	@Override
 	public void run() throws IOException {
@@ -60,19 +58,15 @@ public class WaveletTransform extends CommandLineTool {
 			}
 		}
 		
-		// Copy to a float[] array to avoid lots of autoboxing
+		// Copy to a double[] array to avoid lots of autoboxing
 		log.debug("Loaded "+waveletList.size()+" values for wavelet");
 		double[] wavelet = new double[waveletList.size()];
-		double[] xWavelet = new double[wavelet.length];
 		for (int i = 0; i < wavelet.length; i++) {
-			xWavelet[i] = ((double)i)/(wavelet.length-1);
 			wavelet[i] = waveletList.get(i);
 		}
 		
-		// Set up the interpolator
-		log.debug("Constructing wavelet interpolant");
-		UnivariateInterpolator interpolator = new SplineInterpolator();
-		interp = interpolator.interpolate(xWavelet, wavelet);
+		log.debug("Initializing Wavelet scaling interpolator");
+		scaler = new ArrayScaler(wavelet);
 		
 		// Get the data from the Wig file
 		log.debug("Loading Wig data");
@@ -97,7 +91,7 @@ public class WaveletTransform extends CommandLineTool {
 		for (int i = 0; i < numSteps; i++) {
 			// Stretch the wavelet to size l
 			int l = minLength + i*stepSize;
-			double[] stretchedWavelet = stretch(wavelet, l);
+			double[] stretchedWavelet = scaler.getScaled(l);
 			float sumY = 0, sumSqY = 0;
 			for (int j = 0; j < l; j++) {
 				sumY += stretchedWavelet[j];
@@ -133,20 +127,6 @@ public class WaveletTransform extends CommandLineTool {
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Interpolate x to create a new vector of length l
-	 * @param x a vector of values
-	 * @param l the desired vector length
-	 * @return a new vector of length l created by interpolating x
-	 */
-	private double[] stretch(double[] x, int l) {
-		double[] stretched = new double[l];
-		for (int i = 0; i < l; i++) {
-			stretched[i] = interp.value(((double)i)/l);
-		}
-		return stretched;
 	}
 	
 	public static void main(String[] args) {

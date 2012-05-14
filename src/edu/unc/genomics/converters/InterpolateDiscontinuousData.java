@@ -1,9 +1,7 @@
 package edu.unc.genomics.converters;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.broad.igv.bbfile.WigItem;
@@ -11,7 +9,6 @@ import org.broad.igv.bbfile.WigItem;
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.WigFile;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.genomics.wigmath.WigMathTool;
@@ -184,6 +181,11 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 		new InterpolateDiscontinuousData().instanceMain(args);
 	}
 
+	/**
+	 * An enumeration of known interpolation methods
+	 * @author timpalpant
+	 *
+	 */
 	public enum Interpolant {
 		NEAREST("nearest"),
 		LINEAR("linear"),
