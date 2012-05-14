@@ -134,7 +134,7 @@ public class IntervalAverager extends CommandLineTool {
 			
 			// Average values
 			for (int i = 0; i < n; i++) {
-				writer.write(i-alignmentPoint);
+				writer.write(String.valueOf(i-alignmentPoint));
 				for (int j = 0; j < numFiles; j++) {
 					writer.write("\t" + avg[j][i]);
 				}
