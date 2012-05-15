@@ -27,15 +27,21 @@ public class FindOutlierRegions extends CommandLineTool {
 	public int windowSize;
 	@Parameter(names = {"-t", "--threshold"}, description = "Threshold (fold x mean)")
 	public float fold = 3;
+	@Parameter(names = {"-b", "--below"}, description = "Search for outliers below the threshold")
+	public boolean below = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (bed)", required = true)
 	public Path outputFile;
 	
+	int flip = 1;
 	double threshold;
 	DescriptiveStatistics stats;
 
 	@Override
 	public void run() throws IOException {
 		threshold = fold * inputFile.mean();
+		if (below) {
+			flip = -1;
+		}
 		
 		stats = new DescriptiveStatistics();
 		stats.setWindowSize(windowSize);
@@ -66,12 +72,12 @@ public class FindOutlierRegions extends CommandLineTool {
 							// write it to output as a potential outlier region
 							if (outlierStart == null) {
 								// Start a new outlier region
-								if (stats.getMean() > threshold) {
+								if (flip*stats.getMean() > flip*threshold) {
 									outlierStart = bp + i - windowSize;
 								}
 							} else {
 								// End an outlier region
-								if (stats.getMean() < threshold) {
+								if (flip*stats.getMean() < flip*threshold) {
 									int outlierStop = bp + i;
 									writer.write(chr+"\t"+outlierStart+"\t"+outlierStop);
 									writer.newLine();
@@ -80,16 +86,15 @@ public class FindOutlierRegions extends CommandLineTool {
 							}
 						}
 					} catch (WigFileException e) {
-						log.fatal("Wig file error while processing chunk " + chr + " region " + start + "-" + stop);
+						log.fatal("Wig file error while processing chunk "+chr+":"+start+"-"+stop);
 						e.printStackTrace();
-						throw new RuntimeException("Wig file error while processing chunk " + chr + " region " + start + "-" + stop);
+						throw new RuntimeException("Wig file error while processing chunk "+chr+":"+start+"-"+stop);
 					}
 					
 					bp = chunkStop + 1;
 				}
 			}
 		}
-		
 		
 		inputFile.close();
 	}
