@@ -1,0 +1,43 @@
+<tool id="FindNMers" name="Find NMers" version="1.0.0">
+  <description>in a DNA sequence</description>
+  <command interpreter="sh">galaxyToolRunner.sh dna.FindNMers -i 
+    #if $refGenomeSource.genomeSource == "history":
+      $refGenomeSource.ownFile
+    #else
+      ${refGenomeSource.index.fields.path}
+    #end if
+	-m $mismatches -n $nmer $rc -o $output
+  </command>
+  <inputs>
+    <conditional name="refGenomeSource">
+      <param name="genomeSource" type="select" label="Will you select a reference genome from your history or use a built-in index?" help="Built-ins were indexed using default options">
+        <option value="indexed">Use a built-in index</option>
+        <option value="history">Use one from the history</option>
+      </param>
+      <when value="indexed">
+        <param name="index" type="select" label="Select a reference genome" help="if your genome of interest is not listed - contact Galaxy team">
+          <options from_data_table="sam_fa_indexes">
+            <filter type="sort_by" column="1" />
+            <validator type="no_options" message="No indexes are available" />
+          </options>
+        </param>
+      </when>
+      <when value="history">
+        <param name="ownFile" type="data" format="fasta" metadata_name="dbkey" label="Select the reference genome" />
+      </when>  <!-- history -->
+    </conditional>  <!-- refGenomeSource -->
+    
+    <param name="nmer" type="text" optional="false" label="NMer to search for" />
+    <param name="mismatches" type="integer" value="0" label="Number of allowed mismatches (Hamming distance)" />
+    <param name="rc" type="boolean" checked="true" truevalue="--rc" falsevalue="" label="Search reverse-complement as well" />
+  </inputs>
+  <outputs>
+      <data format="bed" name="output"/>
+  </outputs>
+  
+  <help>
+
+This tool will find all matches of a given NMer in a DNA sequence.
+
+  </help>
+</tool>

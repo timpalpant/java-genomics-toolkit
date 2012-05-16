@@ -32,10 +32,9 @@ public class FastqIlluminaToSanger extends CommandLineTool {
 	
 	@Override
 	public void run() throws IOException {
-		FastqReader reader = new FastqReader(inputFile.toFile());
-		
 		int count = 0;
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+		try (FastqReader reader = new FastqReader(inputFile.toFile());
+				 BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			for (FastqRecord r : reader) {
 				writer.write("@");
 				writer.write(r.getReadHeader());

@@ -10,8 +10,8 @@
 	<classpathentry kind="lib" path="lib/commons-lang3-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/dnaproperties-1732.jar" sourcepath="/Users/timpalpant/Documents/Workspace/dnaproperties/dnaproperties-1732-src"/>
 	<classpathentry kind="lib" path="lib/commons-math3-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/picard-1.67.jar"/>
-	<classpathentry kind="lib" path="lib/sam-1.67.jar"/>
+	<classpathentry kind="lib" path="lib/picard-1.67.jar" sourcepath="/picard/src"/>
+	<classpathentry kind="lib" path="lib/sam-1.67.jar" sourcepath="/picard/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/java-genomics-io"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>

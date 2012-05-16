@@ -6,6 +6,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/RomanNumeralize.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GeneTrackToWig.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GeneTrackToBedGraph.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/FastqIlluminaToSanger.xml" />
   </section>
   <section name="Nucleosomes" id="java-genomics-toolkit-nucleosomes">
     <tool file="java-genomics-toolkit/galaxy-conf/FindBoundaryNucleosomes.xml" />

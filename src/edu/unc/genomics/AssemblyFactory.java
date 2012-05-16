@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.unc.genomics;
 
 import com.beust.jcommander.IStringConverterFactory;
