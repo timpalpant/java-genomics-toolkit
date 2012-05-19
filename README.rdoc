@@ -38,6 +38,38 @@ Other tools require more input:
 
   $ > ./toolRunner.sh wigmath.LogTransform --input input.wig --base 2 --output output.log2.wig
 
+=== List all available tools
+
+  $ > ./toolRunner.sh list
+  
+=== Downloading the toolkit
+
+The recommended way to download the toolkit is to checkout the source code with git:
+
+  $ > git clone git://github.com/timpalpant/java-genomics-toolkit.git
+  
+since then updates may be easily retrieved with
+
+  $ > git pull
+  
+To build the tools from source, call the ant build script
+
+  $ > ant
+  
+Precompiled binaries that include JRE7 and are ready-to-use are available for Linux i586 and x64 platforms from the downloads tab.
+
+== Adding new assemblies
+
+By default, java-genomics-toolkit loads assembly information from chromosome length files in the resources/assemblies directory (or from tool-data resources if loaded into Galaxy). If you would like to use assemblies that are not available, you can either specify the full path to a custom *.len file (see the examples in the resources directory for format), or you can copy your *.len file into the resources directory to refer to it by shortcut, e.g.
+
+  $ > ./toolRunner.sh ngs.BaseAlignCounts -i reads.bam -x 250 -a /path/to/my/sacCer4.len -o counts.wig
+  
+or
+
+  $ > ./toolRunner.sh ngs.BaseAlignCounts -i reads.bam -x 250 -a sacCer4 -o counts.wig
+  
+if sacCer4.len is available in the resources/assemblies/ directory.
+
 == Java Genomics IO
 
 Those wishing to write their own scripts may be interested in https://github.com/timpalpant/java-genomics-io, the toolkit upon which these applications are built.
