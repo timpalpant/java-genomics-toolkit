@@ -1,9 +1,6 @@
 package edu.unc.genomics.dna;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import net.sf.picard.reference.FastaSequenceIndex;
@@ -12,14 +9,19 @@ import net.sf.picard.reference.IndexedFastaSequenceFile;
 import net.sf.picard.reference.ReferenceSequence;
 import net.sf.samtools.util.StringUtil;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.genomeview.dnaproperties.DNAProperty;
 
 import com.beust.jcommander.Parameter;
 
+import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Contig;
+import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.WigFileWriter;
 import edu.unc.utils.Samtools;
 
 /**
@@ -46,7 +48,7 @@ public class DNAPropertyCalculator extends CommandLineTool {
 	public void run() throws IOException {
 		DNAProperty property = DNAProperty.create(propertyName);
 		if (property == null) {
-			log.error("Unknown DNA property: "+propertyName);
+			log.error("Unknown DNA property: "+propertyName+". Options are "+StringUtils.join(DNAProperty.values(),","));
 			throw new CommandLineToolException("Unknown DNA property: "+propertyName);
 		}
 		
@@ -64,24 +66,21 @@ public class DNAPropertyCalculator extends CommandLineTool {
 		Path indexFile = inputFile.resolveSibling(inputFile.getFileName()+".fai");
 		FastaSequenceIndex faidx = new FastaSequenceIndex(indexFile.toFile());
 		
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-			// Write the Wiggle track header
-			writer.write("track type=wiggle_0 name='"+propertyName+"' description='"+propertyName+"'");
-			writer.newLine();
-			
+		TrackHeader header = TrackHeader.newWiggle();
+		header.setName(propertyName);
+		header.setDescription(propertyName);
+		try (WigFileWriter writer = new WigFileWriter(outputFile, header)) {
 			// Process each entry in the FASTA file in chunks
 			for (FastaSequenceIndexEntry contig : faidx) {
 				log.debug("Processing FASTA entry "+contig.getContig()+" (length = "+contig.getSize()+")");
-				// Write the contig header to output
-				writer.write("fixedStep chrom="+contig.getContig()+" start=1 step=1 span=1");
-				writer.newLine();
-				
-				long start = 1;
+				int start = 1;
 				while (start <= contig.getSize()) {
-					long stop = Math.min(start + DEFAULT_CHUNK_SIZE - 1, contig.getSize());
-					log.debug("Processing chunk "+contig.getContig()+":"+start+"-"+stop);
+					int stop = (int) Math.min(start+DEFAULT_CHUNK_SIZE-1, contig.getSize());
+					Interval chunk = new Interval(contig.getContig(), start, stop);
+					log.debug("Processing chunk "+chunk);
 					ReferenceSequence seq = fasta.getSubsequenceAt(contig.getContig(), start, stop);
 					
+					// Calculate the sequence-specific property for this chunk
 					double[] values;
 					if (normalize) {
 						values = property.normalizedProfile(StringUtil.bytesToString(seq.getBases()));
@@ -89,10 +88,14 @@ public class DNAPropertyCalculator extends CommandLineTool {
 						values = property.profile(StringUtil.bytesToString(seq.getBases()));
 					}
 					
-					for (double value : values) {
-						writer.write(Float.toString((float)value));
-						writer.newLine();
+					// Truncate to float array for output
+					float[] floatValues = new float[values.length];
+					for (int i = 0; i < values.length; i++) {
+						floatValues[i] = (float) values[i];
 					}
+					
+					// Write the values for this chunk to disk
+					writer.write(new Contig(chunk, floatValues));
 					
 					start = stop + 1;
 				}

@@ -6,6 +6,7 @@ import edu.unc.genomics.ValuedInterval;
 import edu.unc.genomics.io.IntervalFileFormatException;
 
 /**
+ * Represents a stereotypic nucleosome position call
  * @author timpalpant
  *
  */
@@ -54,7 +55,7 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 	}
 	
 	@Override
-	public String toString() {
+	public String toOutput() {
 		return chr+"\t"+start+"\t"+stop+"\t"+length()+"\t"+lengthStdev+"\t"+dyad+"\t"+dyadStdev+"\t"+conditionalPosition+"\t"+dyadMean+"\t"+occupancy();
 	}
 

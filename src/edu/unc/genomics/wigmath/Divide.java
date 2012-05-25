@@ -1,52 +1,62 @@
 package edu.unc.genomics.wigmath;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.nio.file.Path;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Interval;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 
+/**
+ * Divide two (Big)Wig files base pair by base pair
+ * @author timpalpant
+ *
+ */
 public class Divide extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(Divide.class);
 
-	@Parameter(names = {"-n", "--numerator"}, description = "Dividend / Numerator (file 1)", required = true)
-	public WigFile dividendFile;
+	@Parameter(names = {"-n", "--numerator"}, description = "Dividend / Numerator (file 1)", required = true, validateWith = ReadablePathValidator.class)
+	public Path dividendFile;
 	@Parameter(names = {"-d", "--denominator"}, description = "Divisor / Denominator (file 2)", required = true)
-	public WigFile divisorFile;
+	public Path divisorFile;
 
+	WigFileReader dividendReader, divisorReader;
+	
 	@Override
-	public void setup() {		
-		inputs.add(dividendFile);
-		inputs.add(divisorFile);
+	public void setup() {
+		try {
+			dividendReader = WigFileReader.autodetect(dividendFile);
+			divisorReader = WigFileReader.autodetect(divisorFile);
+		} catch (IOException e) {
+			log.error("IOError opening Wig file");
+			e.printStackTrace();
+			throw new CommandLineToolException(e.getMessage());
+		}
+		inputs.add(dividendReader);
+		inputs.add(divisorReader);
 		log.debug("Initialized " + inputs.size() + " input files");
 	}
 	
 	@Override
-	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		Iterator<WigItem> dividendData = dividendFile.query(chr, start, stop);
-		Iterator<WigItem> divisorData = divisorFile.query(chr, start, stop);
-		
-		float[] result = WigFile.flattenData(dividendData, start, stop);
-		while (divisorData.hasNext()) {
-			WigItem item = divisorData.next();
-			for (int i = item.getStartBase(); i <= item.getEndBase(); i++) {
-				if (i-start >= 0 && i-start < result.length) {
-					if (item.getWigValue() != 0) {
-						result[i-start] /= item.getWigValue();
-					} else {
-						result[i-start] = Float.NaN;
-					}
-				}
+	public float[] compute(Interval chunk) throws IOException, WigFileException {
+		float[] dividend = dividendReader.query(chunk).getValues();
+		float[] divisor = divisorReader.query(chunk).getValues();
+		for (int i = 0; i < dividend.length; i++) {
+			if (divisor[i] == 0) {
+				dividend[i] = Float.NaN;
+			} else {
+				dividend[i] /= divisor[i];
 			}
 		}
 		
-		return result;
+		return dividend;
 	}
 	
 	

@@ -1,28 +1,34 @@
 package edu.unc.genomics.nucleosomes;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
+import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.Contig;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.genomics.io.WigFileWriter;
 
+/**
+ * Solve single-particle hard-rod statistical equilibria with the DynaPro algorithm
+ * See Morozov AV, et al. (2009) Using DNA mechanics to predict in vitro nucleosome positions and formation energies. Nucleic Acids Res 37: 4707-4722
+ * 
+ * @author timpalpant
+ *
+ */
 public class DynaPro extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(DynaPro.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Energy landscape", required = true)
-	public WigFile inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Energy landscape", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-n", "--size"}, description = "Nucleosome size (bp)")
 	public int nucleosomeSize = 147;
 	@Parameter(names = {"-m", "--mean"}, description = "Shift energy landscape to have mean")
@@ -36,36 +42,33 @@ public class DynaPro extends CommandLineTool {
 	
 	@Override
 	public void run() throws IOException {
-		if (newMean != null) {
-			log.debug("Shifting mean of energy landscape from "+inputFile.mean()+" to "+newMean);
-			shift = (float) (newMean - inputFile.mean());
-		}
-		
-		if (newVar != null) {
-			log.debug("Rescaling variance of energy landscape from "+Math.pow(inputFile.stdev(),2)+" to "+newVar);
-			scale = (float) Math.sqrt(newVar / Math.pow(inputFile.stdev(), 2));
-		}
-		
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-			// Write the Wig header
-			writer.write("track type=wiggle_0");
-			writer.newLine();
+		TrackHeader header = TrackHeader.newWiggle();
+		try (WigFileReader reader = WigFileReader.autodetect(inputFile);
+				 WigFileWriter writer = new WigFileWriter(outputFile, header)) {
+			if (newMean != null) {
+				log.debug("Shifting mean of energy landscape from "+reader.mean()+" to "+newMean);
+				shift = (float) (newMean - reader.mean());
+			}
 			
-			for (String chr : inputFile.chromosomes()) {
+			if (newVar != null) {
+				log.debug("Rescaling variance of energy landscape from "+Math.pow(reader.stdev(),2)+" to "+newVar);
+				scale = (float) Math.sqrt(newVar / Math.pow(reader.stdev(), 2));
+			}
+			
+			for (String chr : reader.chromosomes()) {
 				log.debug("Processing chromosome " + chr);
-				int start = inputFile.getChrStart(chr);
-				int stop = inputFile.getChrStop(chr);
+				int start = reader.getChrStart(chr);
+				int stop = reader.getChrStop(chr);
 				
 				// Process the chromosome
-				Iterator<WigItem> data = null;
-				try {
-					data = inputFile.query(chr, start, stop);
-				} catch (WigFileException e) {
-					log.fatal("Error querying Wig file for data from chromosome "+chr);
-					e.printStackTrace();
-					throw new CommandLineToolException("Error querying Wig file for data from chromosome "+chr);
+				float[] energy = reader.query(chr, start, stop).getValues();
+				
+				// Assume 0 if data is missing
+				for (int i = 0; i < energy.length; i++) {
+					if (Float.isNaN(energy[i])) {
+						energy[i] = 0;
+					}
 				}
-				float[] energy = WigFile.flattenData(data, start, stop, 0);
 				
 				// Shift and rescale the energy landscape if specified
 				if (shift != null) {
@@ -98,22 +101,15 @@ public class DynaPro extends CommandLineTool {
 				}
 
 				// Write the chromosome to output
-				writer.write("fixedStep chrom="+chr+" start="+start+" step=1 span=1");
-				writer.newLine();
-				for (int i = 0; i < p.length; i++) {
-					writer.write(Float.toString(p[i]));
-					writer.newLine();
-				}
+				writer.write(new Contig(chr, start, stop, p));
 			}
+		} catch (WigFileException e) {
+			log.error("Error getting data from Wig file");
+			e.printStackTrace();
+			throw new CommandLineToolException("Error getting data from Wig file");
 		}
 	}
 	
-	
-	/**
-	 * @param args
-	 * @throws WigFileException 
-	 * @throws IOException 
-	 */
 	public static void main(String[] args) throws IOException, WigFileException {
 		new DynaPro().instanceMain(args);
 	}

@@ -1,9 +1,6 @@
 package edu.unc.genomics.wigmath;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,20 +12,25 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
+import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.CommandLineTool;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Contig;
+import edu.unc.genomics.Interval;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.genomics.io.WigFileWriter;
 
 /**
- * Abstract class for writing programs to do computation on Wig files
+ * Abstract base class for writing programs to do computation on Wig files
  * Concrete subclasses must implement the compute method
  * 
  * WigMathTool takes all input Wig files, finds the intersecting set
  * of chromosomes with data, and then iterates through the inputs in a chunk-by-chunk
- * fashion, calling compute() on each chunk's coordinates.
+ * fashion, calling compute() on each chunk
  * 
  * The compute method must return the output values for that chunk (one value for each base pair)
- * which will then be written into a new Wig file.
+ * which will then be written into a new output Wig file.
  * 
  * @author timpalpant
  *
@@ -40,31 +42,27 @@ public abstract class WigMathTool extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
 	
-	protected List<WigFile> inputs = new ArrayList<WigFile>();
+	protected List<WigFileReader> inputs = new ArrayList<WigFileReader>();
 	
-	public void addInputFile(WigFile wig) {
+	public void addInputFile(WigFileReader wig) {
 		inputs.add(wig);
 	}
 	
 	/**
-	 * Setup the computation. Should add all input Wig files
-	 * with addInputFile() during setup
+	 * Setup the computation. Should add all input Wig files with addInputFile() during setup
 	 */
 	public abstract void setup();
 	
 	/**
 	 * Do the computation on a chunk and return the results
-	 * Must return (stop-start+1) values
+	 * Must return interval.length() values (one for every base pair in chunk)
 	 * 
-	 * @param chr
-	 * @param start
-	 * @param stop
+	 * @param chunk the interval to process
 	 * @return the results of the computation for this chunk
 	 * @throws IOException
 	 * @throws WigFileException
 	 */
-	public abstract float[] compute(String chr, int start, int stop)
-			 throws IOException, WigFileException;
+	public abstract float[] compute(Interval chunk) throws IOException, WigFileException;
 	
 	@Override
 	public void run() throws IOException {
@@ -72,11 +70,7 @@ public abstract class WigMathTool extends CommandLineTool {
 		setup();
 		
 		log.debug("Processing files and writing result to disk");
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-			// Write the Wig header
-			writer.write("track type=wiggle_0");
-			writer.newLine();
-			
+		try (WigFileWriter writer = new WigFileWriter(outputFile, TrackHeader.newWiggle())) {
 			Set<String> chromosomes = getCommonChromosomes(inputs);
 			log.debug("Found " + chromosomes.size() + " chromosomes in common between all inputs");
 			for (String chr : chromosomes) {
@@ -84,50 +78,54 @@ public abstract class WigMathTool extends CommandLineTool {
 				int stop = getMinChrStop(inputs, chr);
 				log.debug("Processing chromosome " + chr + " region " + start + "-" + stop);
 				
-				// Write the chromosome header to output
-				writer.write("fixedStep chrom="+chr+" start="+start+" step=1 span=1");
-				writer.newLine();
-				
 				// Process the chromosome in chunks
 				int bp = start;
 				while (bp < stop) {
 					int chunkStart = bp;
 					int chunkStop = Math.min(bp+DEFAULT_CHUNK_SIZE-1, stop);
-					int expectedLength = chunkStop - chunkStart + 1;
-					log.debug("Processing chunk "+chr+":"+chunkStart+"-"+chunkStop);
+					Interval chunk = new Interval(chr, chunkStart, chunkStop);
+					log.debug("Processing chunk "+chunk);
 					
-					float[] result = null;
+					float[] result;
 					try {
-						result = compute(chr, chunkStart, chunkStop);
+						result = compute(chunk);
 					} catch (WigFileException e) {
-						log.fatal("Wig file error while processing chunk " + chr + " region " + start + "-" + stop);
+						log.fatal("Wig file error while processing chunk "+chunk);
 						e.printStackTrace();
-						throw new RuntimeException("Wig file error while processing chunk " + chr + " region " + start + "-" + stop);
+						throw new CommandLineToolException("Wig file error while processing chunk "+chunk);
 					}
 					
-					if (result.length != expectedLength) {
-						log.error("Expected result length="+expectedLength+", got="+result.length);
-						throw new RuntimeException("Result is not the expected length!");
+					// Verify that the computation returned the correct number of values for the chunk
+					if (result.length != chunk.length()) {
+						log.error("Expected result length="+chunk.length()+", got="+result.length);
+						throw new CommandLineToolException("Result of Wig computation is not the expected length!");
 					}
 	
-					for (int i = 0; i < result.length; i++) {
-						writer.write(Float.toString(result[i]));
-						writer.newLine();
-					}
+					// Write the result of the computation for this chunk to disk
+					writer.write(new Contig(chunk, result));
 					
+					// Move to the next chunk
 					bp = chunkStop + 1;
 				}
 			}
 		}
 		
-		for (WigFile wig : inputs) {
+		close();
+	}
+	
+	/**
+	 * Close the input files
+	 * @throws IOException 
+	 */
+	private void close() throws IOException {
+		for (WigFileReader wig : inputs) {
 			wig.close();
 		}
 	}
 	
-	public static int getMaxChrStart(List<WigFile> wigs, String chr) {
+	public static int getMaxChrStart(List<WigFileReader> wigs, String chr) {
 		int max = -1;
-		for (WigFile wig : wigs) {
+		for (WigFileReader wig : wigs) {
 			if (wig.getChrStart(chr) > max) {
 				max = wig.getChrStart(chr);
 			}
@@ -136,13 +134,13 @@ public abstract class WigMathTool extends CommandLineTool {
 		return max;
 	}
 	
-	public static int getMinChrStop(List<WigFile> wigs, String chr) {
+	public static int getMinChrStop(List<WigFileReader> wigs, String chr) {
 		if (wigs.size() == 0) {
 			return -1;
 		}
 		
 		int min = Integer.MAX_VALUE;
-		for (WigFile wig : wigs) {
+		for (WigFileReader wig : wigs) {
 			if (wig.getChrStop(chr) < min) {
 				min = wig.getChrStop(chr);
 			}
@@ -156,7 +154,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	 * @param wigs a list of Wig files to get the common chromosomes of
 	 * @return the set of chromosomes held in common by all Wig files in wigs
 	 */
-	public static Set<String> getCommonChromosomes(List<WigFile> wigs) {
+	public static Set<String> getCommonChromosomes(List<WigFileReader> wigs) {
 		if (wigs.size() == 0) {
 			return new HashSet<String>();
 		}
@@ -165,7 +163,7 @@ public abstract class WigMathTool extends CommandLineTool {
 		Iterator<String> it = chromosomes.iterator();
 		while(it.hasNext()) {
 			String chr = it.next();
-			for (WigFile wig : wigs) {
+			for (WigFileReader wig : wigs) {
 				if (!wig.includes(chr)) {
 					it.remove();
 					break;

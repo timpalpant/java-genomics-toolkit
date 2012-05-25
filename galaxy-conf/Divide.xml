@@ -1,4 +1,4 @@
-<tool id="Divide" name="Divide" version="1.0.0">
+<tool id="WigDivide" name="Divide" version="1.0.0">
   <description>two (Big)Wig files</description>
   <command interpreter="sh">galaxyToolRunner.sh wigmath.Divide -n $dividend -d $divisor -o $output</command>
   <inputs>
@@ -9,30 +9,21 @@
     <data format="wig" name="output" metadata_source="dividend" />
   </outputs>
   <tests>
-    <!--<test>
-	    <param name="dividend" value="wigmath.input1"/>
-	    <param name="divisor" value="wigmath.input2"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="divide.output"/>
+      <test>
+	    <param name="dividend" value="wigmath1.wig"/>
+	    <param name="divisor" value="wigmath2.wig"/>
+	    <output name="output" file="divide1.wig"/>
 	  </test>
 	  <test>
-	    <param name="dividend" value="wigmath.input1.bw"/>
-	    <param name="divisor" value="wigmath.input2"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="divide.output"/>
+	    <param name="dividend" value="wigmath1.wig"/>
+	    <param name="divisor" value="wigmath3.bw"/>
+	    <output name="output" file="divide2.wig"/>
 	  </test>
 	  <test>
-	    <param name="dividend" value="wigmath.input1"/>
-	    <param name="divisor" value="wigmath.input2.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="divide.output"/>
+	    <param name="dividend" value="wigmath3.bw"/>
+	    <param name="divisor" value="wigmath2.bw"/>
+	    <output name="output" file="divide3.wig"/>
 	  </test>
-	  <test>
-	    <param name="dividend" value="wigmath.input1.bw"/>
-	    <param name="divisor" value="wigmath.input2.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <output name="output" file="divide.output"/>
-	  </test>-->
   </tests>
   
   <help>

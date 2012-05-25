@@ -1,29 +1,37 @@
 package edu.unc.genomics.nucleosomes;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.nio.file.Path;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.genomics.wigmath.WigMathTool;
 
+/**
+ * Calculate a potential energy landscape from nucleosome occupancy data.
+ * See Locke G, et al. (2010) High-throughput sequencing reveals a simple model of nucleosome energetics. PNAS 107: 20998-21003
+ * 
+ * @author timpalpant
+ *
+ */
 public class PercusDecomposition extends WigMathTool {
 	
 	private static final Logger log = Logger.getLogger(PercusDecomposition.class);
 
 	@Parameter(names = {"-d", "--dyads"}, description = "Dyad counts file", required = true, validateWith = ReadablePathValidator.class)
-	public WigFile dyadsFile;
+	public Path dyadsFile;
 	@Parameter(names = {"-n", "--size"}, description = "Nucleosome size (bp)")
 	public int nucleosomeSize = 147;
 	
+	private WigFileReader reader;
 	int halfNuc = 73;
 	DescriptiveStatistics percusStats;
 	DescriptiveStatistics occupancyStats;
@@ -31,7 +39,14 @@ public class PercusDecomposition extends WigMathTool {
 	
 	@Override
 	public void setup() {
-		addInputFile(dyadsFile);
+		try {
+			reader = WigFileReader.autodetect(dyadsFile);
+		} catch (IOException e) {
+			log.error("IOError opening Wig file");
+			e.printStackTrace();
+			throw new CommandLineToolException("IOError opening Wig file");
+		}
+		addInputFile(reader);
 		halfNuc = nucleosomeSize / 2;
 		
 		log.debug("Initializing statistics");
@@ -41,20 +56,23 @@ public class PercusDecomposition extends WigMathTool {
 		occupancyStats.setWindowSize(nucleosomeSize);
 		
 		log.debug("Computing maximum genome-wide occupancy (normalization factor)");
-		for (String chr : dyadsFile.chromosomes()) {
+		for (String chr : reader.chromosomes()) {
 			occupancyStats.clear();
 			
 			// Walk the chromosome while keeping track of occupancy
-			int bp = dyadsFile.getChrStart(chr);
-			int stop = dyadsFile.getChrStop(chr);
+			int bp = reader.getChrStart(chr);
+			int stop = reader.getChrStop(chr);
 			while (bp <= stop) {
 				int chunkStart = bp;
 				int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, stop);
 				
 				try {
-					Iterator<WigItem> result = dyadsFile.query(chr, chunkStart, chunkStop);
-					float[] data = WigFile.flattenData(result, chunkStart, chunkStop, 0);
+					float[] data = reader.query(chr, chunkStart, chunkStop).getValues();
 					for (int i = 0; i < data.length; i++) {
+						if (Float.isNaN(data[i])) {
+							data[i] = 0;
+						}
+						
 						occupancyStats.addValue(data[i]);
 						if (occupancyStats.getSum() > maxOcc) {
 							maxOcc = occupancyStats.getSum();
@@ -73,17 +91,21 @@ public class PercusDecomposition extends WigMathTool {
 	}
 
 	@Override
-	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
+	public float[] compute(Interval chunk) throws IOException, WigFileException {
 		// Reset sliding window stats
 		percusStats.clear();
 		occupancyStats.clear();
 		
 		// Pad the query with an additional nucleosome on either end
-		int paddedStart = Math.max(start-nucleosomeSize, getMaxChrStart(inputs, chr));
-		int paddedStop = Math.min(stop+nucleosomeSize, getMinChrStop(inputs, chr));
+		int paddedStart = Math.max(chunk.getStart()-nucleosomeSize, getMaxChrStart(inputs, chunk.getChr()));
+		int paddedStop = Math.min(chunk.getStop()+nucleosomeSize, getMinChrStop(inputs, chunk.getChr()));
 		
-		Iterator<WigItem> result = dyadsFile.query(chr, paddedStart, paddedStop);
-		float[] dyads = WigFile.flattenData(result, start-nucleosomeSize, stop+nucleosomeSize, 0);
+		float[] dyads = reader.query(chunk.getChr(), paddedStart, paddedStop).getValues();
+		for (int i = 0; i < dyads.length; i++) {
+			if (Float.isNaN(dyads[i])) {
+				dyads[i] = 0;
+			}
+		}
 		
 		// Calculate normalized occupancy & dyads from the dyads data
 		float[] occ = new float[dyads.length];
@@ -104,7 +126,7 @@ public class PercusDecomposition extends WigMathTool {
 		
 		// Assume kb*T = 1 and mu = 0 (can be arbitrarily shifted and scaled)
 		// See Eq. S12 in Locke et al. (2010), PNAS
-		float[] energies = new float[stop-start+1];
+		float[] energies = new float[chunk.length()];
 		for (int i = nucleosomeSize; i < dyads.length-nucleosomeSize; i++) {
 			double value = Math.log((1-occ[i]+dyads[i])/dyads[i]);
 			double summand = Math.log((1-occ[i+halfNuc])/(1-occ[i+halfNuc]+dyads[i+halfNuc]));

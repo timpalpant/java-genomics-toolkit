@@ -1,28 +1,33 @@
 package edu.unc.genomics.ngs;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.Interval;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 
+/**
+ * Finds regions of a Wig file that differ significantly from the mean, such as CNVs or deletions.
+ * @author timpalpant
+ *
+ */
 public class FindOutlierRegions extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(FindOutlierRegions.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
-	public WigFile inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-w", "--window"}, description = "Window size", required = true)
 	public int windowSize;
 	@Parameter(names = {"-t", "--threshold"}, description = "Threshold (fold x mean)")
@@ -34,24 +39,24 @@ public class FindOutlierRegions extends CommandLineTool {
 	
 	int flip = 1;
 	double threshold;
-	DescriptiveStatistics stats;
+	DescriptiveStatistics stats = new DescriptiveStatistics();
 
 	@Override
 	public void run() throws IOException {
-		threshold = fold * inputFile.mean();
+		stats.setWindowSize(windowSize);
 		if (below) {
 			flip = -1;
 		}
 		
-		stats = new DescriptiveStatistics();
-		stats.setWindowSize(windowSize);
-		
 		// Run through the genome finding regions that exceed the threshold
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-			for (String chr : inputFile.chromosomes()) {
-				int start = inputFile.getChrStart(chr);
-				int stop = inputFile.getChrStop(chr);
-				log.debug("Processing chromosome " + chr + " region " + start + "-" + stop);
+		try (WigFileReader reader = WigFileReader.autodetect(inputFile);
+				 PrintWriter writer = new PrintWriter(Files.newBufferedWriter(outputFile, Charset.defaultCharset()))) {
+			threshold = fold * reader.mean();
+			
+			for (String chr : reader.chromosomes()) {
+				int start = reader.getChrStart(chr);
+				int stop = reader.getChrStop(chr);
+				log.debug("Processing chromosome "+chr+" region "+start+"-"+stop);
 				
 				// Process the chromosome in chunks
 				int bp = start;
@@ -60,11 +65,11 @@ public class FindOutlierRegions extends CommandLineTool {
 				while (bp < stop) {
 					int chunkStart = bp;
 					int chunkStop = Math.min(bp+DEFAULT_CHUNK_SIZE-1, stop);
-					log.debug("Processing chunk "+chr+":"+chunkStart+"-"+chunkStop);
+					Interval chunk = new Interval(chr, chunkStart, chunkStop);
+					log.debug("Processing chunk "+chunk);
 					
 					try {
-						Iterator<WigItem> result = inputFile.query(chr, chunkStart, chunkStop);
-						float[] data = WigFile.flattenData(result, chunkStart, chunkStop);
+						float[] data = reader.query(chunk).getValues();
 						for (int i = 0; i < data.length; i++) {
 							stats.addValue(data[i]);
 							
@@ -79,8 +84,7 @@ public class FindOutlierRegions extends CommandLineTool {
 								// End an outlier region
 								if (flip*stats.getMean() < flip*threshold) {
 									int outlierStop = bp + i;
-									writer.write(chr+"\t"+outlierStart+"\t"+outlierStop);
-									writer.newLine();
+									writer.println(chr+"\t"+outlierStart+"\t"+outlierStop);
 									outlierStart = null;
 								}
 							}
@@ -95,8 +99,6 @@ public class FindOutlierRegions extends CommandLineTool {
 				}
 			}
 		}
-		
-		inputFile.close();
 	}
 	
 	/**

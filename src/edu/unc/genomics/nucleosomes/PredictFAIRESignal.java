@@ -6,26 +6,31 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.genomics.io.WigQueryResult;
 import edu.unc.genomics.wigmath.WigMathTool;
 import edu.unc.utils.InclusionExclusion;
 
+/**
+ * Attempt to predict FAIRE signal from nucleosome occupancy data using a simple probabilistic model
+ * @author timpalpant
+ *
+ */
 public class PredictFAIRESignal extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(PredictFAIRESignal.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input (nucleosome occupancy)", required = true)
-	public WigFile inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input (nucleosome occupancy)", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-s", "--sonication"}, description = "Sonication distribution", required = true, validateWith = ReadablePathValidator.class)
 	public Path sonicationFile;
 	@Parameter(names = {"-c", "--crosslinking"}, description = "FAIRE efficiency / crosslinking coefficient")
@@ -33,13 +38,21 @@ public class PredictFAIRESignal extends WigMathTool {
 	@Parameter(names = {"-x", "--extend"}, description = "In silico read extension (bp)")
 	public int extend = 250;
 
+	WigFileReader reader;
 	double[] sonication = new double[100];
 	int minL = Integer.MAX_VALUE, maxL = 0;
 	double maxOcc;
 	
 	@Override
 	public void setup() {
-		inputs.add(inputFile);
+		try {
+			reader = WigFileReader.autodetect(inputFile);
+		} catch (IOException e) {
+			log.error("IOError opening Wig file");
+			e.printStackTrace();
+			throw new CommandLineToolException(e.getMessage());
+		}
+		inputs.add(reader);
 		
 		log.debug("Loading sonication fragment length distribution");
 		double total = 0;
@@ -81,16 +94,16 @@ public class PredictFAIRESignal extends WigMathTool {
 		}
 		
 		// Store the maximum occupancy
-		maxOcc = inputFile.max();
+		maxOcc = reader.max();
 	}
 	
 	@Override
-	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		int paddedStart = Math.max(start-maxL, inputFile.getChrStart(chr));
-		int paddedStop = Math.min(stop+maxL, inputFile.getChrStop(chr));
+	public float[] compute(Interval chunk) throws IOException, WigFileException {
+		int paddedStart = Math.max(chunk.getStart()-maxL, reader.getChrStart(chunk.getChr()));
+		int paddedStop = Math.min(chunk.getStop()+maxL, reader.getChrStop(chunk.getChr()));
 		
-		Iterator<WigItem> data = inputFile.query(chr, paddedStart, paddedStop);
-		float[] result = WigFile.flattenData(data, start-maxL, stop+maxL, 0);
+		WigQueryResult data = reader.query(chunk.getChr(), paddedStart, paddedStop);
+		float[] result = data.get(chunk.getStart()-maxL, chunk.getStop()+maxL);
 		
 		// Scale the occupancy by the maximum occupancy so that it represents
 		// the probability that a base pair is occupied by a nucleosome
@@ -123,7 +136,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		}
 		
 		log.debug("Extending reads from the +/- strands");
-		float[] prediction = new float[stop-start+1];
+		float[] prediction = new float[chunk.length()];
 		for (int i = 0; i < result.length; i++) {
 			for (int j = 0; j < extend; j++) {
 				// Extend on the + strand

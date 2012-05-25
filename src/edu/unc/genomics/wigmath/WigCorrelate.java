@@ -12,16 +12,21 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.WigEntry;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.utils.FloatCorrelation;
 
+/**
+ * Correlate multiple (Big)Wig files
+ * @author timpalpant
+ *
+ */
 public class WigCorrelate extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(WigCorrelate.class);
@@ -38,7 +43,7 @@ public class WigCorrelate extends CommandLineTool {
 	public Path outputFile;
 	
 	private Correlation corr;
-	private List<WigFile> wigs = new ArrayList<>();
+	private List<WigFileReader> wigs = new ArrayList<>();
 	private List<String> chromosomes;
 	int[] chrStarts, chrStops, chrLengths, nBins;
 	int totalNumBins = 0;
@@ -61,9 +66,9 @@ public class WigCorrelate extends CommandLineTool {
 		log.debug("Initializing input files");
 		for (String inputFile : inputFiles) {
 			try {
-				wigs.add(WigFile.autodetect(Paths.get(inputFile)));
-			} catch (IOException | WigFileException e) {
-				log.error("Error initializing input Wig file: " + inputFile);
+				wigs.add(WigFileReader.autodetect(Paths.get(inputFile)));
+			} catch (IOException e) {
+				log.error("IOError initializing input Wig file: " + inputFile);
 				e.printStackTrace();
 				throw new CommandLineToolException(e.getMessage());
 			}
@@ -83,7 +88,7 @@ public class WigCorrelate extends CommandLineTool {
 		Arrays.fill(chrStops, Integer.MIN_VALUE);
 		for (int i = 0; i < chromosomes.size(); i++) {
 			String chr = chromosomes.get(i);
-			for (WigFile w : wigs) {
+			for (WigFileReader w : wigs) {
 				if (w.getChrStart(chr) < chrStarts[i]) {
 					chrStarts[i] = w.getChrStart(chr);
 				}
@@ -161,7 +166,7 @@ public class WigCorrelate extends CommandLineTool {
 	 * @throws IOException 
 	 * @throws WigFileException 
 	 */
-	private float[] getDataVector(WigFile w) {
+	private float[] getDataVector(WigFileReader w) {
 		float[] values = new float[totalNumBins];
 		int[] counts = new int[totalNumBins];
 		
@@ -169,18 +174,18 @@ public class WigCorrelate extends CommandLineTool {
 		for (int i = 0; i < chromosomes.size(); i++) {
 			String chr = chromosomes.get(i);
 			try {
-				Iterator<WigItem> result = w.query(chr, w.getChrStart(chr), w.getChrStop(chr));
+				Iterator<WigEntry> result = w.getOverlappingEntries(chr, w.getChrStart(chr), w.getChrStop(chr));
 				while (result.hasNext()) {
-					WigItem item = result.next();
+					WigEntry item = result.next();
 					// Add this WigItem to the appropriate bins
-					int bin = item.getStartBase() / stepSize;
+					int bin = item.low() / stepSize;
 					int binStart = bin*stepSize + 1;
-					while (binStart <= item.getEndBase()) {
+					while (binStart <= item.high()) {
 						int binEnd = binStart + windowSize - 1;
-						int intersectStart = Math.max(binStart, item.getStartBase());
-						int intersectStop = Math.min(binEnd, item.getEndBase());
+						int intersectStart = Math.max(binStart, item.low());
+						int intersectStop = Math.min(binEnd, item.high());
 						int overlap = intersectStop - intersectStart + 1;
-						values[bin+binOffset] += overlap * item.getWigValue();
+						values[bin+binOffset] += overlap * item.getValue().floatValue();
 						counts[bin+binOffset] += overlap;
 						
 						// Move to the next bin

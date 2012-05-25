@@ -1,9 +1,6 @@
 package edu.unc.genomics.converters;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
@@ -16,14 +13,22 @@ import edu.unc.genomics.Assembly;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.ValuedInterval;
-import edu.unc.genomics.io.IntervalFile;
+import edu.unc.genomics.io.IntervalFileReader;
+import edu.unc.genomics.io.WigFileWriter;
 
+/**
+ * Convert interval-based data such as microarray data in Bed, BedGraph, or GFF format
+ * to Wig format. Overlapping probes in the original interval dataset are averaged.
+ * 
+ * @author timpalpant
+ *
+ */
 public class IntervalToWig extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(IntervalToWig.class);
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file (Bed/BedGraph/GFF)", required = true)
-	public IntervalFile<? extends Interval> intervalFile;
+	public Path intervalFile;
 	@Parameter(names = {"-z", "--zero"}, description = "Assume zero where there is no data (default = NaN)")
 	public boolean defaultZero = false;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
@@ -33,67 +38,53 @@ public class IntervalToWig extends CommandLineTool {
 	
 	@Override
 	public void run() throws IOException {
-		log.debug("Initializing output file");
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-			// Write the Wiggle track header to the output file
-			TrackHeader header = new TrackHeader("wiggle_0");
-			header.setName("Converted " + intervalFile.getPath().getFileName());
-			header.setDescription("Converted " + intervalFile.getPath().getFileName());
-			writer.write(header.toString());
-			writer.newLine();
-			
+		log.debug("Initializing input/output files");
+		TrackHeader header = TrackHeader.newWiggle();
+		header.setName("Converted " + intervalFile.getFileName());
+		header.setDescription("Converted " + intervalFile.getFileName());
+		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(intervalFile);
+				 WigFileWriter writer = new WigFileWriter(outputFile, header)) {			
 			// Process each chromosome in the assembly
-			for (String chr : intervalFile.chromosomes()) {
+			for (String chr : reader.chromosomes()) {
 				if (!assembly.includes(chr)) {
 					log.info("Skipping chromosome "+chr+" because it is not in assembly "+assembly);
 					continue;
 				}
 				
 				log.debug("Processing chromosome " + chr);
-				// Write the contig header to the output file
-				writer.write("fixedStep chrom="+chr+" start=1 step=1 span=1");
-				writer.newLine();
-				
-				int start = 1;
-				while (start < assembly.getChrLength(chr)) {
-					int stop = Math.min(start + DEFAULT_CHUNK_SIZE - 1, assembly.getChrLength(chr));
-					int length = stop - start + 1;
-					int[] count = new int[length];
-					float[] sum = new float[length];
+				int chunkStart = 1;
+				while (chunkStart < assembly.getChrLength(chr)) {
+					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, assembly.getChrLength(chr));
+					Interval chunk = new Interval(chr, chunkStart, chunkStop);
+					float[] sum = new float[chunk.length()];
+					int[] count = new int[chunk.length()];
 					
-					Iterator<? extends Interval> it = intervalFile.query(chr, start, stop);
+					Iterator<? extends Interval> it = reader.query(chunk);
 					while (it.hasNext()) {
 						ValuedInterval entry = (ValuedInterval) it.next();
 						if (entry.getValue() != null) {
-							int entryStart = Math.max(start, entry.getStart());
-							int entryStop = Math.min(stop, entry.getStop());
+							int entryStart = Math.max(chunkStart, entry.low());
+							int entryStop = Math.min(chunkStop, entry.high());
 							for (int i = entryStart; i <= entryStop; i++) {
-								sum[i-start] += entry.getValue().floatValue();
-								count[i-start]++;
+								sum[i-chunkStart] += entry.getValue().floatValue();
+								count[i-chunkStart]++;
 							}
 						}
 					}
 					
-					// Write the average at each base pair to the output file
+					// Calculate the average at each base pair in the chunk
 					for (int i = 0; i < sum.length; i++) {
-						if (count[i] == 0) {
-							if (defaultZero) {
-								writer.write("0");
-							} else {
-								writer.write(String.valueOf(Float.NaN));
-							}
+						if (count[i] == 0 && !defaultZero) {
+							sum[i] = Float.NaN;
 						} else {
-							writer.write(String.valueOf(sum[i]/count[i]));
+							sum[i] /= count[i];
 						}
-						writer.newLine();
 					}
 					
 					// Process the next chunk
-					start = stop + 1;
+					chunkStart = chunkStop + 1;
 				}
 			}
-		} finally {
-			intervalFile.close();
 		}
 	}
 	

@@ -1,29 +1,38 @@
 package edu.unc.genomics.converters;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.nio.file.Path;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.Interval;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.genomics.wigmath.WigMathTool;
+import edu.unc.genomics.ReadablePathValidator;
 
+/**
+ * Interpolates missing values (NaN) in a Wig file to create a continuous track
+ * Useful for making microarray data continuous
+ * 
+ * @author timpalpant
+ *
+ */
 public class InterpolateDiscontinuousData extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(InterpolateDiscontinuousData.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true)
-	public WigFile inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-t", "--type"}, description = "Interpolant (nearest/linear/cubic)")
 	public String type = "linear";
 	@Parameter(names = {"-m", "--max"}, description = "Maximum span of missing values to interpolate (bp)")
 	public int max = 1000;
 
+	private WigFileReader wig;
 	private Interpolant interp;
 	
 	@Override
@@ -32,7 +41,7 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 		interp = Interpolant.fromName(type);
 		if (interp == null) {
 			log.error("Unknown interpolation method: "+type);
-			throw new CommandLineToolException("Unknown interpolation method: "+type+". Options are nearest, linear, pchip");
+			throw new CommandLineToolException("Unknown interpolation method: "+type+". Options are nearest, linear, cubic");
 		} else {
 			log.debug("Using interpolant: "+type);
 		}
@@ -41,13 +50,19 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 			log.warn("Allowable span of missing values exceeds processing chunk size");
 		}
 		
-		inputs.add(inputFile);
+		try {
+			wig = WigFileReader.autodetect(inputFile);
+		} catch (IOException e) {
+			log.error("Error initializing (Big)Wig file");
+			e.printStackTrace();
+			throw new CommandLineToolException("Error initializing (Big)Wig file");
+		}
+		inputs.add(wig);
 	}
 	
 	@Override
-	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		Iterator<WigItem> data = inputFile.query(chr, start, stop);
-		float[] result = WigFile.flattenData(data, start, stop);
+	public float[] compute(Interval chunk) throws IOException, WigFileException {
+		float[] result = wig.query(chunk).getValues();
 		
 		// Special case: if the first or last value in this chunk is missing, 
 		// then we'll need to look further up/downstream to do the interpolation
@@ -59,7 +74,7 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 		
 		// If the entire chunk is missing, skip it
 		if (first == result.length) {
-			log.warn("Skipping entire chunk "+chr+":"+start+"-"+stop+" that is missing values");
+			log.warn("Skipping entire chunk "+chunk+" that is missing values");
 			return result;
 		}
 		
@@ -67,13 +82,12 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 		if (first > 0 && first < max) {	
 			// Need to look upstream
 			int upstream = max - first;
-			int queryStart = Math.max(start-upstream, inputFile.getChrStart(chr));
-			int queryStop = start-1;
+			int queryStart = Math.max(chunk.getStart()-upstream, wig.getChrStart(chunk.getChr()));
+			int queryStop = chunk.getStart()-1;
 			if (queryStart >= queryStop) {
-				log.debug("Cannot interpolate missing values at the start of chromosome "+chr);
+				log.debug("Cannot interpolate missing values at the start of chromosome "+chunk.getChr());
 			} else {
-				Iterator<WigItem> upstreamData = inputFile.query(chr, queryStart, queryStop);
-				float[] upstreamResult = WigFile.flattenData(upstreamData, queryStart, queryStop);
+				float[] upstreamResult = wig.query(chunk.getChr(), queryStart, queryStop).getValues();
 				int j = upstreamResult.length-1;
 				while (Float.isNaN(upstreamResult[j]) && (--j >= 0));
 				// If we found a value within range, do the interpolation
@@ -91,13 +105,12 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 		if (last < result.length-1 && last >= result.length-max) {
 			// Need to look downstream
 			int downstream = max - (result.length-last);
-			int queryStart = stop+1;
-			int queryStop = Math.min(stop+downstream, inputFile.getChrStop(chr));
+			int queryStart = chunk.getStop()+1;
+			int queryStop = Math.min(chunk.getStop()+downstream, wig.getChrStop(chunk.getChr()));
 			if (queryStart >= queryStop) {
-				log.debug("Cannot interpolate missing values at the end of chromosome "+chr);
+				log.debug("Cannot interpolate missing values at the end of chromosome "+chunk.getChr());
 			} else {
-				Iterator<WigItem> downstreamData = inputFile.query(chr, queryStart, queryStop);
-				float[] downstreamResult = WigFile.flattenData(downstreamData, queryStart, queryStop);
+				float[] downstreamResult = wig.query(chunk.getChr(), queryStart, queryStop).getValues();
 				int j = 0;
 				while (Float.isNaN(downstreamResult[j]) && (++j < downstreamResult.length));
 				// If we found a value within range, do the interpolation
@@ -120,7 +133,7 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 				if (x1-x0 <= max) {
 					doInterpolation(result, x0, x1, result[x0], result[x1]);
 				} else {
-					log.debug("Skipping interval "+chr+":"+(start+x0)+"-"+(start+x1)+" (exceeds maximum span)");
+					log.debug("Skipping interval "+chunk.getChr()+":"+(chunk.getStart()+x0)+"-"+(chunk.getStart()+x1)+" (exceeds maximum span)");
 				}
 			}
 		}

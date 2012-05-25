@@ -12,7 +12,6 @@
     <tool file="java-genomics-toolkit/galaxy-conf/FindBoundaryNucleosomes.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GreedyCaller.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/MapDyads.xml" />
-    <tool file="java-genomics-toolkit/galaxy-conf/NRLCalculator.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Phasogram.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/PercusDecomposition.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/DynaPro.xml" />
@@ -55,4 +54,5 @@
   </section>
   <section name="DNA Properties" id="java-genomics-toolkit-dnaproperty">
   	<tool file="java-genomics-toolkit/galaxy-conf/DNAPropertyCalculator.xml" />
+  	<tool file="java-genomics-toolkit/galaxy-conf/FindNMers.xml" />
   </section>

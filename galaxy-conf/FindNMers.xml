@@ -34,10 +34,19 @@
   <outputs>
       <data format="bed" name="output"/>
   </outputs>
+  <tests>
+    <test>
+      <param name="genomeSource" value="history"/>
+      <param name="ownFile" value="test.fasta"/>
+      <param name="property" value="Twist"/>
+      <param name="N" value="false"/>
+      <output name="output" file="twist.wig"/>
+  	</test>
+	</tests>
   
   <help>
 
-This tool will find all matches of a given NMer in a DNA sequence.
+This tool will find all matches of a given NMer in a DNA sequence. Sequences may be provided in FASTA format or selected from available reference genomes. Mismatches are allowed, but not insertions/deletions. The output is a Bed file with the locations of matches in the reference sequence.
 
   </help>
 </tool>

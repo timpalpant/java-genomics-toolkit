@@ -1,0 +1,8 @@
+track type=wiggle_0 name='Downsampled wigmath3.wig' description='Downsampled wigmath3.wig'
+fixedStep chrom=2micron start=100 step=100 span=100
+18.3
+fixedStep chrom=chrI start=1 step=100 span=100
+150.0
+fixedStep chrom=chrXI start=20 step=100 span=100
+1264.0
+296.0

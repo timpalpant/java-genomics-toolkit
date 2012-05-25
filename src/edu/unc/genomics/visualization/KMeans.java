@@ -25,6 +25,11 @@ import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileSnifferException;
 import edu.unc.genomics.io.WigFileException;
 
+/**
+ * Cluster a heatmap matrix with k-means
+ * @author timpalpant
+ *
+ */
 public class KMeans extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(KMeans.class);

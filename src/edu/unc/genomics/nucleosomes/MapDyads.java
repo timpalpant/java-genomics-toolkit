@@ -1,9 +1,6 @@
 package edu.unc.genomics.nucleosomes;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
@@ -14,15 +11,23 @@ import com.beust.jcommander.Parameter;
 import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.Assembly;
 import edu.unc.genomics.CommandLineTool;
+import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
-import edu.unc.genomics.io.IntervalFile;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.IntervalFileReader;
+import edu.unc.genomics.io.WigFileWriter;
 
+/**
+ * Count the number of read centers overlapping each base pair in the genome
+ * @author timpalpant
+ *
+ */
 public class MapDyads extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(MapDyads.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (reads)", required = true)
-	public IntervalFile<? extends Interval> inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input file (reads)", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-s", "--size"}, description = "Mononucleosome length (default: read length)")
 	public Integer nucleosomeSize;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
@@ -34,57 +39,51 @@ public class MapDyads extends CommandLineTool {
 	public void run() throws IOException {		
 		log.debug("Initializing output file");
 		int mapped = 0;
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-			// Write the Wiggle track header to the output file
-			TrackHeader header = new TrackHeader("wiggle_0");
-			header.setName("Converted " + inputFile.getPath().getFileName());
-			header.setDescription("Converted " + inputFile.getPath().getFileName());
-			writer.write(header.toString());
-			writer.newLine();
-			
+		TrackHeader header = TrackHeader.newWiggle();
+		header.setName("Converted " + inputFile.getFileName());
+		header.setDescription("Converted " + inputFile.getFileName());
+		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(inputFile);
+				 WigFileWriter writer = new WigFileWriter(outputFile, header)) {
 			// Process each chromosome in the assembly
-			for (String chr : inputFile.chromosomes()) {
+			for (String chr : reader.chromosomes()) {
 				if (!assembly.includes(chr)) {
 					log.info("Skipping chromosome "+chr+" because it is not in assembly "+assembly);
 					continue;
 				}
-				
 				log.debug("Processing chromosome " + chr);
-				// Write the contig header to the output file
-				writer.write("fixedStep chrom="+chr+" start=1 step=1 span=1");
-				writer.newLine();
 				
-				int start = 1;
-				while (start < assembly.getChrLength(chr)) {
-					int stop = Math.min(start+DEFAULT_CHUNK_SIZE-1, assembly.getChrLength(chr));
-					int length = stop - start + 1;
-					int[] count = new int[length];
+				int chunkStart = 1;
+				while (chunkStart < assembly.getChrLength(chr)) {
+					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, assembly.getChrLength(chr));
+					Interval chunk = new Interval(chr, chunkStart, chunkStop);
+					float[] count = new float[chunk.length()];
 					
-					Iterator<? extends Interval> it = inputFile.query(chr, start, stop);
+					Iterator<? extends Interval> it = reader.query(chunk);
 					while (it.hasNext()) {
 						Interval entry = it.next();
 						int center;
-						if (nucleosomeSize == null || nucleosomeSize == -1) {
+						if (nucleosomeSize == null || nucleosomeSize <= 0) {
 							center = entry.center();
 						} else {
-							center = entry.getStart() + nucleosomeSize/2;
+							if (entry.isWatson()) {
+								center = entry.getStart() + nucleosomeSize/2;
+							} else {
+								center = entry.getStart() - nucleosomeSize/2;
+							}
 						}
 						
 						// Only map if it is in the current chunk
-						if (start <= center && center <= stop) {
-							count[center-start]++;
+						if (chunkStart <= center && center <= chunkStop) {
+							count[center-chunkStart]++;
 							mapped++;
 						}
 					}
 					
-					// Write the average at each base pair to the output file
-					for (int i = 0; i < count.length; i++) {
-						writer.write(Integer.toString(count[i]));
-						writer.newLine();
-					}
+					// Write the count at each base pair to the output file
+					writer.write(new Contig(chunk, count));
 					
 					// Process the next chunk
-					start = stop + 1;
+					chunkStart = chunkStop + 1;
 				}
 			}
 		}

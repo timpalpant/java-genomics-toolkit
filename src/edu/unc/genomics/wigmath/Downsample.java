@@ -1,29 +1,35 @@
 package edu.unc.genomics.wigmath;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
+import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
+import edu.unc.genomics.io.WigQueryResult;
 import edu.unc.utils.WigStatistic;
 
+/**
+ * Downsample a high-resolution Wig file into larger windows so that it has smaller file size
+ * @author timpalpant
+ *
+ */
 public class Downsample extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(Downsample.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
-	public WigFile inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-w", "--window"}, description = "Window size (bp)")
 	public int windowSize = 100;
 	@Parameter(names = {"-m", "--metric"}, description = "Downsampling metric (coverage/total/mean/min/max)")
@@ -36,24 +42,26 @@ public class Downsample extends CommandLineTool {
 		WigStatistic dsm = WigStatistic.fromName(metric);
 		if (dsm == null) {
 			log.error("Unknown downsampling metric: "+metric);
-			throw new CommandLineToolException("Unknown downsampling metric: "+metric+". Options are mean, min, max");
+			throw new CommandLineToolException("Unknown downsampling metric: "+metric+". Options are mean, min, max, coverage, total");
 		} else {
 			log.debug("Using downsampling metric: "+metric);
 		}
 		
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+		try (WigFileReader reader = WigFileReader.autodetect(inputFile);
+				 PrintWriter writer = new PrintWriter(Files.newBufferedWriter(outputFile, Charset.defaultCharset()))) {
 			// Write the Wig header
-			writer.write("track type=wiggle_0 name='Downsampled "+inputFile.getPath().getFileName()+"' description='Downsampled "+inputFile.getPath().getFileName()+"'");
-			writer.newLine();
+			TrackHeader header = TrackHeader.newWiggle();
+			header.setName("Downsampled "+inputFile.getFileName());
+			header.setDescription("Downsampled "+inputFile.getFileName());
+			writer.println(header);
 			
-			for (String chr : inputFile.chromosomes()) {
+			for (String chr : reader.chromosomes()) {
 				log.debug("Processing chromosome "+chr);
-				int start = inputFile.getChrStart(chr);
-				int stop = inputFile.getChrStop(chr);
+				int start = reader.getChrStart(chr);
+				int stop = reader.getChrStop(chr);
 				
 				// Write the chromosome header to output
-				writer.write("fixedStep chrom="+chr+" start="+start+" step="+windowSize+" span="+windowSize);
-				writer.newLine();
+				writer.println("fixedStep chrom="+chr+" start="+start+" step="+windowSize+" span="+windowSize);
 				
 				// Process the chromosome in chunks
 				int bp = start;
@@ -63,29 +71,28 @@ public class Downsample extends CommandLineTool {
 					
 					try {
 						// Get the original data for this window from the Wig file
-						Iterator<WigItem> result = inputFile.query(chr, chunkStart, chunkStop);
+						WigQueryResult result = reader.query(chr, chunkStart, chunkStop);
 						// Do the downsampling
 						float value = Float.NaN;
 						switch (dsm) {
 						case COVERAGE:
-							value = WigFile.numBases(result, chunkStart, chunkStop);
+							value = result.coverage();
 							break;
 						case TOTAL:
-							value = WigFile.total(result, chunkStart, chunkStop);
+							value = result.total();
 							break;
 						case MEAN:
-							value = WigFile.mean(result, chunkStart, chunkStop);
+							value = result.mean();
 							break;
 						case MIN:
-							value = WigFile.min(result, chunkStart, chunkStop);
+							value = result.min();
 							break;
 						case MAX:
-							value = WigFile.max(result, chunkStart, chunkStop);
+							value = result.max();
 							break;
 						}
 						// Write the downsampled value to the output file
-						writer.write(String.valueOf(value));
-						writer.newLine();
+						writer.println(value);
 					} catch (WigFileException e) {
 						log.error("Error querying Wig file for data from interval "+chr+":"+chunkStart+"-"+chunkStop);
 						e.printStackTrace();
@@ -98,12 +105,7 @@ public class Downsample extends CommandLineTool {
 		}
 	}
 	
-	/**
-	 * @param args
-	 * @throws WigFileException 
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException, WigFileException {
+	public static void main(String[] args) {
 		new Downsample().instanceMain(args);
 	}
 

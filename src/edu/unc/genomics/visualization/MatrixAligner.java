@@ -6,11 +6,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
@@ -18,16 +16,21 @@ import edu.unc.genomics.BedEntry;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.ReadablePathValidator;
-import edu.unc.genomics.io.BedFile;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.io.BedFileReader;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 
+/**
+ * Align data from a Wig file into a matrix for making a heatmap with matrix2png
+ * @author timpalpant
+ *
+ */
 public class MatrixAligner extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(MatrixAligner.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true)
-	public WigFile inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-l", "--loci"}, description = "Loci file (Bed)", required = true, validateWith = ReadablePathValidator.class)
 	public Path lociFile;
 	@Parameter(names = {"-m", "--max"}, description = "Truncate width (base pairs)")
@@ -40,7 +43,7 @@ public class MatrixAligner extends CommandLineTool {
 	@Override
 	public void run() throws IOException {		
 		log.debug("Loading alignment intervals");
-		try (BedFile bed = new BedFile(lociFile)) {
+		try (BedFileReader bed = new BedFileReader(lociFile)) {
 			loci = bed.loadAll();
 		}
 		
@@ -89,7 +92,8 @@ public class MatrixAligner extends CommandLineTool {
 		
 		log.debug("Initializing output file");
 		int count = 0, skipped = 0;
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+		try (WigFileReader reader = WigFileReader.autodetect(inputFile);
+				 BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			writer.write("ID");
 			for (int i = leftBound-alignmentPoint; i <= rightBound-alignmentPoint; i++) {
 				writer.write("\t"+i);
@@ -102,8 +106,7 @@ public class MatrixAligner extends CommandLineTool {
 				count++;
 			  Arrays.fill(row, "-");
 				try {
-					Iterator<WigItem> result = inputFile.query(entry);
-					float[] data = WigFile.flattenData(result, entry.getStart(), entry.getStop());
+					float[] data = reader.query(entry).getValues();
 					
 					// Position the data in the matrix
 					// Locus alignment point (entry value) should be positioned over the matrix alignment point
@@ -117,6 +120,7 @@ public class MatrixAligner extends CommandLineTool {
 						}
 					}
 				} catch (WigFileException e) {
+					log.debug("Skipping interval "+entry+" which does not have data in the Wig file");
 					skipped++;
 				} finally {
 					// Write to output
@@ -130,7 +134,6 @@ public class MatrixAligner extends CommandLineTool {
 			}
 		}
 		
-		inputFile.close();
 		log.debug(count + " intervals processed");
 		log.debug(skipped + " intervals skipped");
 	}

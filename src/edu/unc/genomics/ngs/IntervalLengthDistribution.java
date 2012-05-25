@@ -1,7 +1,7 @@
 package edu.unc.genomics.ngs;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,19 +13,24 @@ import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
-import edu.unc.genomics.io.IntervalFile;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.IntervalFileReader;
 
+/**
+ * Generate a histogram of interval lengths, such as read lengths or gene lengths
+ * @author timpalpant
+ *
+ */
 public class IntervalLengthDistribution extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(IntervalLengthDistribution.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Interval file", required = true)
-	public IntervalFile<? extends Interval> inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Interval file", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-f", "--freq"}, description = "Output frequencies rather than counts")
 	public boolean outputFreq = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
-	
 	
 	@Override
 	public void run() throws IOException {
@@ -33,31 +38,30 @@ public class IntervalLengthDistribution extends CommandLineTool {
 		Frequency freq = new Frequency();
 		int min = Integer.MAX_VALUE;
 		int max = -1;
-		for (Interval i : inputFile) {
-			int L = i.length();
-			freq.addValue(L);
-			
-			if (L < min) {
-				min = L;
-			}
-			if (L > max) {
-				max = L;
+		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(inputFile)) {
+			for (Interval i : reader) {
+				int L = i.length();
+				freq.addValue(L);
+				
+				if (L < min) {
+					min = L;
+				}
+				if (L > max) {
+					max = L;
+				}
 			}
 		}
 		
 		log.debug("Writing histogram output");
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+		try (PrintWriter writer = new PrintWriter(Files.newBufferedWriter(outputFile, Charset.defaultCharset()))) {
 			for (int i = min; i <= max; i++) {
 				if (outputFreq) {
-					writer.write(i+"\t"+freq.getPct(i));
+					writer.println(i+"\t"+freq.getPct(i));
 				} else {
-					writer.write(i+"\t"+freq.getCount(i));
+					writer.println(i+"\t"+freq.getCount(i));
 				}
-				writer.newLine();
 			}
 		}
-		
-		inputFile.close();
 	}
 	
 	public static void main(String[] args) {

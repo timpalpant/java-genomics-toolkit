@@ -1,31 +1,32 @@
 package edu.unc.genomics.nucleosomes;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.ReadablePathValidator;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.io.IntervalFileWriter;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.utils.SortUtils;
 
+/**
+ * Calls stereotypic nucleosome positions from MNase-seq data using a greedy algorithm
+ * @author timpalpant
+ *
+ */
 public class GreedyCaller extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(GreedyCaller.class);
 
 	@Parameter(names = {"-d", "--dyads"}, description = "Dyad counts file", required = true, validateWith = ReadablePathValidator.class)
-	public WigFile dyadsFile;
+	public Path dyadsFile;
 	@Parameter(names = {"-s", "--smoothed"}, description = "Smoothed dyad counts file", required = true, validateWith = ReadablePathValidator.class)
-	public WigFile smoothedDyadsFile;
+	public Path smoothedDyadsFile;
 	@Parameter(names = {"-n", "--size"}, description = "Nucleosome size (bp)")
 	public int nucleosomeSize = 147;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
@@ -34,33 +35,32 @@ public class GreedyCaller extends CommandLineTool {
 	public void run() throws IOException {
 		int halfNuc = nucleosomeSize / 2;
 		int count = 0;
-		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+		try (WigFileReader dyadsReader = WigFileReader.autodetect(dyadsFile);
+				 WigFileReader smoothedDyadsReader = WigFileReader.autodetect(smoothedDyadsFile);
+				 IntervalFileWriter<NucleosomeCall> writer = new IntervalFileWriter<>(outputFile)) {
 			// Write header
-			writer.write("#chr\tstart\tstop\tlength\tlengthStdev\tdyad\tdyadStdev\tconditionalPosition\tdyadMean\toccupancy");
-			writer.newLine();
+			writer.writeComment("#chr\tstart\tstop\tlength\tlengthStdev\tdyad\tdyadStdev\tconditionalPosition\tdyadMean\toccupancy");
 			
-			for (String chr : smoothedDyadsFile.chromosomes()) {
+			for (String chr : smoothedDyadsReader.chromosomes()) {
 				log.debug("Processing chromosome "+chr);
-				int chunkStart = smoothedDyadsFile.getChrStart(chr);
-				int chrStop = smoothedDyadsFile.getChrStop(chr);
+				int chunkStart = smoothedDyadsReader.getChrStart(chr);
+				int chrStop = smoothedDyadsReader.getChrStop(chr);
 				while (chunkStart < chrStop) {
-					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, smoothedDyadsFile.getChrStop(chr));
+					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, smoothedDyadsReader.getChrStop(chr));
 					int paddedStart = Math.max(chunkStart-nucleosomeSize, 1);
-					int paddedStop = Math.min(chunkStop+nucleosomeSize, smoothedDyadsFile.getChrStop(chr));
+					int paddedStop = Math.min(chunkStop+nucleosomeSize, smoothedDyadsReader.getChrStop(chr));
 					log.debug("Processing chunk "+chunkStart+"-"+chunkStop);
 					
-					Iterator<WigItem> dyadsIter;
-					Iterator<WigItem> smoothedIter;
+					float[] dyads;
+					float[] smoothed;
 					try {
-						dyadsIter = dyadsFile.query(chr, paddedStart, paddedStop);
-						smoothedIter = smoothedDyadsFile.query(chr, paddedStart, paddedStop);
+						dyads = dyadsReader.query(chr, paddedStart, paddedStop).getValues();
+						smoothed = smoothedDyadsReader.query(chr, paddedStart, paddedStop).getValues();
 					} catch (IOException | WigFileException e) {
 						e.printStackTrace();
 						throw new CommandLineToolException("Error loading data from Wig file");
 					}
 					
-					float[] dyads = WigFile.flattenData(dyadsIter, paddedStart, paddedStop);
-					float[] smoothed = WigFile.flattenData(smoothedIter, paddedStart, paddedStop);
 					int[] sortedIndices = SortUtils.sortIndices(smoothed);
 
 					// Proceed through the data in descending order
@@ -104,8 +104,7 @@ public class GreedyCaller extends CommandLineTool {
 
 								// Only write nucleosomes within the current chunk to disk
 								if (chunkStart <= dyad && dyad <= chunkStop) {
-									writer.write(call.toString());
-									writer.newLine();
+									writer.write(call);
 									count++;
 								}
 								

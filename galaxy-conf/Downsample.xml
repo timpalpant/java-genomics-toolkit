@@ -16,6 +16,27 @@
       <data format="wig" name="output" metadata_source="input" />
   </outputs>
   
+  <tests>
+      <test>
+	    <param name="input" value="wigmath1.wig"/>
+	    <param name="window" value="1"/>
+	    <param name="metric" value="mean"/>
+	    <output name="output" file="downsample1.wig"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath2.bw"/>
+	    <param name="window" value="5"/>
+	    <param name="metric" value="max"/>
+	    <output name="output" file="downsample2.wig"/>
+	  </test>
+	  <test>
+	    <param name="input" value="wigmath3.wig"/>
+	    <param name="window" value="100"/>
+	    <param name="metric" value="total"/>
+	    <output name="output" file="downsample3.wig"/>
+	  </test>
+  </tests>
+  
   <help>
 
 This tool can be used to reduce the resolution and file size of Wig files for easier upload to UCSC. Data is downsampled in non-overlapping windows starting from the beginning of each chromosome. Each window can be downsampled as the mean, minimum, maximum, total, or coverage of the original data.

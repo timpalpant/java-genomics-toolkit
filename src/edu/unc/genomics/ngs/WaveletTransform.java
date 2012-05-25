@@ -7,27 +7,30 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.broad.igv.bbfile.WigItem;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.ReadablePathValidator;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.utils.ArrayScaler;
 
+/**
+ * This tool performs a Wavelet scaling analysis on data from a genomic interval
+ * @author timpalpant
+ *
+ */
 public class WaveletTransform extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(WaveletTransform.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true)
-	public WigFile inputFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-w", "--wavelet"}, description = "Orthonormal wavelet function (txt)", required = true, validateWith = ReadablePathValidator.class)
 	public Path waveletFile;
 	@Parameter(names = {"-c", "--chr"}, description = "Chromosome", required = true)
@@ -70,14 +73,14 @@ public class WaveletTransform extends CommandLineTool {
 		
 		// Get the data from the Wig file
 		log.debug("Loading Wig data");
-		Iterator<WigItem> result;
-		try {
-			result = inputFile.query(chr, start, stop);
+		float[] x;
+		try (WigFileReader wig = WigFileReader.autodetect(inputFile)) {
+			x = wig.query(chr, start, stop).getValues();
 		} catch (WigFileException e) {
+			log.error("Error retrieving data for interval from Wig file");
 			e.printStackTrace();
-			throw new CommandLineToolException("Error loading Wig data");
+			throw new CommandLineToolException("Error retrieving data for interval from Wig file");
 		}
-		float[] x = WigFile.flattenData(result, start, stop);
 		
 		// Validate that the parameters are sane
 		if (maxLength > x.length) {

@@ -1,35 +1,52 @@
 package edu.unc.genomics.wigmath;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.nio.file.Path;
 
-import org.broad.igv.bbfile.WigItem;
+import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Interval;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 
+/**
+ * Log-transform a (Big)Wig file
+ * @author timpalpant
+ *
+ */
 public class LogTransform extends WigMathTool {
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true)
-	public WigFile inputFile;
+	private static final Logger log = Logger.getLogger(LogTransform.class);
+	
+	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+	public Path inputFile;
 	@Parameter(names = {"-b", "--base"}, description = "Logarithm base (default = 2)")
 	public double base = 2;
 	
+	WigFileReader reader;
 	private double baseChange;
 
 	@Override
 	public void setup() {
 		baseChange = Math.log(base);
-		inputs.add(inputFile);
+		
+		try {
+			reader = WigFileReader.autodetect(inputFile);
+		} catch (IOException e) {
+			log.error("IOError opening Wig file");
+			e.printStackTrace();
+			throw new CommandLineToolException(e.getMessage());
+		}
+		inputs.add(reader);
 	}
 	
 	@Override
-	public float[] compute(String chr, int start, int stop) throws IOException, WigFileException {
-		Iterator<WigItem> data = inputFile.query(chr, start, stop);
-		float[] result = WigFile.flattenData(data, start, stop);
-		
+	public float[] compute(Interval chunk) throws IOException, WigFileException {
+		float[] result = reader.query(chunk).getValues();
 		for (int i = 0; i < result.length; i++) {
 			result[i] = (float) (Math.log(result[i]) / baseChange);
 		}

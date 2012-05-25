@@ -13,14 +13,23 @@ import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
-import edu.unc.genomics.io.IntervalFile;
+import edu.unc.genomics.ReadablePathValidator;
+import edu.unc.genomics.io.IntervalFileReader;
 
+/**
+ * Creates a heatmap matrix of sequencing read coverage separated by read length
+ * See Floer M, et al. (2010) A RSC/nucleosome complex determines chromatin architecture and facilitates activator binding. Cell 141: 407-418
+ * for examples.
+ * 
+ * @author timpalpant
+ *
+ */
 public class ReadLengthDistributionMatrix extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(ReadLengthDistributionMatrix.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (reads)", required = true)
-	public IntervalFile<? extends Interval> intervalFile;
+	@Parameter(names = {"-i", "--input"}, description = "Input file (reads)", required = true, validateWith = ReadablePathValidator.class)
+	public Path intervalFile;
 	@Parameter(names = {"-c", "--chr"}, description = "Chromosome", required = true)
 	public String chr;
 	@Parameter(names = {"-s", "--start"}, description = "Start base pair", required = true)
@@ -47,19 +56,21 @@ public class ReadLengthDistributionMatrix extends CommandLineTool {
 		
 		log.debug("Binning reads by genomic location and length");
 		int[][] counts = new int[histLength][regionLength];
-		Iterator<? extends Interval> reads = intervalFile.query(chr, start, stop);
 		int skipped = 0;
-		while (reads.hasNext()) {
-			Interval read = reads.next();
-			if (read.length() < min || read.length() > max) {
-				skipped++;
-				continue;
-			}
-			int bin = (read.length() - min) / binSize;
-			int intersectStart = Math.max(read.getStart(), start);
-			int intersectStop = Math.min(read.getStop(), stop);
-			for (int i = intersectStart; i <= intersectStop; i++) {
-				counts[bin][i-start]++;
+		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(intervalFile)) {
+			Iterator<? extends Interval> reads = reader.query(chr, start, stop);
+			while (reads.hasNext()) {
+				Interval read = reads.next();
+				if (read.length() < min || read.length() > max) {
+					skipped++;
+					continue;
+				}
+				int bin = (read.length() - min) / binSize;
+				int intersectStart = Math.max(read.getStart(), start);
+				int intersectStop = Math.min(read.getStop(), stop);
+				for (int i = intersectStart; i <= intersectStop; i++) {
+					counts[bin][i-start]++;
+				}
 			}
 		}
 		
@@ -81,8 +92,6 @@ public class ReadLengthDistributionMatrix extends CommandLineTool {
 				}
 			}
 		}
-		
-		intervalFile.close();
 	}
 	
 	public static void main(String[] args) {

@@ -17,10 +17,15 @@ import edu.unc.genomics.BedEntry;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.ReadablePathValidator;
-import edu.unc.genomics.io.BedFile;
-import edu.unc.genomics.io.WigFile;
+import edu.unc.genomics.io.BedFileReader;
+import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 
+/**
+ * Aggregate and average genomic signal for a set of aligned intervals
+ * @author timpalpant
+ *
+ */
 public class IntervalAverager extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(IntervalAverager.class);
@@ -32,7 +37,7 @@ public class IntervalAverager extends CommandLineTool {
 	@Parameter(names = {"-o", "--output"}, description = "Output file (matrix2png format)", required = true)
 	public Path outputFile;
 	
-	private List<WigFile> wigs = new ArrayList<>();
+	private List<WigFileReader> wigs = new ArrayList<>();
 	private int numFiles;
 	private List<BedEntry> loci;
 	
@@ -41,10 +46,10 @@ public class IntervalAverager extends CommandLineTool {
 		log.debug("Initializing input files");
 		for (String inputFile : inputFiles) {
 			try {
-				WigFile wig = WigFile.autodetect(Paths.get(inputFile));
+				WigFileReader wig = WigFileReader.autodetect(Paths.get(inputFile));
 				wigs.add(wig);
-			} catch (IOException | WigFileException e) {
-				log.error("Error initializing input Wig file: " + inputFile);
+			} catch (IOException e) {
+				log.error("IOError initializing input Wig file: " + inputFile);
 				e.printStackTrace();
 				throw new CommandLineToolException(e.getMessage());
 			}
@@ -53,7 +58,7 @@ public class IntervalAverager extends CommandLineTool {
 		log.debug("Initialized " + numFiles + " input files");
 		
 		log.debug("Loading alignment intervals");
-		try (BedFile bed = new BedFile(lociFile)) {
+		try (BedFileReader bed = new BedFileReader(lociFile)) {
 			loci = bed.loadAll();
 		}
 		
@@ -90,9 +95,9 @@ public class IntervalAverager extends CommandLineTool {
 			int n2 = alignmentPoint + Math.abs(entry.getValue().intValue()-entry.getStop());
 			
 			for (int i = 0; i < numFiles; i++) {
-				WigFile w = wigs.get(i);
+				WigFileReader w = wigs.get(i);
 				try {
-					float[] data = WigFile.flattenData(w.query(entry), entry.getStart(), entry.getStop());
+					float[] data = w.query(entry).getValues();
 					assert data.length == n2-n1+1;
 					for (int bp = n1; bp <= n2; bp++) {
 						if (!Float.isNaN(data[bp-n1]) && !Float.isInfinite(data[bp-n1])) {
@@ -101,7 +106,7 @@ public class IntervalAverager extends CommandLineTool {
 						}
 					}
 				} catch (WigFileException e) {
-					log.debug("Error getting data from wig file "+w.getPath().getFileName()+" for interval "+entry.toString());
+					log.debug("Error getting data from wig file "+w.getPath().getFileName()+" for interval "+entry);
 					skipped++;
 				}
 			}
@@ -127,7 +132,7 @@ public class IntervalAverager extends CommandLineTool {
 		try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			// Header
 			writer.write("Position");
-			for (WigFile w : wigs) {
+			for (WigFileReader w : wigs) {
 				writer.write("\t"+w.getPath().getFileName());
 			}
 			writer.newLine();
@@ -143,7 +148,7 @@ public class IntervalAverager extends CommandLineTool {
 		}
 		
 		// Close the input files
-		for (WigFile w : wigs) {
+		for (WigFileReader w : wigs) {
 			w.close();
 		}
 	}

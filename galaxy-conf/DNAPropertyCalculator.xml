@@ -85,12 +85,14 @@
     <test>
       <param name="genomeSource" value="history"/>
       <param name="ownFile" value="test.fasta"/>
+      <param name="property" value="Twist"/>
       <param name="N" value="false"/>
       <output name="output" file="twist.wig"/>
   	</test>
   	<test>
       <param name="genomeSource" value="history"/>
       <param name="ownFile" value="test.fasta"/>
+      <param name="property" value="Twist"/>
       <param name="N" value="true"/>
       <output name="output" file="twist.normalized.wig"/>
   	</test>

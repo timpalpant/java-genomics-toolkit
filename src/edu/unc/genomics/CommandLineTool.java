@@ -23,8 +23,6 @@ public abstract class CommandLineTool {
 		// Add factories for parsing Paths, Assemblies, IntervalFiles, and WigFiles
 		jc.addConverterFactory(new PathFactory());
 		jc.addConverterFactory(new AssemblyFactory());
-		jc.addConverterFactory(new IntervalFileFactory());
-		jc.addConverterFactory(new WigFileFactory());
 		
 		// Set the program name to be the class name
 		jc.setProgramName(this.getClass().getSimpleName());

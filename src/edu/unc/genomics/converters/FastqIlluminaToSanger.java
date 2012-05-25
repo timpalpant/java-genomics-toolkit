@@ -1,7 +1,7 @@
 package edu.unc.genomics.converters;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,26 +34,20 @@ public class FastqIlluminaToSanger extends CommandLineTool {
 	public void run() throws IOException {
 		int count = 0;
 		try (FastqReader reader = new FastqReader(inputFile.toFile());
-				 BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+				 PrintWriter writer = new PrintWriter(Files.newBufferedWriter(outputFile, Charset.defaultCharset()))) {
 			for (FastqRecord r : reader) {
-				writer.write("@");
-				writer.write(r.getReadHeader());
-				writer.newLine();
-				
-				writer.write(r.getReadString());
-				writer.newLine();
-				
-				writer.write("+");
-				writer.write(r.getBaseQualityHeader());
-				writer.newLine();
+				writer.print("@");
+				writer.println(r.getReadHeader());
+				writer.println(r.getReadString());
+				writer.print("+");
+				writer.println(r.getBaseQualityHeader());
 				
 				// Convert the quality score to Sanger format
 				char[] qual = r.getBaseQualityString().toCharArray();
 				for (int i = 0; i < qual.length; i++) {
 					qual[i] -= 31;
 				}
-				writer.write(qual);
-				writer.newLine();
+				writer.println(qual);
 				
 				count++;
 			}

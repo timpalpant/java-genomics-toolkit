@@ -17,6 +17,11 @@ import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.utils.RomanNumeral;
 
+/**
+ * Convert instances of "chr12" to "chrXII" in a text file, etc.
+ * @author timpalpant
+ *
+ */
 public class RomanNumeralize extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(RomanNumeralize.class);

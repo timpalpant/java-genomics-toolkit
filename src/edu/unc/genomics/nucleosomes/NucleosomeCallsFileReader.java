@@ -7,15 +7,16 @@ import net.sf.samtools.TabixWriter;
 import net.sf.samtools.TabixWriter.Conf;
 
 import edu.unc.genomics.IntervalFactory;
-import edu.unc.genomics.io.TextIntervalFile;
+import edu.unc.genomics.io.TextIntervalFileReader;
 
 /**
+ * Read nucleosome calls files
  * @author timpalpant
  *
  */
-public class NucleosomeCallsFile extends TextIntervalFile<NucleosomeCall> {
+public class NucleosomeCallsFileReader extends TextIntervalFileReader<NucleosomeCall> {
 
-	public NucleosomeCallsFile(Path p) throws IOException {
+	public NucleosomeCallsFileReader(Path p) throws IOException {
 		super(p, new NucleosomeCallFactory());
 	}
 	
