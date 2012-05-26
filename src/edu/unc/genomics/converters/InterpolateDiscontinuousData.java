@@ -64,6 +64,14 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
 		float[] result = wig.query(chunk).getValues();
 		
+		int nansbefore = 0;
+		for (float v : result) {
+			if (Float.isNaN(v)) {
+				nansbefore++;
+			}
+		}
+		log.debug("Chunk has "+nansbefore+" missing values before interpolation");
+		
 		// Special case: if the first or last value in this chunk is missing, 
 		// then we'll need to look further up/downstream to do the interpolation
 		// Find the first and last base pairs that have data
@@ -129,7 +137,7 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 			if (Float.isNaN(result[i])) {
 				int x0 = i-1;
 				while (Float.isNaN(result[++i]));
-				int x1 = i - 1;
+				int x1 = i;
 				if (x1-x0 <= max) {
 					doInterpolation(result, x0, x1, result[x0], result[x1]);
 				} else {
@@ -137,6 +145,14 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 				}
 			}
 		}
+		
+		int nansafter = 0;
+		for (float v : result) {
+			if (Float.isNaN(v)) {
+				nansafter++;
+			}
+		}
+		log.debug("Chunk has "+nansafter+" missing values after interpolation");
 		
 		return result;
 	}

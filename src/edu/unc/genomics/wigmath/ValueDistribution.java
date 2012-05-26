@@ -102,10 +102,10 @@ public class ValueDistribution extends CommandLineTool {
 		// Construct the output summary
 		StringBuilder sb = new StringBuilder();
 		sb.append("Moments:\tmean(w) = "+mean+"\n");
-		sb.append("\t\tvar(w) = " + stdev*stdev);
-		sb.append("\t\tskew(w) = " + skewness);
-		sb.append("\t\tkur(w) = " + kurtosis);
-		sb.append("Histogram:");
+		sb.append("\t\tvar(w) = " + stdev*stdev+"\n");
+		sb.append("\t\tskew(w) = " + skewness+"\n");
+		sb.append("\t\tkur(w) = " + kurtosis+"\n");
+		sb.append("Histogram:"+"\n");
 		sb.append(hist);
 		
 		if (outputFile != null) {
