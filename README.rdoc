@@ -8,6 +8,10 @@ Tools may be run from the command-line or from Galaxy (http://getgalaxy.org).
 
 This toolkit requires Java 7, available at http://www.oracle.com/technetwork/java/javase/downloads/index.html.
 
+== Available Tools
+
+For a list of available tools, see http://palpant.us/java-genomics-toolkit or search for java-genomics-toolkit in the Galaxy Tool Shed (http://toolshed.g2.bx.psu.edu) to see the tools in action.
+
 == Loading the Tools into Galaxy
 
 One-click installation is available for your local Galaxy instance through the Galaxy Tool Shed (http://toolshed.g2.bx.psu.edu).
