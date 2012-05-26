@@ -4,6 +4,8 @@ This is a collection of applications for genomics data processing, primarily hig
 
 All tools are designed to process data in pieces so that memory requirements never exceed ~1GB, regardless of genome size. Tools are intended to be modular, so that multiple tools can easily be strung together into ad hoc pipelines or workflows in Galaxy. For example, a common pipeline for our ChIP-seq experiments is: 1) map reads with bowtie, 2) calculate coverage of sequencing reads, 3) normalize by subtracting input, 4) Z-score the normalized coverage, 5) correlate replicates, 6) average multiple replicates, and 7) make a heatmap of the final result.
 
+http://palpant.us/java-genomics-toolkit/images/workflow.png
+
 Tools may be run from the command-line or from Galaxy (http://getgalaxy.org).
 
 This toolkit requires Java 7, available at http://www.oracle.com/technetwork/java/javase/downloads/index.html.
