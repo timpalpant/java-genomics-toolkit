@@ -1,4 +1,4 @@
-<tool id="PercusDecomposition" name="Derive Percus energy landscape" version="1.0.0">
+<tool id="PercusDecomposition" name="Derive Percus energy landscape" version="1.1.0">
   <description>from occupancy data</description>
   <command interpreter="sh">galaxyToolRunner.sh nucleosomes.PercusDecomposition -d $dyads -n $N -o $output</command>
   <inputs>

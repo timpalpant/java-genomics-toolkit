@@ -1,4 +1,4 @@
-package edu.unc.genomics.visualization;
+package edu.unc.genomics;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -9,7 +9,7 @@ import org.apache.commons.math3.stat.clustering.Clusterable;
  * @author timpalpant
  * Holds a row of data for the KMeans program
  */
-class KMeansRow implements Clusterable<KMeansRow>, Serializable {
+public class KMeansRow implements Clusterable<KMeansRow>, Serializable {
 
 	private static final long serialVersionUID = -323598431692368500L;
 	

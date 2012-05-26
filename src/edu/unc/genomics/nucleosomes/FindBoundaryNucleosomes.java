@@ -14,6 +14,8 @@ import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
+import edu.unc.genomics.NucleosomeCall;
+import edu.unc.genomics.NucleosomeCallsFileReader;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileReader;
 

@@ -9,9 +9,9 @@ import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.Interval;
+import edu.unc.genomics.WigMathTool;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.wigmath.WigMathTool;
 import edu.unc.genomics.ReadablePathValidator;
 
 /**

@@ -1,4 +1,4 @@
-<tool id="WigFindOutliers" name="Find outlier regions" version="1.0.0">
+<tool id="WigFindOutliers" name="Find outlier regions" version="1.1.0">
   <description>such as CNVs</description>
   <command interpreter="sh">galaxyToolRunner.sh ngs.FindOutlierRegions -i $input -w $window -t $threshold $below -o $output</command>
   <inputs>

@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.beust.jcommander.Parameter;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.NucleosomeCall;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileWriter;
 import edu.unc.genomics.io.WigFileReader;

@@ -1,4 +1,4 @@
-<tool id="WigScale" name="Scale" version="1.0.0">
+<tool id="WigScale" name="Scale" version="1.1.0">
   <description>a (Big)Wig file</description>
   <command interpreter="sh">galaxyToolRunner.sh wigmath.Scale -i $input -m $M -o $output</command>
   <inputs>

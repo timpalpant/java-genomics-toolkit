@@ -1,4 +1,4 @@
-<tool id="GeneTrackToWig" name="GeneTrack to Wig" version="1.0.0">
+<tool id="GeneTrackToWig" name="GeneTrack to Wig" version="1.1.0">
   <description>converter</description>
   <command interpreter="sh">galaxyToolRunner.sh converters.GeneTrackToWig -i $input -s $shift $zero -a ${chromInfo} -o $output</command>
   <inputs>

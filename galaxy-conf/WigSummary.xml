@@ -1,4 +1,4 @@
-<tool id="WigStats" name="Output a summary" version="1.0.0">
+<tool id="WigSummary" name="Output a summary" version="1.1.0">
   <description>of a (Big)Wig file</description>
   <command interpreter="sh">galaxyToolRunner.sh wigmath.WigSummary -i $input -o $output</command>
   <inputs>

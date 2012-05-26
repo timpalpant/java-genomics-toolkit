@@ -1,4 +1,4 @@
-<tool id="FindNuke" name="Find boundary nucleosomes" version="1.0.0">
+<tool id="FindNuke" name="Find boundary nucleosomes" version="2.0.0">
   <description>in windows</description>
   <command interpreter="sh">galaxyToolRunner.sh nucleosomes.FindBoundaryNucleosomes -i $input -l $loci -o $output</command>
   <inputs>

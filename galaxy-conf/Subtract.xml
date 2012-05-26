@@ -1,4 +1,4 @@
-<tool id="WigSubtract" name="Subtract" version="1.0.0">
+<tool id="WigSubtract" name="Subtract" version="1.1.0">
   <description>two (Big)Wig files</description>
   <command interpreter="sh">galaxyToolRunner.sh wigmath.Subtract -m $minuend -s $subtrahend -o $output</command>
   <inputs>

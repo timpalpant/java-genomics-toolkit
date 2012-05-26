@@ -1,4 +1,4 @@
-<tool id="WigDownsample" name="Downsample" version="1.0.0">
+<tool id="WigDownsample" name="Downsample" version="1.1.0">
   <description>a (Big)Wig file</description>
   <command interpreter="sh">galaxyToolRunner.sh wigmath.Downsample -i $input -m $metric -w $window -o $output</command>
   <inputs>

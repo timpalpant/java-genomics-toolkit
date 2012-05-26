@@ -1,4 +1,4 @@
-<tool id="DynaPro" name="Compute equilibrium nucleosome positions" version="1.0.0">
+<tool id="DynaPro" name="Compute equilibrium nucleosome positions" version="1.1.0">
   <description>using DynaPro</description>
   <command interpreter="sh">galaxyToolRunner.sh nucleosomes.DynaPro -i $input -n $N 
     #if str( $mean ) != ''

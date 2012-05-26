@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
+import edu.unc.genomics.KMeansRow;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileSnifferException;
 import edu.unc.genomics.io.WigFileException;

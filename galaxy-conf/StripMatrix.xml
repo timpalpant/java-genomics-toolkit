@@ -1,4 +1,4 @@
-<tool id="StripMatrix" name="Strip headers" version="1.0.0">
+<tool id="StripMatrix" name="Strip headers" version="1.1.0">
   <description>from an aligned matrix</description>
   <command interpreter="sh">galaxyToolRunner.sh visualization.StripMatrix -i $input -o $output</command>
   <inputs>

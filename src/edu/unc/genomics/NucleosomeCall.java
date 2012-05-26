@@ -1,4 +1,4 @@
-package edu.unc.genomics.nucleosomes;
+package edu.unc.genomics;
 
 import java.util.Comparator;
 

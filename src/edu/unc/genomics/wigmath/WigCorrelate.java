@@ -18,6 +18,7 @@ import com.beust.jcommander.Parameter;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.WigEntry;
+import edu.unc.genomics.WigMathTool;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.utils.FloatCorrelation;

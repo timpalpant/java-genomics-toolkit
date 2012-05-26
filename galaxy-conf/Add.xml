@@ -1,4 +1,4 @@
-<tool id="WigAdd" name="Add" version="1.0.0">
+<tool id="WigAdd" name="Add" version="1.1.0">
   <description>multiple (Big)Wig files</description>
   <command interpreter="sh">
     galaxyToolRunner.sh wigmath.Add -o $output

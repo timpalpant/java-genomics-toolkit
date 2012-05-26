@@ -1,4 +1,4 @@
-<tool id="CallNukes" name="Call Nucleosomes" version="1.0.0">
+<tool id="CallNukes" name="Call Nucleosomes" version="1.1.0">
   <description>in an MNase experiment</description>
   <command interpreter="sh">galaxyToolRunner.sh nucleosomes.GreedyCaller -d $dyads -s $smoothed -n $N -o $output</command>
   <inputs>

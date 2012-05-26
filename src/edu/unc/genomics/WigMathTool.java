@@ -1,4 +1,4 @@
-package edu.unc.genomics.wigmath;
+package edu.unc.genomics;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,8 +13,6 @@ import org.apache.log4j.Logger;
 import com.beust.jcommander.Parameter;
 
 import edu.ucsc.genome.TrackHeader;
-import edu.unc.genomics.CommandLineTool;
-import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.WigFileReader;
@@ -55,7 +53,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	
 	/**
 	 * Do the computation on a chunk and return the results
-	 * Must return interval.length() values (one for every base pair in chunk)
+	 * Must return chunk.length() values (one for every base pair in chunk)
 	 * 
 	 * @param chunk the interval to process
 	 * @return the results of the computation for this chunk
@@ -65,7 +63,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	public abstract float[] compute(Interval chunk) throws IOException, WigFileException;
 	
 	@Override
-	public void run() throws IOException {
+	public final void run() throws IOException {
 		log.debug("Executing setup operations");
 		setup();
 		
@@ -123,6 +121,12 @@ public abstract class WigMathTool extends CommandLineTool {
 		}
 	}
 	
+	/**
+	 * Gets the highest start base for a chromosome amongst all wigs
+	 * @param wigs a List of wig files
+	 * @param chr the chromosome to get the most conservative start base for
+	 * @return the highest start base amongst all of the Wig files in wigs
+	 */
 	public static int getMaxChrStart(List<WigFileReader> wigs, String chr) {
 		int max = -1;
 		for (WigFileReader wig : wigs) {
@@ -134,6 +138,12 @@ public abstract class WigMathTool extends CommandLineTool {
 		return max;
 	}
 	
+	/**
+	 * Gets the lowest stop base for a chromosome amongst all wigs
+	 * @param wigs a List of wig files
+	 * @param chr the chromosome to get the most conservative stop base for
+	 * @return the lowest stop base amongst all of the Wig files in wigs
+	 */
 	public static int getMinChrStop(List<WigFileReader> wigs, String chr) {
 		if (wigs.size() == 0) {
 			return -1;
