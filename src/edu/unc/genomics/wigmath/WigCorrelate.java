@@ -179,19 +179,21 @@ public class WigCorrelate extends CommandLineTool {
 				while (result.hasNext()) {
 					WigEntry item = result.next();
 					// Add this WigItem to the appropriate bins
-					int bin = item.low() / stepSize;
-					int binStart = bin*stepSize + 1;
-					while (binStart <= item.high()) {
-						int binEnd = binStart + windowSize - 1;
-						int intersectStart = Math.max(binStart, item.low());
-						int intersectStop = Math.min(binEnd, item.high());
-						int overlap = intersectStop - intersectStart + 1;
-						values[bin+binOffset] += overlap * item.getValue().floatValue();
-						counts[bin+binOffset] += overlap;
-						
-						// Move to the next bin
-						bin++;
-						binStart += stepSize;
+					if (!Float.isNaN(item.getValue().floatValue())) {
+						int bin = item.low() / stepSize;
+						int binStart = bin*stepSize + 1;
+						while (binStart <= item.high()) {
+							int binEnd = binStart + windowSize - 1;
+							int intersectStart = Math.max(binStart, item.low());
+							int intersectStop = Math.min(binEnd, item.high());
+							int overlap = intersectStop - intersectStart + 1;
+							values[bin+binOffset] += overlap * item.getValue().floatValue();
+							counts[bin+binOffset] += overlap;
+							
+							// Move to the next bin
+							bin++;
+							binStart += stepSize;
+						}
 					}
 				}
 			} catch (WigFileException | IOException e) {

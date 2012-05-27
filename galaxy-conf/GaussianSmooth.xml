@@ -9,48 +9,21 @@
       <data format="wig" name="output" metadata_source="input" />
   </outputs>
   <tests>
-    <!--<test>
-	    <param name="input" value="test.wig"/>
-	    <param name="dbkey" value="sacCer2"/>
+    <test>
+	    <param name="input" value="wigmath1.wig"/>
 	    <param name="S" value="20"/>
-	    <param name="W" value="3"/>
-	    <output name="output" file="smoother.output1"/>
+	    <output name="output" file="gaussian1.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="test.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <param name="S" value="20"/>
-	    <param name="W" value="3"/>
-	    <output name="output" file="smoother.output1"/>
+	    <param name="input" value="wigmath2.bw"/>
+	    <param name="S" value="3"/>
+	    <output name="output" file="gaussian2.wig"/>
 	  </test>
 	  <test>
-	    <param name="input" value="test.wig"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <param name="S" value="10"/>
-	    <param name="W" value="2"/>
-	    <output name="output" file="smoother.output2"/>
+	    <param name="input" value="wigmath3.wig"/>
+	    <param name="S" value="40"/>
+	    <output name="output" file="gaussian3.wig"/>
 	  </test>
-	  <test>
-	    <param name="input" value="test.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <param name="S" value="10"/>
-	    <param name="W" value="2"/>
-	    <output name="output" file="smoother.output2"/>
-	  </test>
-	  <test>
-	    <param name="input" value="test.wig"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <param name="S" value="50"/>
-	    <param name="W" value="1"/>
-	    <output name="output" file="smoother.output3"/>
-	  </test>
-	  <test>
-	    <param name="input" value="test.bw"/>
-	    <param name="dbkey" value="sacCer2"/>
-	    <param name="S" value="5"/>
-	    <param name="W" value="1"/>
-	    <output name="output" file="smoother.output3"/>
-	  </test>-->
   </tests>
   
 <help>

@@ -1,0 +1,7 @@
+track type=wiggle_0
+fixedStep chrom=2micron start=111 span=1 step=1
+NaN
+fixedStep chrom=chrI start=15 span=1 step=1
+NaN
+fixedStep chrom=chrXI start=148 span=1 step=1
+NaN

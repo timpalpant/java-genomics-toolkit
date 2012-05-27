@@ -8,6 +8,23 @@
   <outputs>
       <data format="tabular" name="output" />
   </outputs>
+  <tests>
+    <test>
+      <param name="input" value="test.bed"/>
+      <param name="freq" value="false"/>
+	    <output name="output" file="intervallengthdistribution1.txt"/>
+    </test>
+    <test>
+      <param name="input" value="test.bed"/>
+      <param name="freq" value="true"/>
+	    <output name="output" file="intervallengthdistribution2.txt"/>
+    </test>
+    <test>
+      <param name="input" value="test2.bed"/>
+      <param name="freq" value="false"/>
+	    <output name="output" file="intervallengthdistribution3.txt"/>
+    </test>
+  </tests>
   
 <help>
   
