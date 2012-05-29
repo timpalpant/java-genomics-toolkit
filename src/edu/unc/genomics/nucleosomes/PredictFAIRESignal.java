@@ -35,7 +35,7 @@ public class PredictFAIRESignal extends WigMathTool {
 	public Path sonicationFile;
 	@Parameter(names = {"-c", "--crosslinking"}, description = "FAIRE efficiency / crosslinking coefficient")
 	public float crosslink = 1;
-	@Parameter(names = {"-x", "--extend"}, description = "In silico read extension (bp)")
+	@Parameter(names = {"-x", "--extend"}, description = "In silico read extension (bp), -1 for paired-end")
 	public int extend = 250;
 
 	WigFileReader reader;
@@ -52,7 +52,7 @@ public class PredictFAIRESignal extends WigMathTool {
 			e.printStackTrace();
 			throw new CommandLineToolException(e.getMessage());
 		}
-		inputs.add(reader);
+		addInputFile(reader);
 		
 		log.debug("Loading sonication fragment length distribution");
 		double total = 0;
@@ -111,9 +111,26 @@ public class PredictFAIRESignal extends WigMathTool {
 			result[i] /= maxOcc;
 		}
 		
-		log.debug("Computing FAIRE prediction");
-		float[] watson = new float[result.length];
-		float[] crick = new float[result.length];
+		float[] prediction;
+		if (extend < 0) {
+			prediction = paired(chunk, result);
+		} else {
+			prediction = single(chunk, result);
+		}
+		
+		return prediction;
+	}
+	
+	/**
+	 * Single-end prediction, with artificial uniform extension
+	 * @param chunk
+	 * @param occ
+	 * @return
+	 */
+	private float[] single(Interval chunk, float[] occ) {
+		log.debug("Computing single-end FAIRE prediction");
+		float[] watson = new float[occ.length];
+		float[] crick = new float[occ.length];
 		// Consider all possible fragment lengths
 		for (int i = minL; i < sonication.length; i++) {
 			// No need to count if there are no fragments of this length
@@ -122,10 +139,10 @@ public class PredictFAIRESignal extends WigMathTool {
 			}
 			
 			// Starting at each base pair in the chunk
-			for (int j = 0; j < result.length-i; j++) {
+			for (int j = 0; j < occ.length-i; j++) {
 				// Calculate the probability that this fragment is occupied by a nucleosome
 				// using the inclusion-exclusion principle with nucleosome width = 147bp;
-				float pOccupied = InclusionExclusion.independent(result, j, j+i);
+				float pOccupied = InclusionExclusion.independent(occ, j, j+i);
 				// Calculate the probability that this fragment survives FAIRE
 				float pFAIRE = 1 - crosslink*pOccupied;
 				
@@ -135,9 +152,9 @@ public class PredictFAIRESignal extends WigMathTool {
 			}
 		}
 		
-		log.debug("Extending reads from the +/- strands");
+		log.debug("Calculating coverage (extending reads from the +/- strands)");
 		float[] prediction = new float[chunk.length()];
-		for (int i = 0; i < result.length; i++) {
+		for (int i = 0; i < occ.length; i++) {
 			for (int j = 0; j < extend; j++) {
 				// Extend on the + strand
 				if (i+j-maxL > 0 && i+j-maxL < prediction.length) {
@@ -151,6 +168,40 @@ public class PredictFAIRESignal extends WigMathTool {
 			}
 		}
 		
+		return prediction;
+	}
+	
+	/**
+	 * Paired-end, extend to the actual length of each fragment
+	 * @return
+	 */
+	private float[] paired(Interval chunk, float[] occ) {
+		log.debug("Computing paired-end FAIRE prediction");
+		float[] prediction = new float[chunk.length()];
+		// Consider all possible fragment lengths
+		for (int i = minL; i < sonication.length; i++) {
+			// No need to count if there are no fragments of this length
+			if (sonication[i] == 0) {
+				continue;
+			}
+			
+			// Starting at each base pair in the chunk
+			for (int j = 0; j < occ.length-i; j++) {
+				// Calculate the probability that this fragment is occupied by a nucleosome
+				// using the inclusion-exclusion principle with nucleosome width = 147bp;
+				float pOccupied = InclusionExclusion.independent(occ, j, j+i);
+				// Calculate the probability that this fragment survives FAIRE
+				float pFAIRE = 1 - crosslink*pOccupied;
+				
+				// Add its probability to the occupancy
+				for (int k = 0; k < i; k++) {
+					if (j+k < prediction.length) {
+						prediction[j+k] += sonication[i]*pFAIRE;
+					}
+				}
+			}
+		}
+			
 		return prediction;
 	}
 	

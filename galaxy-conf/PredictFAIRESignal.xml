@@ -5,7 +5,7 @@
       <param format="bigwig,wig" name="input" type="data" label="Nucleosome occupancy data" />
       <param format="tabular" name="sonication" type="data" label="Sonication fragment length distribution" />
       <param name="crosslinking" type="float" value="1.0" label="Crosslinking coefficient" />
-      <param name="extend" type="integer" value="250" label="In silico read extension (bp)" />
+      <param name="extend" type="integer" value="250" label="In silico read extension (-1 for paired-end mode)" />
   </inputs>
   <outputs>
       <data format="wig" name="output" metadata_source="input" />
