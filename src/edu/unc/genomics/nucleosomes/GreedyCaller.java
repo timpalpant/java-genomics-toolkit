@@ -47,8 +47,8 @@ public class GreedyCaller extends CommandLineTool {
 				int chunkStart = smoothedDyadsReader.getChrStart(chr);
 				int chrStop = smoothedDyadsReader.getChrStop(chr);
 				while (chunkStart < chrStop) {
-					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, smoothedDyadsReader.getChrStop(chr));
-					int paddedStart = Math.max(chunkStart-nucleosomeSize, 1);
+					int chunkStop = chunkStart+DEFAULT_CHUNK_SIZE-1;
+					int paddedStart = Math.max(chunkStart-nucleosomeSize, smoothedDyadsReader.getChrStart(chr));
 					int paddedStop = Math.min(chunkStop+nucleosomeSize, smoothedDyadsReader.getChrStop(chr));
 					log.debug("Processing chunk "+chunkStart+"-"+chunkStop);
 					
