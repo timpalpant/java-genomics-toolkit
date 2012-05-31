@@ -29,7 +29,7 @@ public class PredictFAIRESignal extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(PredictFAIRESignal.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input (nucleosome occupancy)", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-i", "--input"}, description = "Nucleosome occupancy (Wig)", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-s", "--sonication"}, description = "Sonication distribution", required = true, validateWith = ReadablePathValidator.class)
 	public Path sonicationFile;
