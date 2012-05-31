@@ -78,10 +78,11 @@ public abstract class WigMathTool extends CommandLineTool {
 	protected abstract float[] compute(Interval chunk) throws IOException, WigFileException;
 	
 	/**
-	 * Process a single chunk for this computation. Chunks must be independent so that
-	 * they can be spanned across multiple threads 
+	 * Process a single chunk for this computation and write the result to output. 
+	 * Chunks must be independent so that they can be spanned across multiple threads 
 	 * @param writer the writer to send the output for this chunk to
 	 * @param chunk the coordinates of the chunk that should be processed
+	 * @returns a Future representing this chunk's job in the executor queue
 	 */
 	private Future<?> processChunk(final WigFileWriter writer, final Interval chunk) {
 		return executor.submit(new Runnable() {

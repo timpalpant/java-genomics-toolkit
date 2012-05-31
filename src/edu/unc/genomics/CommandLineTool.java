@@ -1,8 +1,9 @@
 package edu.unc.genomics;
 
 import java.io.IOException;
+import java.util.Arrays;
 
-import net.sf.samtools.SAMFileReader;
+import org.apache.commons.lang3.StringUtils;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -13,20 +14,6 @@ import com.beust.jcommander.ParameterException;
  *
  */
 public abstract class CommandLineTool {
-	
-	/**
-	 * JCommander command-line argument parser
-	 */
-	private final JCommander jc = new JCommander(this);
-	
-	public CommandLineTool() {
-		// Add factories for parsing Paths, Assemblies, IntervalFiles, and WigFiles
-		jc.addConverterFactory(new PathFactory());
-		jc.addConverterFactory(new AssemblyFactory());
-		
-		// Set the program name to be the class name
-		jc.setProgramName(this.getClass().getSimpleName());
-	}
 	
 	/**
 	 * The default bite-size to use for applications that process files in chunks
@@ -46,31 +33,30 @@ public abstract class CommandLineTool {
 	 * @param args
 	 */
 	public void instanceMain(String[] args) throws CommandLineToolException {
+		// Initialize the command-line options parser
+		JCommander jc = new JCommander(this);
+		
+		// Add factories for parsing Paths, Assemblies, IntervalFiles, and WigFiles
+		jc.addConverterFactory(new PathFactory());
+		jc.addConverterFactory(new AssemblyFactory());
+		
+		// Set the program name to be the class name
+		String[] nameParts = getClass().getName().split("\\.");
+		String shortName = StringUtils.join(Arrays.copyOfRange(nameParts, nameParts.length-2, nameParts.length), '.');
+		jc.setProgramName(shortName);
+		
 		try {
-			toolRunnerMain(args);
+			jc.parse(args);
 		} catch (ParameterException e) {
 			System.err.println(e.getMessage());
 			jc.usage();
 			System.exit(-1);
 		}
-	}
-	
-	/**
-	 * Parse command-line arguments and run the tool
-	 * @param args
-	 * @throws ParameterException if there are invalid/missing parameters
-	 * @throws CommandLineToolException if an exception occurs while running the tool
-	 */
-	public void toolRunnerMain(String[] args) throws ParameterException, CommandLineToolException {
-		jc.parse(args);
-		
-		SAMFileReader.setDefaultValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
 		
 		try {
 			run();
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new CommandLineToolException("IO error while running tool");
+			throw new CommandLineToolException("IO error while running", e);
 		}
 	}
 }
