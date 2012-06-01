@@ -1,0 +1,28 @@
+<tool id="ExtractDataFromWig" name="Extract data from a Wig file" version="1.0.0">
+  <description>for a genomic interval</description>
+  <command interpreter="sh">
+  	galaxyToolRunner.sh ngs.ExtractDataFromRegion --chr $chr --start $start --stop $stop -o $output $file1
+  	  #for $input in $inputs
+        ${input.file}
+      #end for
+  </command>
+  <inputs>
+  	  <param name="file1" label="(Big)Wig file" type="data" format="bigwig,wig" />
+      <repeat name="inputs" title="(Big)Wig file">
+        <param name="file" type="data" format="bigwig,wig" />
+      </repeat>
+      <param format="wig,bigwig" name="input" type="data" label="(Big)Wig file" />
+      <param name="chr" type="text" label="Chromosome" />
+      <param name="start" type="integer" value="1" label="Start base pair" />
+      <param name="stop" type="integer" value="1000" label="Stop base pair" />
+  </inputs>
+  <outputs>
+      <data format="tabular" name="output" />
+  </outputs>
+  
+<help>
+  
+This tool will extract data from Wig or BigWig file(s) for a specific region of the genome.
+
+</help>
+</tool>
