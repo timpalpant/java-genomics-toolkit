@@ -11,7 +11,6 @@
       <repeat name="inputs" title="(Big)Wig file">
         <param name="file" type="data" format="bigwig,wig" />
       </repeat>
-      <param format="wig,bigwig" name="input" type="data" label="(Big)Wig file" />
       <param name="chr" type="text" label="Chromosome" />
       <param name="start" type="integer" value="1" label="Start base pair" />
       <param name="stop" type="integer" value="1000" label="Stop base pair" />
