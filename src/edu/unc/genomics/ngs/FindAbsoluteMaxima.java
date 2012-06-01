@@ -19,7 +19,6 @@ import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileReader;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.io.WigQueryResult;
 import edu.unc.utils.ArrayUtils;
 
 /**
@@ -65,8 +64,7 @@ public class FindAbsoluteMaxima extends CommandLineTool {
 				writer.write(interval.toBed());
 				for (WigFileReader wig : wigs) {
 					try {
-						WigQueryResult results = wig.query(interval);
-						float[] data = results.getValues();
+						float[] data = wig.query(interval).getValues();
 						int dir = interval.isWatson() ? 1 : -1;
 						int maxima = interval.getStart() + dir*ArrayUtils.maxIndex(data);
 						writer.write("\t" + maxima);

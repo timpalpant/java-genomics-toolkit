@@ -13,10 +13,10 @@ import com.beust.jcommander.Parameter;
 import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Contig;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.io.WigQueryResult;
 import edu.unc.utils.WigStatistic;
 
 /**
@@ -71,7 +71,7 @@ public class Downsample extends CommandLineTool {
 					
 					try {
 						// Get the original data for this window from the Wig file
-						WigQueryResult result = reader.query(chr, chunkStart, chunkStop);
+						Contig result = reader.query(chr, chunkStart, chunkStop);
 						// Do the downsampling
 						float value = Float.NaN;
 						switch (dsm) {

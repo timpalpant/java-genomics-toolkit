@@ -8,12 +8,12 @@ import org.apache.log4j.Logger;
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.WigMathTool;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.io.WigQueryResult;
 
 /**
  * Smooth a Wig file with a Gaussian filter
@@ -64,7 +64,7 @@ public class GaussianSmooth extends WigMathTool {
 		// Pad the query for smoothing
 		int paddedStart = Math.max(chunk.getStart()-3*stdev, reader.getChrStart(chunk.getChr()));
 		int paddedStop = Math.min(chunk.getStop()+3*stdev, reader.getChrStop(chunk.getChr()));
-		WigQueryResult result = reader.query(chunk.getChr(), paddedStart, paddedStop);
+		Contig result = reader.query(chunk.getChr(), paddedStart, paddedStop);
 		float[] data = result.get(chunk.getStart()-3*stdev, chunk.getStop()+3*stdev);
 		
 		// Convolve the data with the filter

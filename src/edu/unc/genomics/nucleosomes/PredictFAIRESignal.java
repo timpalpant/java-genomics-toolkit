@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.WigMathTool;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.io.WigQueryResult;
 import edu.unc.utils.InclusionExclusion;
 
 /**
@@ -48,9 +48,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		try {
 			reader = WigFileReader.autodetect(inputFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		addInputFile(reader);
 		
@@ -102,7 +100,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		int paddedStart = Math.max(chunk.getStart()-maxL, reader.getChrStart(chunk.getChr()));
 		int paddedStop = Math.min(chunk.getStop()+maxL, reader.getChrStop(chunk.getChr()));
 		
-		WigQueryResult data = reader.query(chunk.getChr(), paddedStart, paddedStop);
+		Contig data = reader.query(chunk.getChr(), paddedStart, paddedStop);
 		float[] result = data.get(chunk.getStart()-maxL, chunk.getStop()+maxL);
 		
 		// Scale the occupancy by the maximum occupancy so that it represents

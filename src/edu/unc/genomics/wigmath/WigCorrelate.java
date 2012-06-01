@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -17,7 +16,7 @@ import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.WigEntry;
+import edu.unc.genomics.Interval;
 import edu.unc.genomics.WigMathTool;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
@@ -174,31 +173,29 @@ public class WigCorrelate extends CommandLineTool {
 		int binOffset = 0;
 		for (int i = 0; i < chromosomes.size(); i++) {
 			String chr = chromosomes.get(i);
+			int start = chrStarts[i];
+			int stop = chrStops[i];
 			try {
-				Iterator<WigEntry> result = w.getOverlappingEntries(chr, w.getChrStart(chr), w.getChrStop(chr));
-				while (result.hasNext()) {
-					WigEntry item = result.next();
-					// Add this WigItem to the appropriate bins
-					if (!Float.isNaN(item.getValue().floatValue())) {
-						int bin = item.low() / stepSize;
-						int binStart = bin*stepSize + 1;
-						while (binStart <= item.high()) {
-							int binEnd = binStart + windowSize - 1;
-							int intersectStart = Math.max(binStart, item.low());
-							int intersectStop = Math.min(binEnd, item.high());
-							int overlap = intersectStop - intersectStart + 1;
-							values[bin+binOffset] += overlap * item.getValue().floatValue();
-							counts[bin+binOffset] += overlap;
-							
-							// Move to the next bin
-							bin++;
-							binStart += stepSize;
+				int chunkStart = start;
+				while (chunkStart <= stop) {
+					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, stop);
+					Interval chunk = new Interval(chr, chunkStart, chunkStop);
+					float[] result = w.query(chunk).getValues();
+
+					// Aggregate the results from this chunk in the appropriate bins
+					for (int j = 0; j < result.length; j++) {
+						if (!Float.isNaN(result[i])) {
+							int bin = (chunkStart+j) / stepSize;
+							values[bin+binOffset] += result[i];
+							counts[bin+binOffset]++;
 						}
 					}
+					
+					chunkStart = chunkStop + 1;
 				}
 			} catch (WigFileException | IOException e) {
 				log.error("Error getting data from wig file: "+w.getPath());
-				throw new CommandLineToolException(e.getMessage());
+				throw new CommandLineToolException(e);
 			}
 			
 			binOffset += nBins[i];

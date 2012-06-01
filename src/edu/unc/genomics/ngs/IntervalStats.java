@@ -15,12 +15,12 @@ import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileReader;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.io.WigQueryResult;
 import edu.unc.utils.WigStatistic;
 
 /**
@@ -75,7 +75,7 @@ public class IntervalStats extends CommandLineTool {
 				
 				for (WigFileReader wig : wigs) {
 					try {
-						WigQueryResult result = wig.query(interval);
+						Contig result = wig.query(interval);
 						float value = Float.NaN;
 						switch (s) {
 						case MEAN:

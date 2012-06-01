@@ -15,7 +15,6 @@ import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.IntervalFileReader;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
-import edu.unc.genomics.io.WigQueryResult;
 import edu.unc.utils.FFTUtils;
 
 import edu.unc.genomics.ReadablePathValidator;
@@ -54,9 +53,9 @@ public class Autocorrelation extends CommandLineTool {
 			log.debug("Computing autocorrelation for each window");
 			int skipped = 0;
 			for (Interval interval : loci) {				
-				WigQueryResult result;
+				float[] data;
 				try {
-					result = wig.query(interval);
+					data = wig.query(interval).getValues();
 				} catch (IOException | WigFileException e) {
 					log.debug("Skipping interval: " + interval.toString());
 					skipped++;
@@ -64,7 +63,6 @@ public class Autocorrelation extends CommandLineTool {
 				}
 				
 				// Compute the autocorrelation
-				float[] data = result.getValues();
 				float[] auto = FFTUtils.autocovariance(data, limit);
 	
 				// Write to output
