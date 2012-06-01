@@ -140,13 +140,12 @@ public abstract class WigMathTool extends CommandLineTool {
 			}
 			
 			log.debug("Waiting for all chunks to finish processing");
-			executor.shutdown();
-			executor.awaitTermination(30, TimeUnit.DAYS);
-			
 			// Check that all jobs completed without Exceptions
 			for (Future<?> future : jobs) {
 				future.get();
 			}
+			executor.shutdown();
+			executor.awaitTermination(30, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			executor.shutdownNow();
 			throw new CommandLineToolException("Interrupted while waiting for chunks to finish processing!", e);
