@@ -26,23 +26,21 @@ public class Shift extends WigMathTool {
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-m", "--mean"}, description = "New mean")
-	public double newMean = 0;
+	public float newMean = 0;
 	
 	WigFileReader reader;
-	double shift;
+	float shift;
 
 	@Override
 	public void setup() {
 		try {
 			reader = WigFileReader.autodetect(inputFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
 		
-		shift = newMean - reader.mean();
+		shift = (float) (newMean - reader.mean());
 		log.info("Shifting to mean: "+newMean);
 	}
 	

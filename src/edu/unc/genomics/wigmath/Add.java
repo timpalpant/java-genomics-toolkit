@@ -38,9 +38,7 @@ public class Add extends WigMathTool {
 			try {
 				addInputFile(WigFileReader.autodetect(Paths.get(inputFile)));
 			} catch (IOException e) {
-				log.error("IOError initializing input Wig file: " + inputFile);
-				e.printStackTrace();
-				throw new CommandLineToolException(e.getMessage());
+				throw new CommandLineToolException(e);
 			}
 		}
 		log.debug("Initialized " + inputs.size() + " input files");

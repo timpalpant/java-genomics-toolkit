@@ -35,9 +35,7 @@ public class Scale extends WigMathTool {
 		try {
 			reader = WigFileReader.autodetect(inputFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
 		

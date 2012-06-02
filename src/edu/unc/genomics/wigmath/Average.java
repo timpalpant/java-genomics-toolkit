@@ -26,8 +26,6 @@ public class Average extends WigMathTool {
 
 	@Parameter(description = "Input files", required = true)
 	public List<String> inputFiles = new ArrayList<String>();
-	
-	int numFiles;
 
 	@Override
 	public void setup() {

@@ -33,9 +33,7 @@ public class PercusDecomposition extends WigMathTool {
 	
 	private WigFileReader reader;
 	int halfNuc = 73;
-	DescriptiveStatistics percusStats;
-	DescriptiveStatistics occupancyStats;
-	double maxOcc = 0;
+	float maxOcc = 0;
 	
 	@Override
 	public void setup() {
@@ -50,9 +48,9 @@ public class PercusDecomposition extends WigMathTool {
 		halfNuc = nucleosomeSize / 2;
 		
 		log.debug("Initializing statistics");
-		percusStats = new DescriptiveStatistics();
+		DescriptiveStatistics percusStats = new DescriptiveStatistics();
 		percusStats.setWindowSize(nucleosomeSize);
-		occupancyStats = new DescriptiveStatistics();
+		DescriptiveStatistics occupancyStats = new DescriptiveStatistics();
 		occupancyStats.setWindowSize(nucleosomeSize);
 		
 		log.debug("Computing maximum genome-wide occupancy (normalization factor)");
@@ -75,7 +73,7 @@ public class PercusDecomposition extends WigMathTool {
 						
 						occupancyStats.addValue(data[i]);
 						if (occupancyStats.getSum() > maxOcc) {
-							maxOcc = occupancyStats.getSum();
+							maxOcc = (float) occupancyStats.getSum();
 						}
 					}
 				} catch (WigFileException | IOException e) {
@@ -92,9 +90,10 @@ public class PercusDecomposition extends WigMathTool {
 
 	@Override
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
-		// Reset sliding window stats
-		percusStats.clear();
-		occupancyStats.clear();
+		DescriptiveStatistics percusStats = new DescriptiveStatistics();
+		percusStats.setWindowSize(nucleosomeSize);
+		DescriptiveStatistics occupancyStats = new DescriptiveStatistics();
+		occupancyStats.setWindowSize(nucleosomeSize);
 		
 		// Pad the query with an additional nucleosome on either end
 		int paddedStart = Math.max(chunk.getStart()-nucleosomeSize, getMaxChrStart(inputs, chunk.getChr()));

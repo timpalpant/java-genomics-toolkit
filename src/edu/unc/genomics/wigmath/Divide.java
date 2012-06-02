@@ -36,9 +36,7 @@ public class Divide extends WigMathTool {
 			dividendReader = WigFileReader.autodetect(dividendFile);
 			divisorReader = WigFileReader.autodetect(divisorFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		inputs.add(dividendReader);
 		inputs.add(divisorReader);

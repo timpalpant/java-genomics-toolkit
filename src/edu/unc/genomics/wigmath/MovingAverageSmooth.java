@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
@@ -22,30 +21,21 @@ import edu.unc.genomics.io.WigFileException;
  */
 public class MovingAverageSmooth extends WigMathTool {
 
-	private static final Logger log = Logger.getLogger(MovingAverageSmooth.class);
-
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-w", "--width"}, description = "Width of kernel (bp)")
 	public int width = 10;
 	
 	WigFileReader reader;
-	DescriptiveStatistics stats;
 
 	@Override
 	public void setup() {
 		try {
 			reader = WigFileReader.autodetect(inputFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
-		
-		log.debug("Initializing statistics");
-		stats = new DescriptiveStatistics();
-		stats.setWindowSize(width);
 	}
 	
 	@Override
@@ -56,6 +46,8 @@ public class MovingAverageSmooth extends WigMathTool {
 		float[] data = reader.query(chunk.getChr(), queryStart, queryStop).getValues();
 		
 		float[] smoothed = new float[chunk.length()];
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		stats.setWindowSize(width);
 		for (int bp = chunk.getStart(); bp <= chunk.getStop(); bp++) {
 			stats.addValue(data[bp-queryStart]);
 			if (bp-chunk.getStart()-width/2 >= 0) {

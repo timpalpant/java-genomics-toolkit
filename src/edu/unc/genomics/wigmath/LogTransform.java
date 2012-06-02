@@ -3,8 +3,6 @@ package edu.unc.genomics.wigmath;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.apache.log4j.Logger;
-
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineToolException;
@@ -20,8 +18,6 @@ import edu.unc.genomics.io.WigFileException;
  *
  */
 public class LogTransform extends WigMathTool {
-
-	private static final Logger log = Logger.getLogger(LogTransform.class);
 	
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
@@ -38,9 +34,7 @@ public class LogTransform extends WigMathTool {
 		try {
 			reader = WigFileReader.autodetect(inputFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
 	}

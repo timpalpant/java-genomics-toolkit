@@ -39,7 +39,7 @@ public class PredictFAIRESignal extends WigMathTool {
 	public int extend = 250;
 
 	WigFileReader reader;
-	float[] sonication = new float[100];
+	volatile float[] sonication = new float[100];
 	int minL = Integer.MAX_VALUE, maxL = 0;
 	float maxOcc;
 	

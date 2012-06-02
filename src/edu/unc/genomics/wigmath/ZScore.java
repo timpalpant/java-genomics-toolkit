@@ -27,29 +27,25 @@ public class ZScore extends WigMathTool {
 	public Path inputFile;
 	
 	WigFileReader reader;
-	double mean;
-	double stdev;
+	float mean, stdev;
 
 	@Override
 	public void setup() {
 		try {
 			reader = WigFileReader.autodetect(inputFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
 		
-		mean = reader.mean();
-		stdev = reader.stdev();
+		mean = (float) reader.mean();
+		stdev = (float) reader.stdev();
 		if(stdev == 0) {
-			log.error("Cannot Z-score a file with stdev = 0!");
 			throw new CommandLineToolException("Cannot Z-score a file with stdev = 0!");
 		}
 		
-		log.info("Mean = "+((float)mean));
-		log.info("StDev = "+((float)stdev));
+		log.info("Mean = "+mean);
+		log.info("StDev = "+stdev);
 	}
 	
 	@Override

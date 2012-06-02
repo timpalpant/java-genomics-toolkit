@@ -37,9 +37,7 @@ public class Subtract extends WigMathTool {
 			minuendReader = WigFileReader.autodetect(minuendFile);
 			subtrahendReader = WigFileReader.autodetect(subtrahendFile);
 		} catch (IOException e) {
-			log.error("IOError opening Wig file");
-			e.printStackTrace();
-			throw new CommandLineToolException(e.getMessage());
+			throw new CommandLineToolException(e);
 		}
 		inputs.add(minuendReader);
 		inputs.add(subtrahendReader);
