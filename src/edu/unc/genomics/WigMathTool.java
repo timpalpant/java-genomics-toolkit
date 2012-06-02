@@ -7,11 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -42,8 +37,8 @@ public abstract class WigMathTool extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(WigMathTool.class);
 	
-	@Parameter(names = {"-p", "--threads"}, description = "Number of threads")
-	public int numThreads = 1;
+//	@Parameter(names = {"-p", "--threads"}, description = "Number of threads")
+//	public int numThreads = 1;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
 	
@@ -80,40 +75,40 @@ public abstract class WigMathTool extends CommandLineTool {
 	 * @param chunk the coordinates of the chunk that should be processed
 	 * @returns a Future representing this chunk's job in the executor queue
 	 */
-	private Runnable getRunnableForChunk(final WigFileWriter writer, final Interval chunk) {
-		return new Runnable() {
-			@Override
-			public void run() {
-				log.debug("Processing chunk "+chunk);
-				float[] result;
-				try {
-					result = compute(chunk);
-				} catch (WigFileException | IOException e) {
-					throw new CommandLineToolException("Exception while processing chunk "+chunk, e);
-				}
-				
-				// Verify that the computation returned the correct number of values for the chunk
-				if (result.length != chunk.length()) {
-					log.error("Expected result length="+chunk.length()+", got="+result.length);
-					throw new CommandLineToolException("Result of Wig computation is not the expected length!");
-				}
-
-				// Write the result of the computation for this chunk to disk
-				writer.write(new Contig(chunk, result));
-			}
-		};
-	}
+//	private Runnable getRunnableForChunk(final WigFileWriter writer, final Interval chunk) {
+//		return new Runnable() {
+//			@Override
+//			public void run() {
+//				log.debug("Processing chunk "+chunk);
+//				float[] result;
+//				try {
+//					result = compute(chunk);
+//				} catch (WigFileException | IOException e) {
+//					throw new CommandLineToolException("Exception while processing chunk "+chunk, e);
+//				}
+//				
+//				// Verify that the computation returned the correct number of values for the chunk
+//				if (result.length != chunk.length()) {
+//					log.error("Expected result length="+chunk.length()+", got="+result.length);
+//					throw new CommandLineToolException("Result of Wig computation is not the expected length!");
+//				}
+//
+//				// Write the result of the computation for this chunk to disk
+//				writer.write(new Contig(chunk, result));
+//			}
+//		};
+//	}
 	
 	@Override
 	public final void run() throws IOException {
 		log.debug("Executing setup operations");
 		setup();
 		
-		log.debug("Using "+numThreads+" threads");
-		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+//		log.debug("Using "+numThreads+" threads");
+//		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 		
 		log.debug("Processing files and writing result to disk");
-		List<Future<?>> jobs = new ArrayList<>();
+//		List<Future<?>> jobs = new ArrayList<>();
 		try (WigFileWriter writer = new WigFileWriter(outputFile, TrackHeader.newWiggle())) {
 			Set<String> chromosomes = getCommonChromosomes(inputs);
 			log.debug("Found " + chromosomes.size() + " chromosomes in common between all inputs");
@@ -128,7 +123,24 @@ public abstract class WigMathTool extends CommandLineTool {
 					int chunkStart = bp;
 					int chunkStop = Math.min(bp+DEFAULT_CHUNK_SIZE-1, stop);
 					Interval chunk = new Interval(chr, chunkStart, chunkStop);
-					jobs.add(executor.submit(getRunnableForChunk(writer, chunk)));
+//					jobs.add(executor.submit(getRunnableForChunk(writer, chunk)));
+					
+					log.debug("Processing chunk "+chunk);
+					float[] result;
+					try {
+						result = compute(chunk);
+					} catch (WigFileException | IOException e) {
+						throw new CommandLineToolException("Exception while processing chunk "+chunk, e);
+					}
+					
+					// Verify that the computation returned the correct number of values for the chunk
+					if (result.length != chunk.length()) {
+						log.error("Expected result length="+chunk.length()+", got="+result.length);
+						throw new CommandLineToolException("Result of Wig computation is not the expected length!");
+					}
+
+					// Write the result of the computation for this chunk to disk
+					writer.write(new Contig(chunk, result));
 					
 					// Move to the next chunk
 					bp = chunkStop + 1;
@@ -136,18 +148,18 @@ public abstract class WigMathTool extends CommandLineTool {
 			}
 			
 			// Check that all jobs completed without ExecutionExceptions
-			for (Future<?> f : jobs) {
-				f.get();
-			}
-			
-			executor.shutdown();
-			executor.awaitTermination(1, TimeUnit.HOURS);
-		} catch (InterruptedException e) {
-			executor.shutdownNow();
-			throw new CommandLineToolException("Interrupted while waiting for chunks to finish processing!", e);
-		} catch (ExecutionException e) {
-			executor.shutdownNow();
-			throw new CommandLineToolException("Exception occurred during chunk processing", e);
+//			for (Future<?> f : jobs) {
+//				f.get();
+//			}
+//			
+//			executor.shutdown();
+//			executor.awaitTermination(1, TimeUnit.HOURS);
+//		} catch (InterruptedException e) {
+//			executor.shutdownNow();
+//			throw new CommandLineToolException("Interrupted while waiting for chunks to finish processing!", e);
+//		} catch (ExecutionException e) {
+//			executor.shutdownNow();
+//			throw new CommandLineToolException("Exception occurred during chunk processing", e);
 		} finally {
 			close();
 		}
