@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -48,10 +48,6 @@ public abstract class WigMathTool extends CommandLineTool {
 	public Path outputFile;
 	
 	/**
-	 * Manages the thread pool for compute jobs
-	 */
-	private ExecutorService executor;
-	/**
 	 * Holds all of the input Wig files for this compute job. 
 	 * Used to find the intersecting set of chromosomes to process
 	 */
@@ -84,10 +80,10 @@ public abstract class WigMathTool extends CommandLineTool {
 	 * @param chunk the coordinates of the chunk that should be processed
 	 * @returns a Future representing this chunk's job in the executor queue
 	 */
-	private Callable<Boolean> processChunk(final WigFileWriter writer, final Interval chunk) {
-		return new Callable<Boolean>() {
+	private Runnable getRunnableForChunk(final WigFileWriter writer, final Interval chunk) {
+		return new Runnable() {
 			@Override
-			public Boolean call() {
+			public void run() {
 				log.debug("Processing chunk "+chunk);
 				float[] result;
 				try {
@@ -104,7 +100,6 @@ public abstract class WigMathTool extends CommandLineTool {
 
 				// Write the result of the computation for this chunk to disk
 				writer.write(new Contig(chunk, result));
-				return true;
 			}
 		};
 	}
@@ -115,10 +110,10 @@ public abstract class WigMathTool extends CommandLineTool {
 		setup();
 		
 		log.debug("Using "+numThreads+" threads");
-		executor = Executors.newFixedThreadPool(numThreads);
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 		
 		log.debug("Processing files and writing result to disk");
-		List<Callable<Boolean>> jobs = new ArrayList<>();
+		List<Future<?>> jobs = new ArrayList<>();
 		try (WigFileWriter writer = new WigFileWriter(outputFile, TrackHeader.newWiggle())) {
 			Set<String> chromosomes = getCommonChromosomes(inputs);
 			log.debug("Found " + chromosomes.size() + " chromosomes in common between all inputs");
@@ -133,24 +128,25 @@ public abstract class WigMathTool extends CommandLineTool {
 					int chunkStart = bp;
 					int chunkStop = Math.min(bp+DEFAULT_CHUNK_SIZE-1, stop);
 					Interval chunk = new Interval(chr, chunkStart, chunkStop);
-					jobs.add(processChunk(writer, chunk));
+					jobs.add(executor.submit(getRunnableForChunk(writer, chunk)));
 					
 					// Move to the next chunk
 					bp = chunkStop + 1;
 				}
 			}
 			
-			// Process all of the chunks with the thread pool manager
-			List<Future<Boolean>> futures = executor.invokeAll(jobs);
-			
 			// Check that all jobs completed without ExecutionExceptions
-			for (Future<Boolean> f : futures) {
+			for (Future<?> f : jobs) {
 				f.get();
 			}
+			
+			executor.shutdown();
+			executor.awaitTermination(1, TimeUnit.HOURS);
 		} catch (InterruptedException e) {
 			executor.shutdownNow();
 			throw new CommandLineToolException("Interrupted while waiting for chunks to finish processing!", e);
 		} catch (ExecutionException e) {
+			executor.shutdownNow();
 			throw new CommandLineToolException("Exception occurred during chunk processing", e);
 		} finally {
 			close();

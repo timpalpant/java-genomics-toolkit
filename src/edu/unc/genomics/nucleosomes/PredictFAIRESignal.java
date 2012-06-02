@@ -39,9 +39,9 @@ public class PredictFAIRESignal extends WigMathTool {
 	public int extend = 250;
 
 	WigFileReader reader;
-	double[] sonication = new double[100];
+	float[] sonication = new float[100];
 	int minL = Integer.MAX_VALUE, maxL = 0;
-	double maxOcc;
+	float maxOcc;
 	
 	@Override
 	public void setup() {
@@ -53,7 +53,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		addInputFile(reader);
 		
 		log.debug("Loading sonication fragment length distribution");
-		double total = 0;
+		float total = 0;
 		try(BufferedReader reader = Files.newBufferedReader(sonicationFile, Charset.defaultCharset())) {
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -63,7 +63,7 @@ public class PredictFAIRESignal extends WigMathTool {
 					throw new CommandLineToolException("Invalid format for sonication distribution file");
 				}
 				int length = Integer.parseInt(entry[0]);
-				double percent = Double.parseDouble(entry[1]);
+				float percent = Float.parseFloat(entry[1]);
 				// Expand the sonication distribution array if necessary
 				if (length >= sonication.length) {
 					sonication = Arrays.copyOf(sonication, Math.max(sonication.length+100, length+1));
@@ -92,7 +92,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		}
 		
 		// Store the maximum occupancy
-		maxOcc = reader.max();
+		maxOcc = (float) reader.max();
 	}
 	
 	@Override
@@ -126,7 +126,6 @@ public class PredictFAIRESignal extends WigMathTool {
 	 * @return
 	 */
 	private float[] single(Interval chunk, float[] occ) {
-		log.debug("Computing single-end FAIRE prediction");
 		float[] watson = new float[occ.length];
 		float[] crick = new float[occ.length];
 		// Consider all possible fragment lengths
@@ -144,7 +143,7 @@ public class PredictFAIRESignal extends WigMathTool {
 				// Calculate the probability that this fragment survives FAIRE
 				float pFAIRE = 1 - crosslink*pOccupied;
 				// And weight the probability by the sonication distribution
-				double pFragment = sonication[i]*pFAIRE;
+				float pFragment = sonication[i]*pFAIRE;
 				
 				// Add its probability at the +/- ends, weighted by fragment abundance
 				watson[j] += pFragment;
@@ -152,7 +151,6 @@ public class PredictFAIRESignal extends WigMathTool {
 			}
 		}
 		
-		log.debug("Calculating coverage (extending reads from the +/- strands)");
 		float[] prediction = new float[chunk.length()];
 		for (int i = 0; i < occ.length; i++) {
 			for (int j = 0; j < extend; j++) {
@@ -176,7 +174,6 @@ public class PredictFAIRESignal extends WigMathTool {
 	 * @return
 	 */
 	private float[] paired(Interval chunk, float[] occ) {
-		log.debug("Computing paired-end FAIRE prediction");
 		float[] prediction = new float[chunk.length()];
 		// Consider all possible fragment lengths
 		for (int i = minL; i < sonication.length; i++) {
@@ -193,7 +190,7 @@ public class PredictFAIRESignal extends WigMathTool {
 				// Calculate the probability that this fragment survives FAIRE
 				float pFAIRE = 1 - crosslink*pOccupied;
 				// And weight the probability by the sonication distribution
-				double pFragment = sonication[i]*pFAIRE;
+				float pFragment = sonication[i]*pFAIRE;
 				
 				// Add its probability to the occupancy
 				for (int k = 0; k < i; k++) {
