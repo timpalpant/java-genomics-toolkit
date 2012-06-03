@@ -1,9 +1,10 @@
-<tool id="WigScale" name="Scale" version="1.1.0">
+<tool id="WigScale" name="Scale" version="1.2.0">
   <description>a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.Scale -i $input -m $M -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.Scale -i $input -m $M $chr -o $output</command>
   <inputs>
     <param format="bigwig,wig" name="input" type="data" label="Scale the data in" />
     <param name="M" type="float" value="0" label="Multiply by (leave 0 to scale by 1/mean)" />
+    <param name="chr" type="boolean" checked="false" truevalue="-c" falsevalue="" label="Scale chromosomes to 1/mean individually (no effect if scale factor is specified)" />
   </inputs>
   <outputs>
     <data format="wig" name="output" metadata_source="input" />
@@ -49,7 +50,7 @@
   
   <help>
 
-This tool will multiply all values in a Wig file by a scalar. For example, this can be used to normalize to read depth by multiplying by 1/(# reads). By default, the tool will scale to 1/(mean value), which is equivalent to dividing by coverage and multiplying by the size of the genome. The resulting output file should have mean 1.
+This tool will multiply all values in a Wig file by a scale factor. For example, this can be used to normalize to read depth by multiplying by 1/(# reads). By default, the tool will scale to 1/(mean value), which is equivalent to dividing by coverage and multiplying by the size of the genome. The resulting output file should have mean 1.
     
 .. class:: infomark
 

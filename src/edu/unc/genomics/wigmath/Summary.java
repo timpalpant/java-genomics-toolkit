@@ -23,7 +23,7 @@ import edu.unc.genomics.ngs.Autocorrelation;
  * @author timpalpant
  *
  */
-public class WigSummary extends CommandLineTool {
+public class Summary extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(Autocorrelation.class);
 
@@ -48,7 +48,7 @@ public class WigSummary extends CommandLineTool {
 	}
 	
 	public static void main(String[] args) throws IOException, WigFileException {
-		new WigSummary().instanceMain(args);
+		new Summary().instanceMain(args);
 	}
 
 }

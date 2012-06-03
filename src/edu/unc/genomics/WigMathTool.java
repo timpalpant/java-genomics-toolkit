@@ -219,7 +219,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	 * @return the set of chromosomes held in common by all Wig files in wigs
 	 */
 	public static Set<String> getCommonChromosomes(List<WigFileReader> wigs) {
-		if (wigs.size() == 0) {
+		if (wigs == null || wigs.size() == 0) {
 			return new HashSet<String>();
 		}
 		

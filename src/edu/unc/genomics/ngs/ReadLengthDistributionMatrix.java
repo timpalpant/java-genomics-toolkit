@@ -2,6 +2,7 @@ package edu.unc.genomics.ngs;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,8 +43,10 @@ public class ReadLengthDistributionMatrix extends CommandLineTool {
 	public int max = 200;
 	@Parameter(names = {"-b", "--bin"}, description = "Bin size (bp)")
 	public int binSize = 1;
-	@Parameter(names = {"-o", "--output"}, description = "Output file (tabular)", required = true)
+	@Parameter(names = {"-o", "--output"}, description = "Matrix output file (tabular)", required = true)
 	public Path outputFile;
+	@Parameter(names = {"-p", "--pileup"}, description = "Pileup output file (tabular)")
+	public Path pileupFile;
 	
 	@Override
 	public void run() throws IOException {
@@ -56,6 +59,7 @@ public class ReadLengthDistributionMatrix extends CommandLineTool {
 		
 		log.debug("Binning reads by genomic location and length");
 		int[][] counts = new int[histLength][regionLength];
+		int[] pileup = new int[regionLength];
 		int skipped = 0;
 		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(intervalFile)) {
 			Iterator<? extends Interval> reads = reader.query(chr, start, stop);
@@ -70,6 +74,7 @@ public class ReadLengthDistributionMatrix extends CommandLineTool {
 				int intersectStop = Math.min(read.getStop(), stop);
 				for (int i = intersectStart; i <= intersectStop; i++) {
 					counts[bin][i-start]++;
+					pileup[i-start]++;
 				}
 			}
 		}
@@ -89,6 +94,18 @@ public class ReadLengthDistributionMatrix extends CommandLineTool {
 				writer.write(String.valueOf(min+i*binSize));
 				for (int j = 0; j < regionLength; j++) {
 					writer.write("\t"+counts[i][j]);
+				}
+			}
+		}
+		
+		// Write to output in DataGraph format
+		if (pileupFile != null) {
+			try (PrintWriter writer = new PrintWriter(Files.newBufferedWriter(pileupFile, Charset.defaultCharset()))) {
+				// Header line
+				writer.println("Pos\tValue");
+				
+				for (int i = 0; i < regionLength; i++) {
+					writer.println((start+i)+"\t"+pileup[i]);
 				}
 			}
 		}

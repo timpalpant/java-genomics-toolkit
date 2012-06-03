@@ -2,6 +2,8 @@ package edu.unc.genomics.wigmath;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -27,26 +29,37 @@ public class Shift extends WigMathTool {
 	public Path inputFile;
 	@Parameter(names = {"-m", "--mean"}, description = "New mean")
 	public float newMean = 0;
+	@Parameter(names = {"-c", "--chr"}, description = "Shift each chromosome individually")
+	public boolean byChromosome = false;
 	
 	WigFileReader reader;
-	float shift;
+	Map<String,Float> shifts = new HashMap<>();
 
 	@Override
 	public void setup() {
 		try {
-			reader = WigFileReader.autodetect(inputFile);
-		} catch (IOException e) {
+			reader = WigFileReader.autodetect(inputFile);	
+			for (String chr : reader.chromosomes()) {
+				float shift;
+				if (byChromosome) {
+					float chrMean = (float) reader.queryStats(chr, reader.getChrStart(chr), reader.getChrStop(chr)).getMean();
+					log.debug("Mean of "+chr+" = "+chrMean);
+					shift = newMean - chrMean;
+				} else {
+					shift = (float) (newMean - reader.mean());
+				}
+				shifts.put(chr, shift);
+			}
+		} catch (IOException | WigFileException e) {
 			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
-		
-		shift = (float) (newMean - reader.mean());
-		log.info("Shifting to mean: "+newMean);
 	}
 	
 	@Override
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
 		float[] result = reader.query(chunk).getValues();
+		float shift = shifts.get(chunk.getChr());
 		for (int i = 0; i < result.length; i++) {
 			result[i] += shift;
 		}

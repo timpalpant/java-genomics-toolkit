@@ -2,7 +2,10 @@ package edu.unc.genomics.wigmath;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
@@ -25,34 +28,49 @@ public class ZScore extends WigMathTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
+	@Parameter(names = {"-c", "--chr"}, description = "Z-score chromosomes individually")
+	public boolean byChromosome = false;
 	
 	WigFileReader reader;
-	float mean, stdev;
+	Map<String,Float> means = new HashMap<>();
+	Map<String,Float> stdevs = new HashMap<>();
 
 	@Override
 	public void setup() {
 		try {
 			reader = WigFileReader.autodetect(inputFile);
-		} catch (IOException e) {
+			for (String chr : reader.chromosomes()) {
+				float mean, stdev;
+				if (byChromosome) {
+					SummaryStatistics stats = reader.queryStats(chr, reader.getChrStart(chr), reader.getChrStop(chr));
+					mean = (float) stats.getMean();
+					stdev = (float) stats.getStandardDeviation();
+					log.debug("Z-scoring "+chr+" to chromosome mean = "+mean+", stdev = "+stdev);
+				} else {
+					mean = (float) reader.mean();
+					stdev = (float) reader.stdev();
+					log.debug("Z-scoring "+chr+" to global mean = "+mean+", stdev = "+stdev);
+				}
+				
+				if(stdev == 0) {
+					throw new CommandLineToolException("Cannot Z-score a file with stdev = 0!");
+				}
+				means.put(chr, mean);
+				stdevs.put(chr, stdev);
+			}
+		} catch (IOException | WigFileException e) {
 			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
-		
-		mean = (float) reader.mean();
-		stdev = (float) reader.stdev();
-		if(stdev == 0) {
-			throw new CommandLineToolException("Cannot Z-score a file with stdev = 0!");
-		}
-		
-		log.info("Mean = "+mean);
-		log.info("StDev = "+stdev);
 	}
 	
 	@Override
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
 		float[] result = reader.query(chunk).getValues();
+		float mean = means.get(chunk.getChr());
+		float stdev = stdevs.get(chunk.getChr());
 		for (int i = 0; i < result.length; i++) {
-			result[i] = (float)((result[i] - mean) / stdev);
+			result[i] = (result[i] - mean) / stdev;
 		}
 		
 		return result;

@@ -1,9 +1,10 @@
-<tool id="WigShift" name="Mean shift" version="1.1.0">
+<tool id="WigShift" name="Mean shift" version="1.2.0">
   <description>a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.Shift -i $input -m $M -o $output</command>
+  <command interpreter="sh">galaxyToolRunner.sh wigmath.Shift -i $input -m $M $chr -o $output</command>
   <inputs>
     <param format="bigwig,wig" name="input" type="data" label="Shift the data in" />
     <param name="M" type="float" value="0" label="To have mean" />
+    <param name="chr" type="boolean" checked="false" truevalue="-c" falsevalue="" label="Mean-shift chromosomes individually" />
   </inputs>
   <outputs>
     <data format="wig" name="output" metadata_source="input" />

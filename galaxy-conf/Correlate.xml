@@ -1,13 +1,15 @@
 <tool id="WigCorrelate" name="Correlate" version="1.1.0">
   <description>multiple (Big)Wig files</description>
   <command interpreter="sh">
-    galaxyToolRunner.sh wigmath.WigCorrelate -w $window -s $step -t $type -o $output
+    galaxyToolRunner.sh wigmath.Correlate -w $window -s $step -t $type -o $output $file1 $file2
       #for $input in $inputs
         ${input.file}
       #end for
   </command>
   <inputs>
-      <repeat name="inputs" title="(Big)Wig file">
+      <param name="file1" label="(Big)Wig file 1" type="data" format="bigwig,wig" />
+      <param name="file2" label="(Big)Wig file 2" type="data" format="bigwig,wig" />
+      <repeat name="inputs" title="Additional (Big)Wig file">
         <param name="file" type="data" format="bigwig,wig" />
       </repeat>
       <param name="window" type="integer" value="100" label="Window size (bp)" />

@@ -41,8 +41,8 @@
     <tool file="java-genomics-toolkit/galaxy-conf/Scale.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Shift.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Subtract.xml" />
-    <tool file="java-genomics-toolkit/galaxy-conf/WigCorrelate.xml" />
-    <tool file="java-genomics-toolkit/galaxy-conf/WigSummary.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/Correlate.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/Summary.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/ValueDistribution.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/ZScore.xml" />
   </section>

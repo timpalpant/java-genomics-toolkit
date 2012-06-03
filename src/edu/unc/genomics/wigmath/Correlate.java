@@ -27,9 +27,9 @@ import edu.unc.utils.FloatCorrelation;
  * @author timpalpant
  *
  */
-public class WigCorrelate extends CommandLineTool {
+public class Correlate extends CommandLineTool {
 
-	private static final Logger log = Logger.getLogger(WigCorrelate.class);
+	private static final Logger log = Logger.getLogger(Correlate.class);
 
 	@Parameter(description = "Input files", required = true)
 	public List<String> inputFiles = new ArrayList<String>();
@@ -184,7 +184,7 @@ public class WigCorrelate extends CommandLineTool {
 
 					// Aggregate the results from this chunk in the appropriate bins
 					for (int j = 0; j < result.length; j++) {
-						if (!Float.isNaN(result[i])) {
+						if (!Float.isNaN(result[j])) {
 							int bin = (chunkStart+j) / stepSize;
 							values[bin+binOffset] += result[i];
 							counts[bin+binOffset]++;
@@ -219,7 +219,7 @@ public class WigCorrelate extends CommandLineTool {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException, WigFileException {
-		new WigCorrelate().instanceMain(args);
+		new Correlate().instanceMain(args);
 	}
 	
 	public enum Correlation {
