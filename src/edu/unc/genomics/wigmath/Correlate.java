@@ -10,17 +10,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
+import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.WigMathTool;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.utils.FloatCorrelation;
+import edu.unc.utils.WigStatistic;
 
 /**
  * Correlate multiple (Big)Wig files
@@ -37,11 +40,14 @@ public class Correlate extends CommandLineTool {
 	public int windowSize = 100;
 	@Parameter(names = {"-s", "--step"}, description = "Sliding shift step (bp)")
 	public int stepSize = 50;
+	@Parameter(names = {"-m", "--metric"}, description = "Downsampling metric (coverage/total/mean/min/max)")
+	public String metric = "mean";
 	@Parameter(names = {"-t", "--type"}, description = "Correlation metric to use (pearson/spearman)")
 	public String type = "pearson";
 	@Parameter(names = {"-o", "--output"}, description = "Output file")
 	public Path outputFile;
 	
+	private WigStatistic dsm;
 	private Correlation corr;
 	private List<WigFileReader> wigs = new ArrayList<>();
 	private List<String> chromosomes;
@@ -53,6 +59,14 @@ public class Correlate extends CommandLineTool {
 	public void run() throws IOException {
 		if (inputFiles.size() < 2) {
 			throw new CommandLineToolException("Cannot correlate < 2 input files.");
+		}
+		
+		dsm = WigStatistic.fromName(metric);
+		if (dsm == null) {
+			log.error("Unknown downsampling metric: "+metric);
+			throw new CommandLineToolException("Unknown downsampling metric: "+metric+". Options are mean, min, max, coverage, total");
+		} else {
+			log.debug("Using downsampling metric: "+metric);
 		}
 		
 		corr = Correlation.fromName(type);
@@ -168,9 +182,8 @@ public class Correlate extends CommandLineTool {
 	 */
 	private float[] getDataVector(WigFileReader w) {
 		float[] values = new float[totalNumBins];
-		int[] counts = new int[totalNumBins];
-		
 		int binOffset = 0;
+		SummaryStatistics stats = new SummaryStatistics();
 		for (int i = 0; i < chromosomes.size(); i++) {
 			String chr = chromosomes.get(i);
 			int start = chrStarts[i];
@@ -179,17 +192,46 @@ public class Correlate extends CommandLineTool {
 				int chunkStart = start;
 				while (chunkStart <= stop) {
 					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, stop);
+					// Take bin-sized chunks
+					chunkStop = (chunkStop-chunkStart)/stepSize;
 					Interval chunk = new Interval(chr, chunkStart, chunkStop);
-					float[] result = w.query(chunk).getValues();
+					Contig result = w.query(chunk);
 
-					// Aggregate the results from this chunk in the appropriate bins
-					for (int j = 0; j < result.length; j++) {
-						if (!Float.isNaN(result[j])) {
-							int bin = (chunkStart+j) / stepSize;
-							values[bin+binOffset] += result[i];
-							counts[bin+binOffset]++;
+					// Aggregate the values from this chunk in the correct bins
+					int binIndex = (chunkStart-start) / stepSize;
+					int binStart, binStop;
+					do {
+						binStart = binIndex*stepSize + 1;
+						binStop = binStart + windowSize - 1;
+						
+						stats.clear();
+						for (int bp = binStart; bp <= binStop; bp++) {
+							float value = result.get(bp);
+							if (!Float.isNaN(value)) {
+								stats.addValue(value);
+							}
 						}
-					}
+						
+						switch (dsm) {
+						case COVERAGE:
+							values[binOffset+binIndex] = stats.getN();
+							break;
+						case TOTAL:
+							values[binOffset+binIndex] = (float) stats.getSum();
+							break;
+						case MEAN:
+							values[binOffset+binIndex] = (float) stats.getMean();
+							break;
+						case MIN:
+							values[binOffset+binIndex] = (float) stats.getMin();
+							break;
+						case MAX:
+							values[binOffset+binIndex] = (float) stats.getMax();
+							break;
+						}
+						
+						binIndex++;
+					} while (binStop <= chunkStop);
 					
 					chunkStart = chunkStop + 1;
 				}
@@ -199,15 +241,6 @@ public class Correlate extends CommandLineTool {
 			}
 			
 			binOffset += nBins[i];
-		}
-		
-		// Compute the average for each bin
-		for (int i = 0; i < totalNumBins; i++) {
-			if (counts[i] > 0) {
-				values[i] /= counts[i];
-			} else {
-				values[i] = Float.NaN;
-			}
 		}
 		
 		return values;

@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
@@ -13,7 +14,6 @@ import com.beust.jcommander.Parameter;
 import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.Contig;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
@@ -71,24 +71,24 @@ public class Downsample extends CommandLineTool {
 					
 					try {
 						// Get the original data for this window from the Wig file
-						Contig result = reader.query(chr, chunkStart, chunkStop);
+						SummaryStatistics result = reader.queryStats(chr, chunkStart, chunkStop);
 						// Do the downsampling
 						float value = Float.NaN;
 						switch (dsm) {
 						case COVERAGE:
-							value = result.coverage();
+							value = result.getN();
 							break;
 						case TOTAL:
-							value = result.total();
+							value = (float) result.getSum();
 							break;
 						case MEAN:
-							value = result.mean();
+							value = (float) result.getMean();
 							break;
 						case MIN:
-							value = result.min();
+							value = (float) result.getMin();
 							break;
 						case MAX:
-							value = result.max();
+							value = (float) result.getMax();
 							break;
 						}
 						// Write the downsampled value to the output file

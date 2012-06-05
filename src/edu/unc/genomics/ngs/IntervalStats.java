@@ -9,13 +9,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.CommandLineToolException;
-import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.io.IntervalFileReader;
@@ -75,23 +75,23 @@ public class IntervalStats extends CommandLineTool {
 				
 				for (WigFileReader wig : wigs) {
 					try {
-						Contig result = wig.query(interval);
+						SummaryStatistics result = wig.queryStats(interval);
 						float value = Float.NaN;
 						switch (s) {
 						case MEAN:
-							value = result.mean();
+							value = (float) result.getMean();
 							break;
 						case MIN:
-							value = result.min();
+							value = (float) result.getMin();
 							break;
 						case MAX:
-							value = result.max();
+							value = (float) result.getMax();
 							break;
 						case TOTAL:
-							value = result.total();
+							value = (float) result.getSum();
 							break;
 						case COVERAGE:
-							value = result.coverage();
+							value = result.getN();
 							break;
 						}
 						writer.write("\t" + value);
