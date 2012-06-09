@@ -56,7 +56,7 @@ public class NucleosomeCall extends ValuedInterval implements Comparable<Nucleos
 	
 	@Override
 	public String toOutput() {
-		return chr+"\t"+start+"\t"+stop+"\t"+length()+"\t"+lengthStdev+"\t"+dyad+"\t"+dyadStdev+"\t"+conditionalPosition+"\t"+dyadMean+"\t"+occupancy();
+		return getChr()+"\t"+getStart()+"\t"+getStop()+"\t"+length()+"\t"+lengthStdev+"\t"+dyad+"\t"+dyadStdev+"\t"+conditionalPosition+"\t"+dyadMean+"\t"+occupancy();
 	}
 
 	/**
