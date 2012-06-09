@@ -83,7 +83,7 @@ public class PredictFAIRESignal extends WigMathTool {
 			throw new CommandLineToolException("Error loading sonication fragment length distribution");
 		}
 		// Truncate the array to the minimum possible size
-		sonication = Arrays.copyOfRange(sonication, 0, maxL);
+		sonication = Arrays.copyOfRange(sonication, 0, maxL+1);
 		log.debug("Loaded sonication distribution for lengths: "+minL+"-"+maxL+"bp");
 		
 		// Normalize the sonication distribution so that it has total 1
@@ -129,7 +129,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		float[] watson = new float[occ.length];
 		float[] crick = new float[occ.length];
 		// Consider all possible fragment lengths
-		for (int i = minL; i < sonication.length; i++) {
+		for (int i = minL; i <= maxL; i++) {
 			// No need to count if there are no fragments of this length
 			if (sonication[i] == 0) {
 				continue;

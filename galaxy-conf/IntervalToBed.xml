@@ -1,0 +1,15 @@
+<tool id="IntervalToBed" name="SAM/BAM/GFF/BigBed to Bed" version="1.0.0">
+  <description>converter</description>
+  <command interpreter="sh">galaxyToolRunner.sh converters.IntervalToBed -i $input -o $output</command>
+  <inputs>
+      <param name="input" type="data" format="sam,bam,gff,bigbed" label="Input" />
+  </inputs>
+  <outputs>
+      <data name="output" format="bed" metadata_source="input" />
+  </outputs>
+<help>
+
+This tool will convert any file in SAM, BAM, GFF, or BigBed format to Bed format.
+
+</help>
+</tool>

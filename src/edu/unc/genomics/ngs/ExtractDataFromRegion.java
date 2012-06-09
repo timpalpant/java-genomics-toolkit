@@ -20,9 +20,7 @@ import edu.unc.genomics.io.WigFileException;
 import edu.unc.genomics.io.WigFileReader;
 
 /**
- * Creates a heatmap matrix of sequencing read coverage separated by read length
- * See Floer M, et al. (2010) A RSC/nucleosome complex determines chromatin architecture and facilitates activator binding. Cell 141: 407-418
- * for examples.
+ * Extracts the values from a (Big)Wig file for a given interval
  * 
  * @author timpalpant
  *
