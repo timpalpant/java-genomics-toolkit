@@ -21,7 +21,7 @@ public class IntervalToBed extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(IntervalToBed.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Bedgraph/SAM/BAM format)", required = true)
+	@Parameter(names = {"-i", "--input"}, description = "Input file (Bedgraph/BigBed/GFF/SAM/BAM format)", required = true)
 	public Path inputFile;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (Bed format)", required = true)
 	public Path outputFile;
