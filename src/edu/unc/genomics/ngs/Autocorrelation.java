@@ -39,8 +39,8 @@ public class Autocorrelation extends CommandLineTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
-	@Parameter(names = {"-l", "--loci"}, description = "Genomic loci (Bed format)", required = true)
-	public IntervalFileReader<? extends Interval> loci;
+	@Parameter(names = {"-l", "--loci"}, description = "Genomic loci (Bed format)", required = true, validateWith = ReadablePathValidator.class)
+	public Path lociFile;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
 	@Parameter(names = {"-m", "--max"}, description = "Autocorrelation limit (bp)")
@@ -49,7 +49,8 @@ public class Autocorrelation extends CommandLineTool {
 	@Override
 	public void run() throws IOException {
 		try (WigFileReader wig = WigFileReader.autodetect(inputFile);
-				BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+				 IntervalFileReader<? extends Interval> loci = IntervalFileReader.autodetect(lociFile);
+				 BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
 			log.debug("Computing autocorrelation for each window");
 			int skipped = 0;
 			for (Interval interval : loci) {				
