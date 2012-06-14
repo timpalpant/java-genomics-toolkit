@@ -58,8 +58,7 @@ public class GreedyCaller extends CommandLineTool {
 						dyads = dyadsReader.query(chr, paddedStart, paddedStop).getValues();
 						smoothed = smoothedDyadsReader.query(chr, paddedStart, paddedStop).getValues();
 					} catch (IOException | WigFileException e) {
-						e.printStackTrace();
-						throw new CommandLineToolException("Error loading data from Wig file");
+						throw new CommandLineToolException(e);
 					}
 					
 					int[] sortedIndices = SortUtils.sortIndices(smoothed);

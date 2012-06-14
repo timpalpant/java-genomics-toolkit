@@ -1,0 +1,18 @@
+<tool id="PairNukes" name="Pair nucleosomes" version="1.0.0">
+  <description>by overlap</description>
+  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.PairOverlappingNucleosomes -a $input1 -b $input2 -m $N -o $output</command>
+  <inputs>
+      <param name="input1" type="data" format="tabular" label="Nucleosome calls 1" />
+      <param name="input2" type="data" format="tabular" label="Nucleosome calls 2" />
+      <param name="N" type="integer" value="73" label="Minimum overlap (bp)" />
+  </inputs>
+  <outputs>
+      <data name="output" format="tabular" />
+  </outputs>
+  
+<help>
+  
+This tool will pair overlapping nucleosomes from two sets of nucleosome calls. In the event that multiple calls overlap, the one with the largest overlap is selected as a match.
+
+</help>
+</tool>

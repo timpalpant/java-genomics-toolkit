@@ -20,7 +20,7 @@ import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 
 /**
- * Attempt to predict FAIRE signal from nucleosome occupancy data using a simple probabilistic model
+ * Attempt to predict dinucleosome signal from mononucleosome data using a simple probabilistic model
  * @author timpalpant
  *
  */

@@ -1,15 +1,19 @@
-<tool id="IntervalToBed" name="SAM/BAM/GFF/BedGraph/BigBed to Bed" version="1.0.0">
+<tool id="IntervalToBed" name="SAM/BAM/GFF/BedGraph/BigBed/VCF to Bed" version="1.0.0">
   <description>converter</description>
   <command interpreter="sh">galaxyToolRunner.sh converters.IntervalToBed -i $input -o $output</command>
   <inputs>
-      <param name="input" type="data" format="sam,bam,gff,bigbed,bedgraph" label="Input" />
+      <param name="input" type="data" format="sam,bam,gff,bigbed,bedgraph,vcf" label="Input" />
   </inputs>
   <outputs>
       <data name="output" format="bed" metadata_source="input" />
   </outputs>
 <help>
 
-This tool will convert any file in SAM, BAM, GFF, BedGraph, or BigBed format to Bed format.
+This tool will convert any file in SAM, BAM, GFF, BedGraph, BigBed, or VCF format to Bed format.
+
+.. class:: warningmark
+	
+For SAM/BAM data, paired-end reads are converted to Bed format as the entire fragment (5' end of mate 1 to the 5' end of mate 2). Single-end reads are converted to Bed format as the read itself, with strand information. If your SAM/BAM file contains both mate alignments from a paired-end sequencing run (i.e. two entries for each fragment), you should first filter out reads from either the + or - strand with the SAM Tools -> Filter SAM tool to avoid producing redundant entries in the output Bed file.
 
 </help>
 </tool>

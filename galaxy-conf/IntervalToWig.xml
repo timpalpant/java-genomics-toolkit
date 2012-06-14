@@ -1,4 +1,4 @@
-<tool id="BedToWig" name="Interval to Wig" version="1.1.0">
+<tool id="BedToWig" name="Bed/BedGraph/GFF to Wig" version="1.1.0">
   <description>converter</description>
   <command interpreter="sh">galaxyToolRunner.sh converters.IntervalToWig -i $input $zero -a ${chromInfo} -o $output</command>
   <inputs>

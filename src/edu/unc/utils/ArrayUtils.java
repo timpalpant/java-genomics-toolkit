@@ -25,4 +25,20 @@ public class ArrayUtils {
 		
 		return maxIndex;
 	}
+	
+	public static float[] mapToFloat(int[] data) {
+		float[] ret = new float[data.length];
+		for (int i = 0; i < data.length; i++) {
+			ret[i] = data[i];
+		}
+		return ret;
+	}
+	
+	public static int[] mapToInt(float[] data) {
+		int[] ret = new int[data.length];
+		for (int i = 0; i < data.length; i++) {
+			ret[i] = (int) data[i];
+		}
+		return ret;
+	}
 }

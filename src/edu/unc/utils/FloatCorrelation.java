@@ -52,17 +52,10 @@ public class FloatCorrelation {
 		}
 		
 		// Compute the ranking of x and y
-		float[] rankX = mapToFloat(SortUtils.rank(x));
-		float[] rankY = mapToFloat(SortUtils.rank(y));
+		float[] rankX = ArrayUtils.mapToFloat(SortUtils.rank(x));
+		float[] rankY = ArrayUtils.mapToFloat(SortUtils.rank(y));
 		
 		return pearson(rankX, rankY);
 	}
 	
-	private static float[] mapToFloat(int[] data) {
-		float[] ret = new float[data.length];
-		for (int i = 0; i < data.length; i++) {
-			ret[i] = data[i];
-		}
-		return ret;
-	}
 }

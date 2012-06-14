@@ -18,7 +18,7 @@ import edu.unc.genomics.io.IntervalFileReader;
  */
 public class BaseAlignCounts extends ReadMapperTool {
 		
-	@Parameter(names = {"-x", "--extend"}, description = "Extend reads from 5' end (default = read length)")
+	@Parameter(names = {"-x", "--extend"}, description = "Extend reads from 5' end (default = fragment length)")
 	public Integer extend = -1;
 	
 	@Override

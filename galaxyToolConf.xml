@@ -16,6 +16,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/Phasogram.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/PercusDecomposition.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/DynaPro.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/PairOverlappingNucleosomes.xml" />
   </section>
   <section name="NGS" id="java-genomics-toolkit-ngs">
     <tool file="java-genomics-toolkit/galaxy-conf/Autocorrelation.xml" />
