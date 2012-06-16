@@ -37,6 +37,7 @@
     <tool file="java-genomics-toolkit/galaxy-conf/Downsample.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/FindOutlierRegions.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/GaussianSmooth.xml" />
+    <tool file="java-genomics-toolkit/galaxy-conf/JoinContigs.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/LogTransform.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/MovingAverageSmooth.xml" />
     <tool file="java-genomics-toolkit/galaxy-conf/Multiply.xml" />

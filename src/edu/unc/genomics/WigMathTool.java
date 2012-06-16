@@ -37,8 +37,6 @@ public abstract class WigMathTool extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(WigMathTool.class);
 	
-//	@Parameter(names = {"-p", "--threads"}, description = "Number of threads")
-//	public int numThreads = 1;
 	@Parameter(names = {"-f", "--fixedstep"}, description = "Force fixedStep output")
 	public boolean fixedStep = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
