@@ -39,6 +39,8 @@ public abstract class WigMathTool extends CommandLineTool {
 	
 //	@Parameter(names = {"-p", "--threads"}, description = "Number of threads")
 //	public int numThreads = 1;
+	@Parameter(names = {"-f", "--fixedstep"}, description = "Force fixedStep output")
+	public boolean fixedStep = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
 	
@@ -104,7 +106,11 @@ public abstract class WigMathTool extends CommandLineTool {
 					}
 
 					// Write the result of the computation for this chunk to disk
-					writer.write(new Contig(chunk, result));
+					if (fixedStep) {
+						writer.writeFixedStepContig(new Contig(chunk, result));
+					} else {
+						writer.write(new Contig(chunk, result));
+					}
 					
 					// Move to the next chunk
 					bp = chunkStop + 1;
