@@ -35,6 +35,8 @@ public abstract class ReadMapperTool extends CommandLineTool {
 	public Path intervalFile;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public Assembly assembly;
+	@Parameter(names = {"-f", "--fixedstep"}, description = "Force fixedStep output")
+	public boolean fixedStep = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
 	
@@ -79,7 +81,11 @@ public abstract class ReadMapperTool extends CommandLineTool {
 					}
 					
 					// Write the count at each base pair to the output file
-					writer.write(new Contig(chunk, result));
+					if (fixedStep) {
+						writer.writeFixedStepContig(new Contig(chunk, result));
+					} else {
+						writer.write(new Contig(chunk, result));
+					}
 					
 					// Process the next chunk
 					chunkStart = chunkStop + 1;
