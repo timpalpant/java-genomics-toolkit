@@ -75,10 +75,10 @@ public class GeneTrackToWig extends ReadMapperTool {
 			}
 		}
 		
-		// Calculate the average at each base pair in the chunk
+		// Put NaNs where there was no data
 		for (int i = 0; i < sum.length; i++) {
-			if (count[i] != 0 || !defaultZero) {
-				sum[i] /= count[i];
+			if (count[i] == 0 && !defaultZero) {
+				sum[i] = Float.NaN;
 			}
 		}
 		
