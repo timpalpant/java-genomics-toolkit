@@ -28,7 +28,7 @@ public class ZScore extends WigMathTool {
 
 	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
-	@Parameter(names = {"-c", "--chr"}, description = "Z-score chromosomes individually")
+	@Parameter(names = {"-b", "--bychr"}, description = "Z-score each chromosome individually")
 	public boolean byChromosome = false;
 	
 	WigFileReader reader;

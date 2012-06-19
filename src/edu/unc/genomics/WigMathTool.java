@@ -37,6 +37,8 @@ public abstract class WigMathTool extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(WigMathTool.class);
 	
+	@Parameter(names = {"-c", "--chunk"}, description = "Size to chunk each chromosome into when processing (bp)")
+	public int chunkSize = DEFAULT_CHUNK_SIZE;
 	@Parameter(names = {"-f", "--fixedstep"}, description = "Force fixedStep output")
 	public boolean fixedStep = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
@@ -86,7 +88,7 @@ public abstract class WigMathTool extends CommandLineTool {
 				int bp = start;
 				while (bp < stop) {
 					int chunkStart = bp;
-					int chunkStop = Math.min(bp+DEFAULT_CHUNK_SIZE-1, stop);
+					int chunkStop = Math.min(bp+chunkSize-1, stop);
 					Interval chunk = new Interval(chr, chunkStart, chunkStop);
 					
 					log.debug("Processing chunk "+chunk);

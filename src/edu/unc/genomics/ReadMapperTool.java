@@ -35,6 +35,8 @@ public abstract class ReadMapperTool extends CommandLineTool {
 	public Path intervalFile;
 	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
 	public Assembly assembly;
+	@Parameter(names = {"-c", "--chunk"}, description = "Size to chunk each chromosome into when processing (bp)")
+	public int chunkSize = DEFAULT_CHUNK_SIZE;
 	@Parameter(names = {"-f", "--fixedstep"}, description = "Force fixedStep output")
 	public boolean fixedStep = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
@@ -69,7 +71,7 @@ public abstract class ReadMapperTool extends CommandLineTool {
 				log.debug("Processing chromosome " + chr);
 				int chunkStart = 1;
 				while (chunkStart < assembly.getChrLength(chr)) {
-					int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, assembly.getChrLength(chr));
+					int chunkStop = Math.min(chunkStart+chunkSize-1, assembly.getChrLength(chr));
 					Interval chunk = new Interval(chr, chunkStart, chunkStop);
 					log.debug("Processing chunk "+chunk);
 					float[] result = compute(reader, chunk);

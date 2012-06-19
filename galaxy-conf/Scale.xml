@@ -4,7 +4,7 @@
   <inputs>
     <param format="bigwig,wig" name="input" type="data" label="Scale the data in" />
     <param name="M" type="float" value="0" label="Multiply by (leave 0 to scale by 1/mean)" />
-    <param name="chr" type="boolean" checked="false" truevalue="-c" falsevalue="" label="Scale chromosomes to 1/mean individually (no effect if scale factor is specified)" />
+    <param name="chr" type="boolean" checked="false" truevalue="--bychr" falsevalue="" label="Scale chromosomes to 1/mean individually (no effect if scale factor is specified)" />
   </inputs>
   <outputs>
     <data format="wig" name="output" metadata_source="input" />

@@ -3,7 +3,7 @@
   <command interpreter="sh">galaxyToolRunner.sh wigmath.ZScore -i $input $chr -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Z-score the data in" />
-      <param name="chr" type="boolean" checked="false" truevalue="-c" falsevalue="" label="Z-score chromosomes individually" />
+      <param name="chr" type="boolean" checked="false" truevalue="--bychr" falsevalue="" label="Z-score chromosomes individually" />
   </inputs>
   <outputs>
       <data format="wig" name="output" metadata_source="input" />

@@ -33,7 +33,7 @@ public class PredictFAIRESignal extends WigMathTool {
 	public Path inputFile;
 	@Parameter(names = {"-s", "--sonication"}, description = "Sonication distribution", required = true, validateWith = ReadablePathValidator.class)
 	public Path sonicationFile;
-	@Parameter(names = {"-c", "--crosslinking"}, description = "FAIRE efficiency / crosslinking coefficient")
+	@Parameter(names = {"-e", "--efficiency"}, description = "FAIRE efficiency / crosslinking coefficient")
 	public float crosslink = 1;
 	@Parameter(names = {"-x", "--extend"}, description = "In silico read extension (bp), -1 for paired-end")
 	public int extend = 250;

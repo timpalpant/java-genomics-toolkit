@@ -30,7 +30,7 @@ public class Scale extends WigMathTool {
 	public Path inputFile;
 	@Parameter(names = {"-m", "--multiplier"}, description = "Multiplier (scale factor, default = 1/mean)")
 	public Float multiplier;
-	@Parameter(names = {"-c", "--chr"}, description = "Scale to the mean of each chromosome")
+	@Parameter(names = {"-b", "--bychr"}, description = "Scale to the mean of each chromosome")
 	public boolean byChromosome = false;
 	
 	WigFileReader reader;

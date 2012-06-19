@@ -29,7 +29,7 @@ public class Shift extends WigMathTool {
 	public Path inputFile;
 	@Parameter(names = {"-m", "--mean"}, description = "New mean")
 	public float newMean = 0;
-	@Parameter(names = {"-c", "--chr"}, description = "Shift each chromosome individually")
+	@Parameter(names = {"-b", "--bychr"}, description = "Shift each chromosome individually")
 	public boolean byChromosome = false;
 	
 	WigFileReader reader;
