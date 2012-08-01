@@ -41,6 +41,8 @@ public abstract class ReadMapperTool extends CommandLineTool {
 	public boolean fixedStep = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
 	public Path outputFile;
+	@Parameter(names = {"-b", "--split"}, description = "Write each chromosome into its own output file")
+	public boolean split = false;
 	
 	/**
 	 * Do the computation on a chunk and return the results
@@ -59,40 +61,56 @@ public abstract class ReadMapperTool extends CommandLineTool {
 		TrackHeader header = TrackHeader.newWiggle();
 		header.setName("Processed " + intervalFile.getFileName());
 		header.setDescription("Processed " + intervalFile.getFileName());
-		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(intervalFile);
-				 WigFileWriter writer = new WigFileWriter(outputFile, header)) {
-			// Process each chromosome in the assembly
-			for (String chr : reader.chromosomes()) {
-				if (!assembly.includes(chr)) {
-					log.info("Skipping "+chr+" not in assembly "+assembly);
-					continue;
+		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(intervalFile)) {
+			if (split) {
+				for (String chr : reader.chromosomes()) {
+					// Construct a filename for this chromosome from the given output filename
+					String outputFileStr = outputFile.getFileName().toString();
+					String base = outputFileStr.substring(0, outputFileStr.lastIndexOf('.'));
+					String ext = outputFileStr.substring(outputFileStr.lastIndexOf('.'));
+					try (WigFileWriter writer = new WigFileWriter(outputFile.resolveSibling(base+"."+chr+ext), header)) {
+						processChromosome(reader, writer, chr);
+					}
 				}
-				
-				log.debug("Processing chromosome " + chr);
-				int chunkStart = 1;
-				while (chunkStart < assembly.getChrLength(chr)) {
-					int chunkStop = Math.min(chunkStart+chunkSize-1, assembly.getChrLength(chr));
-					Interval chunk = new Interval(chr, chunkStart, chunkStop);
-					log.debug("Processing chunk "+chunk);
-					float[] result = compute(reader, chunk);
-					
-					// Verify that the computation returned the correct number of values for the chunk
-					if (result.length != chunk.length()) {
-						log.error("Expected result length="+chunk.length()+", got="+result.length);
-						throw new CommandLineToolException("Result of mapping computation is not the expected length!");
+			} else {
+				try (WigFileWriter writer = new WigFileWriter(outputFile, header)) {
+					for (String chr : reader.chromosomes()) {
+						processChromosome(reader, writer, chr);
 					}
-					
-					// Write the count at each base pair to the output file
-					if (fixedStep) {
-						writer.writeFixedStepContig(new Contig(chunk, result));
-					} else {
-						writer.write(new Contig(chunk, result));
-					}
-					
-					// Process the next chunk
-					chunkStart = chunkStop + 1;
 				}
 			}
+		}
+	}
+
+	private void processChromosome(IntervalFileReader<? extends Interval> reader, WigFileWriter writer, String chr) throws IOException {
+		if (!assembly.includes(chr)) {
+			log.info("Skipping "+chr+" not in assembly "+assembly);
+			return;
+		}
+		
+		log.debug("Processing chromosome " + chr);
+		int chunkStart = 1;
+		while (chunkStart < assembly.getChrLength(chr)) {
+			int chunkStop = Math.min(chunkStart+chunkSize-1, assembly.getChrLength(chr));
+			Interval chunk = new Interval(chr, chunkStart, chunkStop);
+			log.debug("Processing chunk "+chunk);
+			float[] result = compute(reader, chunk);
+			
+			// Verify that the computation returned the correct number of values for the chunk
+			if (result.length != chunk.length()) {
+				log.error("Expected result length="+chunk.length()+", got="+result.length);
+				throw new CommandLineToolException("Result of mapping computation is not the expected length!");
+			}
+			
+			// Write the count at each base pair to the output file
+			if (fixedStep) {
+				writer.writeFixedStepContig(new Contig(chunk, result));
+			} else {
+				writer.write(new Contig(chunk, result));
+			}
+			
+			// Process the next chunk
+			chunkStart = chunkStop + 1;
 		}
 	}
 }
