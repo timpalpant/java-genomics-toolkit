@@ -124,7 +124,7 @@ public class MatrixAligner extends CommandLineTool {
 					skipped++;
 				} finally {
 					// Write to output
-					String id = ((entry.getId() == null) ? entry.getId() : "Row "+count);
+					String id = ((entry.getId() != null) ? entry.getId() : "Row "+count);
 					writer.write(id);
 					for (int i = leftBound; i <= rightBound; i++) {
 						writer.write("\t"+row[i]);
