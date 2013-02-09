@@ -111,6 +111,8 @@ public class PredictFAIRESignal extends WigMathTool {
 		occupancyStats.setWindowSize(nucSize);
 
 		log.debug("Computing maximum genome-wide occupancy (normalization factor)");
+		String maxOccChr = null;
+		int maxOccPos = 0;
 		for (String chr : reader.chromosomes()) {
 			occupancyStats.clear();
 
@@ -119,7 +121,7 @@ public class PredictFAIRESignal extends WigMathTool {
 			int stop = reader.getChrStop(chr);
 			while (bp <= stop) {
 				int chunkStart = bp;
-				int chunkStop = Math.min(chunkStart + DEFAULT_CHUNK_SIZE - 1, stop);
+				int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, stop);
 
 				try {
 					float[] data = reader.query(chr, chunkStart, chunkStop).getValues();
@@ -131,6 +133,8 @@ public class PredictFAIRESignal extends WigMathTool {
 						occupancyStats.addValue(data[i]);
 						if (occupancyStats.getSum() > maxOcc) {
 							maxOcc = (float) occupancyStats.getSum();
+							maxOccChr = chr;
+							maxOccPos = chunkStart + i - nucSize/2;
 						}
 					}
 				} catch (WigFileException | IOException e) {
@@ -142,7 +146,7 @@ public class PredictFAIRESignal extends WigMathTool {
 				bp = chunkStop + 1;
 			}
 		}
-		log.debug("Computed maximum genome-wide occupancy = " + maxOcc);
+		log.debug("Found maximum genome-wide occupancy = "+maxOcc+" at "+maxOccChr+":"+maxOccPos);
 	}
 
 	@Override
@@ -210,7 +214,7 @@ public class PredictFAIRESignal extends WigMathTool {
 				// weighted by the sonication distribution
 				float pFragment = sonication[l] * pFAIRE(x, l);
 				watson[x] += pFragment;
-				crick[x + l - 1] += pFragment;
+				crick[x+l-1] += pFragment;
 			}
 		}
 
@@ -219,13 +223,13 @@ public class PredictFAIRESignal extends WigMathTool {
 		for (int i = 0; i < pNuc.length; i++) {
 			for (int j = 0; j < extend; j++) {
 				// Extend on the + strand
-				if (i + j - maxL > 0 && i + j - maxL < prediction.length) {
-					prediction[i + j - maxL] += watson[i];
+				if (i+j-maxL > 0 && i+j-maxL < prediction.length) {
+					prediction[i+j-maxL] += watson[i];
 				}
 
 				// Extend on the - strand
-				if (i - j - maxL > 0 && i - j - maxL < prediction.length) {
-					prediction[i - j - maxL] += crick[i];
+				if (i-j-maxL > 0 && i-j-maxL < prediction.length) {
+					prediction[i-j-maxL] += crick[i];
 				}
 			}
 		}
@@ -248,15 +252,15 @@ public class PredictFAIRESignal extends WigMathTool {
 			}
 
 			// Starting at each base pair in the chunk
-			for (int x = maxL - l; x < pNuc.length - maxL; x++) {
+			for (int x = maxL-l; x < pNuc.length-maxL; x++) {
 				// Calculate the probability that this fragment survives FAIRE
 				// and add its probability to the prediction,
 				// weighted by the sonication distribution
 				float pFragment = sonication[l] * pFAIRE(x, l);
-				for (int k = 0; k < l; k++) {
-					if (x - maxL + k > 0 && x - maxL + k < prediction.length) {
-						prediction[x - maxL + k] += pFragment;
-					}
+				int start = Math.max(x-maxL, 0);
+				int stop = Math.min(x-maxL+l, prediction.length);
+				for (int k = start; k < stop; k++) {
+					prediction[k] += pFragment;
 				}
 			}
 		}
@@ -271,6 +275,14 @@ public class PredictFAIRESignal extends WigMathTool {
 	private float pFAIRE(int x, int l) {
 		return 1 - crosslink * pOcc(x, l);
 	}
+	
+	/**
+	 * The probability that a fragment of length l, starting at x,
+	 * is occupied by n nucleosomes
+	 */
+	//private float pOcc(int x, int l, int n) {
+		
+	//a}
 
 	/**
 	 * The probability that a fragment of length l, starting at x, is occupied
@@ -292,7 +304,7 @@ public class PredictFAIRESignal extends WigMathTool {
 		if (l <= 0) {
 			float p = 0;
 			// log.debug("x = "+x+", l = "+l);
-			for (int i = x - nucSize / 2; i < x + l + nucSize / 2; i++) {
+			for (int i = x-nucSize/2; i < x+l+nucSize/2; i++) {
 				p += pNuc[i];
 			}
 			return p;
@@ -309,10 +321,9 @@ public class PredictFAIRESignal extends WigMathTool {
 		float p1 = pOcc[x];
 
 		// 2. Is the fragment starting at x+N with length l-N occupied? Recurse
-		float p2 = pOcc(x + nucSize, l - nucSize);
+		float p2 = pOcc(x+nucSize, l-nucSize);
 
-		// 1 and 2. What is the probability that there is a nucleosome in
-		// [x-N/2,x+N/2)
+		// 1 and 2. What is the probability that there is a nucleosome in [x-N/2,x+N/2)
 		// AND the fragment starting at x+N with length l-N is occupied?
 		// Break it down by each mutually exclusive x+j case, for j \in
 		// [-N/2,N/2)
@@ -320,8 +331,8 @@ public class PredictFAIRESignal extends WigMathTool {
 		if (pAndCache.isCached(x, l)) {
 			p1Andp2 = pAndCache.getCache(x, l);
 		} else {
-			for (int j = -nucSize / 2; j < nucSize / 2; j++) {
-				p1Andp2 += pNuc[x + j] * pOcc(x + j + nucSize, l - j - nucSize);
+			for (int j = -nucSize/2; j < nucSize/2; j++) {
+				p1Andp2 += pNuc[x+j] * pOcc(x+j+nucSize, l-j-nucSize);
 			}
 			pAndCache.setCache(x, l, p1Andp2);
 		}

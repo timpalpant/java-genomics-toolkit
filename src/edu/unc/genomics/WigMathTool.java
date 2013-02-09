@@ -94,7 +94,6 @@ public abstract class WigMathTool extends CommandLineTool {
 			for (String chr : chromosomes) {
 				int start = getMaxChrStart(inputs, chr);
 				int stop = getMinChrStop(inputs, chr);
-				log.debug("Queueing chromosome " + chr + " region " + start + "-" + stop);
 				
 				// Process the chromosome in chunks
 				int bp = start;
@@ -102,7 +101,6 @@ public abstract class WigMathTool extends CommandLineTool {
 					int chunkStart = bp;
 					int chunkStop = Math.min(bp+chunkSize-1, stop);
 					final Interval chunk = new Interval(chr, chunkStart, chunkStop);
-					log.debug("Queueing chunk "+chunk);
 					
 					pool.submit(new Runnable() {
 
