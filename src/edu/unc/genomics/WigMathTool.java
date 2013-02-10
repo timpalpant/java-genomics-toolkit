@@ -7,8 +7,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -88,6 +90,7 @@ public abstract class WigMathTool extends CommandLineTool {
 		pool = Executors.newFixedThreadPool(nThreads);
 		
 		log.debug("Processing files and writing result to disk");
+		List<Future<?>> futures = new ArrayList<>();
 		try (WigFileWriter writer = new WigFileWriter(outputFile, TrackHeader.newWiggle())) {
 			Set<String> chromosomes = getCommonChromosomes(inputs);
 			log.debug("Found " + chromosomes.size() + " chromosomes in common between all inputs");
@@ -102,15 +105,15 @@ public abstract class WigMathTool extends CommandLineTool {
 					int chunkStop = Math.min(bp+chunkSize-1, stop);
 					final Interval chunk = new Interval(chr, chunkStart, chunkStop);
 					
-					pool.submit(new Runnable() {
+					Future<?> future = pool.submit(new Runnable() {
 
-                        @Override
-                        public void run() {
+                      @Override
+                       public void run() {
                         	log.debug("Processing chunk "+chunk);
                         	float[] result;
         					try {
         						result = compute(chunk);
-        					} catch (WigFileException | IOException e) {
+        					} catch (Exception e) {
         						throw new CommandLineToolException("Exception while processing chunk "+chunk, e);
         					}
         					
@@ -130,17 +133,19 @@ public abstract class WigMathTool extends CommandLineTool {
 					  
 					});
 					
+					futures.add(future);
+					
 					// Move to the next chunk
 					bp = chunkStop + 1;
 				}
 			}
 			
-			pool.shutdown();
-			try {
-				pool.awaitTermination(10, TimeUnit.DAYS);
-			} catch (InterruptedException e) {
-				throw new CommandLineToolException(e);
+			for (Future<?> f : futures) {
+				f.get();
 			}
+		} catch (InterruptedException | ExecutionException e) {
+			pool.shutdownNow();
+			throw new CommandLineToolException(e);
 		} finally {
 			close();
 		}
