@@ -28,6 +28,8 @@ public class GaussianSmooth extends WigMathTool {
 	public Path inputFile;
 	@Parameter(names = {"-s", "--stdev"}, description = "Standard deviation of Gaussian (bp)")
 	public int stdev = 20;
+	@Parameter(names = {"-w", "--window"}, description = "Kernel width in (+/-) standard deviations")
+	public int windowWidth = 3;
 	
 	WigFileReader reader;
 	float[] filter;
@@ -43,7 +45,7 @@ public class GaussianSmooth extends WigMathTool {
 		
 		// Use a window size equal to +/- 3 SD's
 		log.debug("Initializing Gaussian filter");
-		filter = new float[6*stdev+1];
+		filter = new float[2*windowWidth*stdev+1];
 		float sum = 0;
 		for (int i = 0; i < filter.length; i++) {
 			float x = i - 3*stdev;
@@ -60,10 +62,10 @@ public class GaussianSmooth extends WigMathTool {
 	@Override
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
 		// Pad the query for smoothing
-		int paddedStart = Math.max(chunk.getStart()-3*stdev, reader.getChrStart(chunk.getChr()));
-		int paddedStop = Math.min(chunk.getStop()+3*stdev, reader.getChrStop(chunk.getChr()));
+		int paddedStart = Math.max(chunk.getStart()-windowWidth*stdev, reader.getChrStart(chunk.getChr()));
+		int paddedStop = Math.min(chunk.getStop()+windowWidth*stdev, reader.getChrStop(chunk.getChr()));
 		Contig result = reader.query(chunk.getChr(), paddedStart, paddedStop);
-		float[] data = result.get(chunk.getStart()-3*stdev, chunk.getStop()+3*stdev);
+		float[] data = result.get(chunk.getStart()-windowWidth*stdev, chunk.getStop()+windowWidth*stdev);
 		
 		// Convolve the data with the filter
 		float[] smoothed = new float[chunk.length()];

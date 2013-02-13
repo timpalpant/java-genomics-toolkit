@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -48,7 +47,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	public int nThreads = 1;
 	@Parameter(names = { "-f", "--fixedstep" }, description = "Force fixedStep output")
 	public boolean fixedStep = false;
-	@Parameter(names = { "-o", "--output" }, description = "Output file", required = true)
+	@Parameter(names = { "-o", "--output" }, description = "Output Wig file", required = true)
 	public Path outputFile;
 
 	private ExecutorService pool;
@@ -86,7 +85,7 @@ public abstract class WigMathTool extends CommandLineTool {
 		log.debug("Executing setup operations");
 		setup();
 		
-		log.debug("Initializing thread pool");
+		log.debug("Initializing thread pool with "+nThreads+" threads");
 		pool = Executors.newFixedThreadPool(nThreads);
 		
 		log.debug("Processing files and writing result to disk");
@@ -105,9 +104,9 @@ public abstract class WigMathTool extends CommandLineTool {
 					int chunkStop = Math.min(bp+chunkSize-1, stop);
 					final Interval chunk = new Interval(chr, chunkStart, chunkStop);
 					
-					Future<?> future = pool.submit(new Runnable() {
+					futures.add(pool.submit(new Runnable() {
 
-                      @Override
+                       @Override
                        public void run() {
                         	log.debug("Processing chunk "+chunk);
                         	float[] result;
@@ -124,16 +123,15 @@ public abstract class WigMathTool extends CommandLineTool {
         					}
 
         					// Write the result of the computation for this chunk to disk
+        					Contig outputContig = new Contig(chunk, result);
         					if (fixedStep) {
-        						writer.writeFixedStepContig(new Contig(chunk, result));
+        						writer.writeFixedStepContig(outputContig);
         					} else {
-        						writer.write(new Contig(chunk, result));
+        						writer.write(outputContig);
         					}
                         }
 					  
-					});
-					
-					futures.add(future);
+					}));
 					
 					// Move to the next chunk
 					bp = chunkStop + 1;
@@ -144,9 +142,9 @@ public abstract class WigMathTool extends CommandLineTool {
 				f.get();
 			}
 		} catch (InterruptedException | ExecutionException e) {
-			pool.shutdownNow();
 			throw new CommandLineToolException(e);
 		} finally {
+			pool.shutdownNow();
 			close();
 		}
 	}

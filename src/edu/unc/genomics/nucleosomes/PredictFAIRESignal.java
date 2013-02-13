@@ -17,6 +17,7 @@ import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
 import edu.unc.genomics.WigMathTool;
+import edu.unc.genomics.io.WigFileFormatException;
 import edu.unc.genomics.io.WigFileReader;
 import edu.unc.genomics.io.WigFileException;
 import edu.unc.utils.FAIREModel;
@@ -41,28 +42,20 @@ public class PredictFAIRESignal extends WigMathTool {
 	@Parameter(names = { "-e", "--efficiency" }, description = "FAIRE crosslinking efficiency [0,1]")
 	public float crosslink = 1;
 	@Parameter(names = { "-x", "--extend" }, description = "Single-end read extension (bp); -1 for paired-end")
-	public int extend = 250;
+	public int extend = -1;
 	@Parameter(names = { "-n", "--nuc-size" }, description = "Nucleosome size (bp)")
 	public int nucSize = 147;
 
 	WigFileReader reader;
 	float[] sonication = new float[100];
-	int minL = Integer.MAX_VALUE, maxL = 0;
-	DescriptiveStatistics occupancyStats = new DescriptiveStatistics();
 	float maxOcc;
 
-	@Override
-	public void setup() {
-		try {
-			reader = WigFileReader.autodetect(inputFile);
-		} catch (IOException e) {
-			throw new CommandLineToolException(e);
-		}
-		addInputFile(reader);
-
+	public static float[] loadSonication(Path s) {
 		log.debug("Loading sonication fragment length distribution");
+		float[] sonication = new float[100];
+		int maxL = 0;
 		float total = 0;
-		try (BufferedReader reader = Files.newBufferedReader(sonicationFile, Charset.defaultCharset())) {
+		try (BufferedReader reader = Files.newBufferedReader(s, Charset.defaultCharset())) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				// Parse the line
@@ -75,10 +68,7 @@ public class PredictFAIRESignal extends WigMathTool {
 				float percent = Float.parseFloat(entry[1]);
 				// Expand the sonication distribution array if necessary
 				if (length >= sonication.length) {
-					sonication = Arrays.copyOf(sonication, Math.max(sonication.length + 100, length + 1));
-				}
-				if (length < minL) {
-					minL = length;
+					sonication = Arrays.copyOf(sonication, Math.max(sonication.length+100, length+1));
 				}
 				if (length > maxL) {
 					maxL = length;
@@ -91,73 +81,81 @@ public class PredictFAIRESignal extends WigMathTool {
 			e.printStackTrace();
 			throw new CommandLineToolException("Error loading sonication fragment length distribution");
 		}
-		log.debug("Longest fragment = "+maxL);
-		if (maxL < extend) {
-			maxL = extend;
-		}
-		// We need an additional nucSize/2 overhang
-		maxL += nucSize / 2;
+		
+		log.debug("Longest fragment length: "+maxL+"bp");
 		// Truncate the array to the minimum possible size
-		sonication = Arrays.copyOfRange(sonication, 0, maxL + 1);
-		log.debug("Loaded sonication distribution for lengths: " + minL + "-" + maxL + "bp");
+		sonication = Arrays.copyOfRange(sonication, 0, maxL+1);
 
 		// Normalize the sonication distribution so that it has total 1
 		for (int i = 0; i < sonication.length; i++) {
 			sonication[i] /= total;
 		}
-
-		// Calculate the maximum dyad density in any nucleosome-sized window
-		// (i.e. maximum occupancy), for normalization
-		// so that the dyad counts represent probabilities
-		log.debug("Initializing statistics");
+		
+		return sonication;
+	}
+	
+	/**
+	 * Calculate the maximum dyad density in any nucleosome-sized window
+	 * (i.e. maximum occupancy), for normalization
+	 * so that the dyad counts represent probabilities
+	 * @throws IOException 
+	 * @throws WigFileFormatException 
+	 * @throws WigFileException 
+	 */
+	public static float getMaxOccupancy(WigFileReader reader, int nucSize) 
+			throws WigFileFormatException, IOException, WigFileException {
+		log.debug("Computing maximum genome-wide occupancy");
+		DescriptiveStatistics occupancyStats = new DescriptiveStatistics();
 		occupancyStats.setWindowSize(nucSize);
 
-		log.debug("Computing maximum genome-wide occupancy (normalization factor)");
+		float maxOcc = 0;
 		String maxOccChr = null;
 		int maxOccPos = 0;
 		for (String chr : reader.chromosomes()) {
 			occupancyStats.clear();
 
 			// Walk the chromosome while keeping track of occupancy
-			int bp = reader.getChrStart(chr);
+			int start = reader.getChrStart(chr);
 			int stop = reader.getChrStop(chr);
-			while (bp <= stop) {
-				int chunkStart = bp;
-				int chunkStop = Math.min(chunkStart+DEFAULT_CHUNK_SIZE-1, stop);
-
-				try {
-					float[] data = reader.query(chr, chunkStart, chunkStop).getValues();
-					for (int i = 0; i < data.length; i++) {
-						if (Float.isNaN(data[i])) {
-							data[i] = 0;
-						}
-
-						occupancyStats.addValue(data[i]);
-						if (occupancyStats.getSum() > maxOcc) {
-							maxOcc = (float) occupancyStats.getSum();
-							maxOccChr = chr;
-							maxOccPos = chunkStart + i - nucSize/2;
-						}
-					}
-				} catch (WigFileException | IOException e) {
-					log.error("Error getting data from input Wig file");
-					e.printStackTrace();
-					throw new CommandLineToolException("Error getting data from input Wig file");
+			float[] data = reader.query(chr, start, stop).getValues();
+			for (int i = 0; i < data.length; i++) {
+				if (Float.isNaN(data[i])) {
+					data[i] = 0;
 				}
 
-				bp = chunkStop + 1;
+				occupancyStats.addValue(data[i]);
+				if (occupancyStats.getSum() > maxOcc) {
+					maxOcc = (float) occupancyStats.getSum();
+					maxOccChr = chr;
+					maxOccPos = i - nucSize/2;
+				}
 			}
 		}
+		
 		log.debug("Found maximum genome-wide occupancy = "+maxOcc+" at "+maxOccChr+":"+maxOccPos);
+		return maxOcc;
+	}
+	
+	@Override
+	public void setup() {
+		try {
+			reader = WigFileReader.autodetect(inputFile);
+			maxOcc = getMaxOccupancy(reader, nucSize);
+		} catch (IOException | WigFileFormatException | WigFileException e) {
+			throw new CommandLineToolException(e);
+		}
+		addInputFile(reader);
+
+		sonication = loadSonication(sonicationFile);
 	}
 
 	@Override
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
-		int paddedStart = Math.max(chunk.getStart() - maxL, reader.getChrStart(chunk.getChr()));
-		int paddedStop = Math.min(chunk.getStop() + maxL, reader.getChrStop(chunk.getChr()));
+		int paddedStart = Math.max(chunk.getStart()-sonication.length, reader.getChrStart(chunk.getChr()));
+		int paddedStop = Math.min(chunk.getStop()+sonication.length, reader.getChrStop(chunk.getChr()));
 
 		Contig data = reader.query(chunk.getChr(), paddedStart, paddedStop);
-		float[] pNuc = data.get(chunk.getStart() - maxL, chunk.getStop() + maxL);
+		float[] pNuc = data.get(chunk.getStart()-sonication.length, chunk.getStop()+sonication.length);
 		// Scale the dyad density by the maximum occupancy so that it represents
 		// the probability that a nucleosome is positioned at that base pair
 		// You should probably remove outliers (esp. CNVs) first
@@ -166,11 +164,14 @@ public class PredictFAIRESignal extends WigMathTool {
 		}
 		
 		FAIREModel model = new FAIREModel(pNuc, sonication, nucSize, crosslink);
+		float[] prediction;
 		if (extend > 0) {
-			return model.singleEnd(extend);
+			prediction = model.singleEnd(extend);
 		} else {
-			return model.pairedEnd();
+			prediction = model.pairedEnd();
 		}
+		
+		return Arrays.copyOfRange(prediction, sonication.length, prediction.length-sonication.length);
 	}
 
 	/**

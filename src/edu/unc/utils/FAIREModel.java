@@ -12,47 +12,64 @@ public class FAIREModel {
 	
 	private static final Logger log = Logger.getLogger(FAIREModel.class);
 	
+	// Everything is final because changes would invalidate the caches
 	private final float[] pNuc;
 	private final float[] sonication;
 	private final float crosslink;
 	private final int maxL, nucSize, maxNucs;
-	private final Cache pOccCache, pAndCache, pNCache;
+	private final Cache pOccXLNCache, pOccXLCache, pExtractedDNA, pFAIRECache;
 
+	/**
+	 * Model FAIRE signal from nucleosome maps
+	 * 
+	 * pNuc must be normalized so that the sum of any adjacent nucSize base pairs is <= 1 
+	 * (nucleosomes cannot overlap)
+	 * 
+	 * sonication must be normalized so that the total == 1
+	 * 
+	 * The model requires 2 * sonication.length overhang on each end, so the returned results
+	 * will have length pNuc.length - 2*sonication.length + 1
+	 */
 	public FAIREModel(final float[] pNuc, final float[] sonication, final int nucSize, final float crosslink) {
 		this.pNuc = pNuc;
 		this.sonication = sonication;
-		this.nucSize = nucSize;
 		if (nucSize <= 0) {
 			throw new IllegalArgumentException("Nucleosome size must be > 0");
 		}
-		if (crosslink < 0 || crosslink > 1) {
-			throw new IllegalArgumentException("Crosslinking coefficient must be in [0,1]");
-		}
+		this.nucSize = nucSize;
 		maxL = sonication.length;
 		maxNucs = maxL/nucSize + 1; // +1 because of the overhang
 		log.debug("Maximum number of nucleosomes that will fit on a fragment = "+maxNucs);
+		if (crosslink < 0 || crosslink > 1) {
+			throw new IllegalArgumentException("Crosslinking coefficient must be in [0,1]");
+		}
 		// Scale the crosslinking coefficient by maxNucs
 		// so that n * crosslink <= 1
 		this.crosslink = crosslink / maxNucs;
 		log.debug("Scaled crosslinking efficiency to maximum number of nucleosomes = "+this.crosslink);
 
 		// Create memoization caches
-		// Since pOcc() is a function on the lattice (x,l), where
+		// Since pOcc() is a function on the lattice (x,l,n), where
 		// x \in [nucSize/2, pNuc.length-nucSize/2]
 		// l \in [minL, maxL]
-		// we preallocate with these dimensions: pNuc.length x (maxL+1)
-		// This cache will be large if the chunk size is too big
-		pOccCache = new Cache(pNuc.length, maxL+1);
-		pAndCache = new Cache(pNuc.length, maxL+1);
-		pNCache = new Cache(pNuc.length, maxL+1, maxNucs+1);
+		// n \in [0, maxNucs]
+		// we preallocate with these dimensions: pNuc.length x (maxL+1) x (maxNucs+1)
+		// This cache may be very large if pNuc or maxL is large
+		pOccXLNCache = new Cache(pNuc.length, maxL+1, maxNucs+1);
+		pOccXLCache = new Cache(pNuc.length, maxL+1);
+		pExtractedDNA = new Cache(pNuc.length, maxL+1);
+		pFAIRECache = new Cache(pNuc.length, maxL+1);
 		
 		// Pre-calculate pOcc(x) for efficiency
+		// Store it in pOccXLCache[x][0] since this is unused by pOcc
 		DescriptiveStatistics occupancyStats = new DescriptiveStatistics();
 		occupancyStats.setWindowSize(nucSize);
-		for (int i = 0; i < pNuc.length; i++) {
-			occupancyStats.addValue(pNuc[i]);
+		for (int i = 0; i < pNuc.length+nucSize/2; i++) {
+			if (i < pNuc.length) { 
+				occupancyStats.addValue(pNuc[i]);
+			}
 			if (i-nucSize/2 >= 0) {
-				pOccCache.setCache(i-nucSize/2, (float)occupancyStats.getSum());
+				pOccXLCache.setCache(i-nucSize/2, (float)occupancyStats.getSum());
 			}
 		}
 	}
@@ -75,29 +92,28 @@ public class FAIREModel {
 			}
 
 			// Starting at each base pair in the chunk
-			for (int x = maxL-extend; x < pNuc.length-maxL; x++) {
+			for (int x = 0; x < pNuc.length-l; x++) {
 				// Calculate the probability that this fragment survives FAIRE
 				// and add its probability to the prediction,
 				// weighted by the sonication distribution
-				float pFragment = sonication[l] * pFAIRE(x, l);
-				watson[x] += pFragment;
-				crick[x+l-1] += pFragment;
+				float pFAIRE = pFAIRE(x, l);
+				watson[x] += pFAIRE;
+				crick[x+l-1] += pFAIRE;
 			}
 		}
 
-		log.debug("Extending watson and crick strands to produce single-end FAIRE signal");
-		float[] prediction = new float[pNuc.length-2*(maxL-1)];
-		for (int i = 0; i < pNuc.length; i++) {
-			for (int j = 0; j < extend; j++) {
-				// Extend on the + strand
-				if (i+j-maxL > 0 && i+j-maxL < prediction.length) {
-					prediction[i+j-maxL] += watson[i];
-				}
-
-				// Extend on the - strand
-				if (i-j-maxL > 0 && i-j-maxL < prediction.length) {
-					prediction[i-j-maxL] += crick[i];
-				}
+		log.debug("Extending watson fragments");
+		float[] prediction = new float[pNuc.length];
+		for (int i = 0; i < pNuc.length-extend; i++) {
+			for (int j = 0; j <= extend; j++) {
+				prediction[i+j] += watson[i];
+			}
+		}
+		
+		log.debug("Extending crick fragments");
+		for (int i = pNuc.length-1; i >= extend; i--) {
+			for (int j = 0; j <= extend; j++) {
+				prediction[i-j] += crick[i];
 			}
 		}
 
@@ -110,7 +126,7 @@ public class FAIREModel {
 	 * @return paired-end FAIRE signal for the chunk
 	 */
 	public float[] pairedEnd() {
-		float[] prediction = new float[pNuc.length-2*(maxL-1)];
+		float[] prediction = new float[pNuc.length];
 		// Consider all possible fragment lengths
 		for (int l = 1; l < sonication.length; l++) {
 			// No need to count if there are no fragments of this length
@@ -119,52 +135,111 @@ public class FAIREModel {
 			}
 
 			// Starting at each base pair in the chunk
-			for (int x = maxL-l; x < pNuc.length-maxL; x++) {
+			for (int x = 0; x < pNuc.length-l; x++) {
 				// Calculate the probability that this fragment survives FAIRE
 				// and add its probability to the prediction,
 				// weighted by the sonication distribution
-				float pFragment = sonication[l] * pFAIRE(x, l);
-				int start = Math.max(x-maxL, 0);
-				int stop = Math.min(x-maxL+l, prediction.length);
-				for (int k = start; k < stop; k++) {
-					prediction[k] += pFragment;
+				float pFAIRE = pFAIRE(x, l);
+				for (int k = 0; k < l; k++) {
+					prediction[x+k] += pFAIRE;
 				}
 			}
 		}
 
 		return prediction;
 	}
-
+	
+	
 	/**
-	 * The probability that a fragment of length l, starting at x, survives
-	 * phenol:chloroform, given the nucleosome distribution in pNuc
+	 * @param x
+	 * @param l
+	 * @return
 	 */
-	private float pFAIRE(int x, int l) {
+	public float pFAIRE(int x, int l) {
+		// Fragments that don't exist
+		if (l <= 0 || x < 0 || x+l >= pNuc.length) {
+			return 0;
+		}
+		
+		// Check the cache
+		if (pFAIRECache.isCached(x, l)) {
+			return pFAIRECache.getCache(x, l);
+		}
+		
+		// Decompose pFAIRE into two events:
+		// 1. The probability that this fragment survives extraction
+		// 2. The probability that overlapping fragments survive FAIRE
+		// 3. pFAIRE is P(1) and not P(2)
+		
+		// The probability that this fragment survives extraction
+		float pFragment = pExtractedDNA(x, l);
+		
+		// The probability that any overlapping fragment survives FAIRE
+		// This will recurse to the ends of the DNA segment (in pNuc)
+		float pOverlapping = 0;
+//		for (int otherL = 1; otherL < sonication.length; otherL++) {
+//			for (int otherX = x-otherL+1; otherX < x+l-1; otherX++) {
+//				// Any other fragment
+//				if (otherX == x && otherL == l) {
+//					continue;
+//				}
+//				pOverlapping += pFAIRE(otherX, otherL) * (1-pOverlapping);
+//			}
+//		}
+		
+		float pFAIRE = pFragment * (1-pOverlapping);
+		// Store in the cache
+		pFAIRECache.setCache(x, l, pFAIRE);
+		
+		return pFAIRE;
+	}
+	
+	/**
+	 * The probability that a fragment of length l, starting at x,
+	 * survives extraction in the DNA phase
+	 * 
+	 * This does not take into account depletion by overlapping
+	 */
+	public float pExtractedDNA(int x, int l) {
+		if (l <= 0 || x < 0 || x+l >= pNuc.length) { 
+			return 0;
+		}
+		
+		// Check the cache
+		if (pExtractedDNA.isCached(x, l)) {
+			return pExtractedDNA.getCache(x, l);
+		}
+		
 		// The maximum number of nucleosomes that can occupy this fragment
 		int maxN = l/nucSize + 1; // +1 because of the overhang
-		// Calculate the probability of having each number of nucleosomes,
-		// weight them by the number of nucleosomes,
-		// and let pFAIRE be the probability that none of them happen
-		// Each event is independent
-		float p = 0;
+		// Calculate the probability of being in the protein phase:
+		// Calculate the probability of having each number of nucleosomes
+		// Weight by the number of nucleosomes and crosslinking efficiency
+		// Each event is independent because pOcc(x,l,n) is defined as having
+		// exactly n nucleosomes
+		float pProtein = 0;
 		for (int n = 1; n <= maxN; n++) {
 			// Weighted probability of being occupied by n nucleosomes
 			float pN = crosslink * n * pOcc(x, l, n);
 			// See: http://lethalman.blogspot.com/2011/08/probability-of-union-of-independent.html
-			p += pN * (1-p);
+			pProtein += pN * (1-pProtein);
 		}
 		
-		return 1 - p;
+		// The probability of surviving extraction in the DNA phase
+		float pDNA = sonication[l] * (1-pProtein);
+		pExtractedDNA.setCache(x, l, pDNA);
+		
+		return pDNA;
 	}
 	
 	/**
 	 * The probability that a fragment of length l, starting at x,
 	 * is occupied by exactly n nucleosomes
 	 */
-	private float pOcc(int x, int l, int n) {
+	public float pOcc(int x, int l, int n) {
 		// Decompose the probability into two events:
 		// 1) Is there a nucleosome in [x-N/2,x+N/2) and
-		// 2) Is the fragment starting at x+N with length l-N occupied
+		// 2) Is the fragment starting at x+N with length l-N occupied by n-1 nucleosomes
 		
 		// Base case for recursion (the end of a fragment)
 		if (l <= 0) {
@@ -178,20 +253,22 @@ public class FAIREModel {
 		}
 		
 		float p = 0;
-		if (pNCache.isCached(x, l, n)) {
-			p = pNCache.getCache(x, l, n);
+		if (pOccXLNCache.isCached(x, l, n)) {
+			p = pOccXLNCache.getCache(x, l, n);
 		} else {
 			// Base case for recursion
-			// the probability that it is not occupied by a nucleosome
+			// the probability that it is not occupied by any nucleosomes
 			if (n == 0) {
 				p = 1 - pOcc(x, l);
 			} else {
 				// Break it down by each mutually exclusive x+j case, for j \in [-N/2,N/2)
-				for (int j = -nucSize/2; j < nucSize/2; j++) {
+				int start = Math.max(-nucSize/2, -x);
+				int stop = Math.min(nucSize/2, pNuc.length-x);
+				for (int j = start; j < stop; j++) {
 					p += pNuc[x+j] * pOcc(x+j+nucSize, l-j-nucSize, n-1);
 				}
 			}
-			pNCache.setCache(x, l, n, p);
+			pOccXLNCache.setCache(x, l, n, p);
 		}
 
 		return p;
@@ -199,15 +276,11 @@ public class FAIREModel {
 
 	/**
 	 * The probability that a fragment of length l, starting at x, is occupied
-	 * by a nucleosome, given the nucleosome distribution in pNuc
+	 * by at least one nucleosome, given the nucleosome distribution in pNuc
 	 * 
-	 * pNuc[x] must be normalized so that the sum of any adjacent N base pairs
-	 * is <= 1 (i.e. nucleosomes cannot overlap)
-	 * 
-	 * pOcc[x] must be the convolution of pNuc with an N-base pair window, i.e.
-	 * the probability of being occupied for each base pair x
+	 * This corresponds to the base case: 1 - pOcc(x,l,0)
 	 */
-	private float pOcc(int x, int l) {
+	public float pOcc(int x, int l) {
 		// Decompose the probability into the union of two events:
 		// 1) Is there a nucleosome in [x-N/2,x+N/2) or
 		// 2) Is the fragment starting at x+N with length l-N occupied
@@ -216,21 +289,23 @@ public class FAIREModel {
 		// Base case for recursion (the end of a fragment)
 		if (l <= 0) {
 			float p = 0;
-			for (int i = x-nucSize/2; i < x+l+nucSize/2; i++) {
+			int start = Math.max(x-nucSize/2, 0);
+			int stop = Math.min(x+l+nucSize/2, pNuc.length);
+			for (int i = start; i < stop; i++) {
 				p += pNuc[i];
 			}
 			return p;
 		}
-
-		// Check for a cached result
-		if (pOccCache.isCached(x, l)) {
-			return pOccCache.getCache(x, l);
+		
+		// Check the cache
+		if (pOccXLCache.isCached(x, l)) {
+			return pOccXLCache.getCache(x, l);
 		}
-
+		
 		// 1. Is there a nucleosome in [x-N/2,x+N/2)?
 		// Since nucleosomes cannot overlap, these events are all independent
 		// so sum the probabilities, i.e. calculate the occupancy of x
-		float p1 = pOccCache.getCache(x);
+		float p1 = pOccXLCache.getCache(x);
 
 		// 2. Is the fragment starting at x+N with length l-N occupied? Recurse
 		float p2 = pOcc(x+nucSize, l-nucSize);
@@ -238,31 +313,28 @@ public class FAIREModel {
 		// 1 and 2. What is the probability that there is a nucleosome in [x-N/2,x+N/2)
 		// AND the fragment starting at x+N with length l-N is occupied?
 		float p1Andp2 = 0;
-		if (pAndCache.isCached(x, l)) {
-			p1Andp2 = pAndCache.getCache(x, l);
-		} else {
-			// Break it down by each mutually exclusive x+j case, for j \in [-N/2,N/2)
-			for (int j = -nucSize/2; j < nucSize/2; j++) {
-				p1Andp2 += pNuc[x+j] * pOcc(x+j+nucSize, l-j-nucSize);
-			}
-			pAndCache.setCache(x, l, p1Andp2);
+		// Break it down by each mutually exclusive x+j case, for j \in [-N/2,N/2)
+		int start = Math.max(-nucSize/2, -x);
+		int stop = Math.min(nucSize/2, pNuc.length-x);
+		for (int j = start; j < stop; j++) {
+			p1Andp2 += pNuc[x+j] * pOcc(x+j+nucSize, l-j-nucSize);
 		}
 
-		// Cache the result
+		// Store the result in the cache
 		float p = p1 + p2 - p1Andp2;
-		pOccCache.setCache(x, l, p);
-
+		pOccXLCache.setCache(x, l, p);
+		
 		return p;
 	}
 	
 	/**
-	 * A memoization cache for a function that takes values on a lattice
+	 * A memoization cache for a function that takes positive values on a lattice
 	 * in 1, 2, or 3D
 	 */
 	private static class Cache {
-
+		
 		private float[][][] cache;
-
+		
 		/** 
 		 * 3D cache
 		 * @param sizeX
@@ -281,14 +353,6 @@ public class FAIREModel {
 		 */
 		public Cache(int sizeX, int sizeY) {
 			this(sizeX, sizeY, 1);
-		}
-		
-		/**
-		 * 1D cache
-		 * @param size
-		 */
-		public Cache(int size) {
-			this(size, 1, 1);
 		}
 
 		public void resetCache() {
