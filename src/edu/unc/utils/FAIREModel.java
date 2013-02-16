@@ -17,7 +17,7 @@ public class FAIREModel {
 	private final float[] sonication;
 	private final float crosslink;
 	private final int maxL, nucSize, maxNucs;
-	private final Cache pOccXLNCache, pOccXLCache, pExtractedDNA, pFAIRECache;
+	private final Cache pOccXLNCache, pOccXLCache, pAqueousCache;
 
 	/**
 	 * Model FAIRE signal from nucleosome maps
@@ -57,8 +57,7 @@ public class FAIREModel {
 		// This cache may be very large if pNuc or maxL is large
 		pOccXLNCache = new Cache(pNuc.length, maxL+1, maxNucs+1);
 		pOccXLCache = new Cache(pNuc.length, maxL+1);
-		pExtractedDNA = new Cache(pNuc.length, maxL+1);
-		pFAIRECache = new Cache(pNuc.length, maxL+1);
+		pAqueousCache = new Cache(pNuc.length, maxL+1);
 		
 		// Pre-calculate pOcc(x) for efficiency
 		// Store it in pOccXLCache[x][0] since this is unused by pOcc
@@ -96,7 +95,7 @@ public class FAIREModel {
 				// Calculate the probability that this fragment survives FAIRE
 				// and add its probability to the prediction,
 				// weighted by the sonication distribution
-				float pFAIRE = pFAIRE(x, l);
+				float pFAIRE = sonication[l] * pAqueous(x, l);
 				watson[x] += pFAIRE;
 				crick[x+l-1] += pFAIRE;
 			}
@@ -139,7 +138,7 @@ public class FAIREModel {
 				// Calculate the probability that this fragment survives FAIRE
 				// and add its probability to the prediction,
 				// weighted by the sonication distribution
-				float pFAIRE = pFAIRE(x, l);
+				float pFAIRE = sonication[l] * pAqueous(x, l);
 				for (int k = 0; k < l; k++) {
 					prediction[x+k] += pFAIRE;
 				}
@@ -149,65 +148,20 @@ public class FAIREModel {
 		return prediction;
 	}
 	
-	
-	/**
-	 * @param x
-	 * @param l
-	 * @return
-	 */
-	public float pFAIRE(int x, int l) {
-		// Fragments that don't exist
-		if (l <= 0 || x < 0 || x+l >= pNuc.length) {
-			return 0;
-		}
-		
-		// Check the cache
-		if (pFAIRECache.isCached(x, l)) {
-			return pFAIRECache.getCache(x, l);
-		}
-		
-		// Decompose pFAIRE into two events:
-		// 1. The probability that this fragment survives extraction
-		// 2. The probability that overlapping fragments survive FAIRE
-		// 3. pFAIRE is P(1) and not P(2)
-		
-		// The probability that this fragment survives extraction
-		float pFragment = pExtractedDNA(x, l);
-		
-		// The probability that any overlapping fragment survives FAIRE
-		// This will recurse to the ends of the DNA segment (in pNuc)
-		float pOverlapping = 0;
-//		for (int otherL = 1; otherL < sonication.length; otherL++) {
-//			for (int otherX = x-otherL+1; otherX < x+l-1; otherX++) {
-//				// Any other fragment
-//				if (otherX == x && otherL == l) {
-//					continue;
-//				}
-//				pOverlapping += pFAIRE(otherX, otherL) * (1-pOverlapping);
-//			}
-//		}
-		
-		float pFAIRE = pFragment * (1-pOverlapping);
-		// Store in the cache
-		pFAIRECache.setCache(x, l, pFAIRE);
-		
-		return pFAIRE;
-	}
-	
 	/**
 	 * The probability that a fragment of length l, starting at x,
 	 * survives extraction in the DNA phase
 	 * 
 	 * This does not take into account depletion by overlapping
 	 */
-	public float pExtractedDNA(int x, int l) {
+	public float pAqueous(int x, int l) {
 		if (l <= 0 || x < 0 || x+l >= pNuc.length) { 
 			return 0;
 		}
 		
 		// Check the cache
-		if (pExtractedDNA.isCached(x, l)) {
-			return pExtractedDNA.getCache(x, l);
+		if (pAqueousCache.isCached(x, l)) {
+			return pAqueousCache.getCache(x, l);
 		}
 		
 		// The maximum number of nucleosomes that can occupy this fragment
@@ -217,19 +171,19 @@ public class FAIREModel {
 		// Weight by the number of nucleosomes and crosslinking efficiency
 		// Each event is independent because pOcc(x,l,n) is defined as having
 		// exactly n nucleosomes
-		float pProtein = 0;
+		float pInterphase = 0;
 		for (int n = 1; n <= maxN; n++) {
 			// Weighted probability of being occupied by n nucleosomes
 			float pN = crosslink * n * pOcc(x, l, n);
 			// See: http://lethalman.blogspot.com/2011/08/probability-of-union-of-independent.html
-			pProtein += pN * (1-pProtein);
+			pInterphase += pN * (1-pInterphase);
 		}
 		
 		// The probability of surviving extraction in the DNA phase
-		float pDNA = sonication[l] * (1-pProtein);
-		pExtractedDNA.setCache(x, l, pDNA);
+		float pAqueous = 1 - pInterphase;
+		pAqueousCache.setCache(x, l, pAqueous);
 		
-		return pDNA;
+		return pAqueous;
 	}
 	
 	/**
