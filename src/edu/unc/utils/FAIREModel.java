@@ -16,7 +16,7 @@ public class FAIREModel {
 	private final float[] pNuc;
 	private final float[] sonication;
 	private final float crosslink;
-	private final int maxL, nucSize, maxNucs;
+	private final int maxL, nucSize, halfNuc, thNuc, maxNucs;
 	private final Cache pOccXLNCache, pOccXLCache, pAqueousCache;
 
 	/**
@@ -37,6 +37,8 @@ public class FAIREModel {
 			throw new IllegalArgumentException("Nucleosome size must be > 0");
 		}
 		this.nucSize = nucSize;
+		this.halfNuc = nucSize/2;
+		this.thNuc = 3*nucSize/2;
 		maxL = sonication.length;
 		maxNucs = maxL/nucSize + 1; // +1 because of the overhang
 		log.debug("Maximum number of nucleosomes that will fit on a fragment = "+maxNucs);
@@ -216,10 +218,10 @@ public class FAIREModel {
 				p = 1 - pOcc(x, l);
 			} else {
 				// Break it down by each mutually exclusive x+j case, for j \in [-N/2,N/2)
-				int start = Math.max(-nucSize/2, -x);
-				int stop = Math.min(nucSize/2, pNuc.length-x);
+				int start = Math.max(-halfNuc, -x);
+				int stop = Math.min(halfNuc, pNuc.length-x);
 				for (int j = start; j < stop; j++) {
-					p += pNuc[x+j] * pOcc(x+j+nucSize, l-j-nucSize, n-1);
+					p += pNuc[x+j] * pOcc(x+j+thNuc, l-j-thNuc, n-1);
 				}
 			}
 			pOccXLNCache.setCache(x, l, n, p);
@@ -243,8 +245,8 @@ public class FAIREModel {
 		// Base case for recursion (the end of a fragment)
 		if (l <= 0) {
 			float p = 0;
-			int start = Math.max(x-nucSize/2, 0);
-			int stop = Math.min(x+l+nucSize/2, pNuc.length);
+			int start = Math.max(x-halfNuc, 0);
+			int stop = Math.min(x+l+halfNuc, pNuc.length);
 			for (int i = start; i < stop; i++) {
 				p += pNuc[i];
 			}
@@ -268,10 +270,10 @@ public class FAIREModel {
 		// AND the fragment starting at x+N with length l-N is occupied?
 		float p1Andp2 = 0;
 		// Break it down by each mutually exclusive x+j case, for j \in [-N/2,N/2)
-		int start = Math.max(-nucSize/2, -x);
-		int stop = Math.min(nucSize/2, pNuc.length-x);
+		int start = Math.max(-halfNuc, -x);
+		int stop = Math.min(halfNuc, pNuc.length-x);
 		for (int j = start; j < stop; j++) {
-			p1Andp2 += pNuc[x+j] * pOcc(x+j+nucSize, l-j-nucSize);
+			p1Andp2 += pNuc[x+j] * pOcc(x+j+thNuc, l-j-thNuc);
 		}
 
 		// Store the result in the cache
