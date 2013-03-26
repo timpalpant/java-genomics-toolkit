@@ -8,6 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFileReader.ValidationStringency;
+
 /**
  * A command-line script
  * @author timpalpant
@@ -53,10 +56,14 @@ public abstract class CommandLineTool {
 			System.exit(-1);
 		}
 		
+		ValidationStringency stringency = SAMFileReader.getDefaultValidationStringency();
 		try {
+			SAMFileReader.setDefaultValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
 			run();
 		} catch (IOException e) {
 			throw new CommandLineToolException("IO error while running", e);
+		} finally {
+			SAMFileReader.setDefaultValidationStringency(stringency);
 		}
 	}
 }
