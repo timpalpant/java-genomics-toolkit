@@ -27,6 +27,8 @@ public class Subtract extends WigMathTool {
 	public Path minuendFile;
 	@Parameter(names = {"-s", "--subtrahend"}, description = "Subtrahend (bottom - file 2)", required = true, validateWith = ReadablePathValidator.class)
 	public Path subtrahendFile;
+	@Parameter(names = {"-z", "--assume-zero"}, description = "Assume missing data is zero")
+	public boolean assumeZero = false;
 
 	WigFileReader minuendReader, subtrahendReader;
 	
@@ -48,6 +50,19 @@ public class Subtract extends WigMathTool {
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
 		float[] minuend = minuendReader.query(chunk).getValues();
 		float[] subtrahend = subtrahendReader.query(chunk).getValues();
+
+		// Fill missing data with zeros
+		if (assumeZero) {
+			for (int i = 0; i < minuend.length; i++) {
+				if (Float.isNaN(minuend[i])) {
+					minuend[i] = 0;
+				}
+				if (Float.isNaN(subtrahend[i])) {
+					subtrahend[i] = 0;
+				}
+			}
+		}
+
 		for (int i = 0; i < minuend.length; i++) {
 			minuend[i] -= subtrahend[i];
 		}
