@@ -20,7 +20,7 @@ then
     then
       for f in `ls $DIR/src/edu/unc/genomics/$d/*`
       do
-        scriptname=`basename -s .java $f`
+        scriptname=`basename $f .java`
         echo $d.$scriptname
       done
     fi
@@ -37,4 +37,4 @@ if [[ "$version" < "1.7" ]]; then
 fi
 
 # Run a tool with the passed arguments
-java -Xmx2000m -Dlog4j.configuration=log4j.properties -cp $DIR:$DIR/build:$DIR/dist/*:$DIR/lib/* edu.unc.genomics."$@"
+java -Xss128m -Xmx6000m -Dlog4j.configuration=log4j.properties -cp $DIR:$DIR/build:$DIR/dist/*:$DIR/lib/* edu.unc.genomics."$@"
