@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.DataFormatException;
 
+import org.apache.log4j.Logger;
+
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.ParameterException;
 
@@ -14,6 +16,8 @@ import com.beust.jcommander.ParameterException;
  *
  */
 public class AssemblyConverter implements IStringConverter<Assembly> {
+
+	private static final Logger log = Logger.getLogger(AssemblyConverter.class);
 	
 	public static final Path ASSEMBLIES_DIR = Paths.get("resources", "assemblies");
 
@@ -36,7 +40,8 @@ public class AssemblyConverter implements IStringConverter<Assembly> {
 		try {
 			return new Assembly(p);
 		} catch (IOException | DataFormatException e) {
-			throw new ParameterException("Error loading Assembly from file: " + p);
+			log.error("Error loading Assembly from file: "+p);
+			throw new ParameterException(e);
 		}
 	}
 	
