@@ -44,12 +44,28 @@ public class Subtract extends WigMathTool {
 		inputs.add(minuendReader);
 		inputs.add(subtrahendReader);
 		log.debug("Initialized " + inputs.size() + " input files");
+		if (assumeZero) {
+			log.debug("Assuming missing data is zero");
+			unionExtents = assumeZero;
+		}
 	}
 	
 	@Override
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
-		float[] minuend = minuendReader.query(chunk).getValues();
-		float[] subtrahend = subtrahendReader.query(chunk).getValues();
+		int minuendStart = Math.max(minuendReader.getChrStart(chunk.getChr()),
+									chunk.getStart());
+		int minuendStop = Math.min(minuendReader.getChrStop(chunk.getChr()),
+								   chunk.getStop());
+		float[] minuend = minuendReader.query(chunk.getChr(),
+											  minuendStart,
+											  minuendStop).get(chunk);
+		int subtrahendStart = Math.max(subtrahendReader.getChrStart(chunk.getChr()),
+									   chunk.getStart());
+		int subtrahendStop = Math.min(subtrahendReader.getChrStop(chunk.getChr()),
+									  chunk.getStop());
+		float[] subtrahend = subtrahendReader.query(chunk.getChr(),
+													subtrahendStart,
+													subtrahendStop).get(chunk);
 
 		// Fill missing data with zeros
 		if (assumeZero) {

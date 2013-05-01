@@ -51,6 +51,11 @@ public abstract class WigMathTool extends CommandLineTool {
 	public Path outputFile;
 
 	private ExecutorService pool;
+	/**
+	 * Process the union of the extents of all input files
+	 * rather than the intersection
+	 */
+	protected boolean unionExtents = false;
 
 	/**
 	 * Holds all of the input Wig files for this compute job. Used to find the
@@ -91,11 +96,18 @@ public abstract class WigMathTool extends CommandLineTool {
 		log.debug("Processing files and writing result to disk");
 		List<Future<?>> futures = new ArrayList<>();
 		try (WigFileWriter writer = new WigFileWriter(outputFile, TrackHeader.newWiggle())) {
-			Set<String> chromosomes = getCommonChromosomes(inputs);
-			log.debug("Found " + chromosomes.size() + " chromosomes in common between all inputs");
+			Set<String> chromosomes = null;
+			if (unionExtents) {
+				chromosomes = getUnionChromosomes(inputs);
+				log.debug("Found " + chromosomes.size() + " chromosomes in the union of all inputs");
+			} else {
+				chromosomes = getIntersectionChromosomes(inputs);
+				log.debug("Found " + chromosomes.size() + " chromosomes in the intersection of all inputs");
+			}
+			
 			for (String chr : chromosomes) {
-				int start = getMaxChrStart(inputs, chr);
-				int stop = getMinChrStop(inputs, chr);
+				int start = unionExtents ? getUnionChrStart(inputs, chr) : getIntersectionChrStart(inputs, chr);
+				int stop = unionExtents ? getUnionChrStop(inputs, chr) : getIntersectionChrStop(inputs, chr);
 				
 				// Process the chromosome in chunks
 				int bp = start;
@@ -169,7 +181,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	 *            the chromosome to get the most conservative start base for
 	 * @return the highest start base amongst all of the Wig files in wigs
 	 */
-	public static int getMaxChrStart(List<WigFileReader> wigs, String chr) {
+	public static int getIntersectionChrStart(List<WigFileReader> wigs, String chr) {
 		int max = -1;
 		for (WigFileReader wig : wigs) {
 			if (wig.getChrStart(chr) > max) {
@@ -179,7 +191,7 @@ public abstract class WigMathTool extends CommandLineTool {
 
 		return max;
 	}
-
+	
 	/**
 	 * Gets the lowest stop base for a chromosome amongst all wigs
 	 * 
@@ -189,7 +201,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	 *            the chromosome to get the most conservative stop base for
 	 * @return the lowest stop base amongst all of the Wig files in wigs
 	 */
-	public static int getMinChrStop(List<WigFileReader> wigs, String chr) {
+	public static int getIntersectionChrStop(List<WigFileReader> wigs, String chr) {
 		if (wigs.size() == 0) {
 			return -1;
 		}
@@ -203,7 +215,7 @@ public abstract class WigMathTool extends CommandLineTool {
 
 		return min;
 	}
-
+	
 	/**
 	 * Get the set of chromosomes that are held in common by all input files
 	 * 
@@ -211,7 +223,7 @@ public abstract class WigMathTool extends CommandLineTool {
 	 *            a list of Wig files to get the common chromosomes of
 	 * @return the set of chromosomes held in common by all Wig files in wigs
 	 */
-	public static Set<String> getCommonChromosomes(List<WigFileReader> wigs) {
+	public static Set<String> getIntersectionChromosomes(List<WigFileReader> wigs) {
 		if (wigs == null || wigs.size() == 0) {
 			return new HashSet<String>();
 		}
@@ -226,6 +238,66 @@ public abstract class WigMathTool extends CommandLineTool {
 					break;
 				}
 			}
+		}
+
+		return chromosomes;
+	}
+	
+	/**
+	 * Gets the lowest start base for a chromosome amongst all wigs
+	 * 
+	 * @param wigs
+	 *            a List of wig files
+	 * @param chr
+	 *            the chromosome to get the most extensive start base for
+	 * @return the lowest start base amongst all of the Wig files in wigs
+	 */
+	public static int getUnionChrStart(List<WigFileReader> wigs, String chr) {
+		if (wigs.size() == 0) {
+			return -1;
+		}
+		
+		int min = Integer.MAX_VALUE;
+		for (WigFileReader wig : wigs) {
+			if (wig.getChrStart(chr) < min) {
+				min = wig.getChrStart(chr);
+			}
+		}
+
+		return min;
+	}
+	
+	/**
+	 * Gets the highest stop base for a chromosome amongst all wigs
+	 * 
+	 * @param wigs
+	 *            a List of wig files
+	 * @param chr
+	 *            the chromosome to get the most extensive stop base for
+	 * @return the highest stop base amongst all of the Wig files in wigs
+	 */
+	public static int getUnionChrStop(List<WigFileReader> wigs, String chr) {
+		int max = -1;
+		for (WigFileReader wig : wigs) {
+			if (wig.getChrStop(chr) > max) {
+				max = wig.getChrStop(chr);
+			}
+		}
+
+		return max;
+	}
+	
+	/**
+	 * Get the set of chromosomes that are held in common by all input files
+	 * 
+	 * @param wigs
+	 *            a list of Wig files to get the common chromosomes of
+	 * @return the set of chromosomes held in common by all Wig files in wigs
+	 */
+	public static Set<String> getUnionChromosomes(List<WigFileReader> wigs) {
+		Set<String> chromosomes = new HashSet<>();
+		for (WigFileReader wig : wigs) {
+			chromosomes.addAll(wig.chromosomes());
 		}
 
 		return chromosomes;
