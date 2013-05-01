@@ -96,8 +96,8 @@ public class PercusDecomposition extends WigMathTool {
 		occupancyStats.setWindowSize(nucleosomeSize);
 		
 		// Pad the query with an additional nucleosome on either end
-		int paddedStart = Math.max(chunk.getStart()-nucleosomeSize, getMaxChrStart(inputs, chunk.getChr()));
-		int paddedStop = Math.min(chunk.getStop()+nucleosomeSize, getMinChrStop(inputs, chunk.getChr()));
+		int paddedStart = Math.max(chunk.getStart()-nucleosomeSize, reader.getChrStart(chunk.getChr()));
+		int paddedStop = Math.min(chunk.getStop()+nucleosomeSize, reader.getChrStop(chunk.getChr()));
 		
 		float[] dyads = reader.query(chunk.getChr(), paddedStart, paddedStop).getValues();
 		for (int i = 0; i < dyads.length; i++) {

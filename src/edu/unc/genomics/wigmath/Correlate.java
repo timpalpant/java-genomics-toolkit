@@ -95,7 +95,7 @@ public class Correlate extends CommandLineTool {
 		}
 		
 		// Get the maximum extent for each chromosome
-		chromosomes = new ArrayList<>(WigMathTool.getCommonChromosomes(wigs));
+		chromosomes = new ArrayList<>(WigMathTool.getIntersectionChromosomes(wigs));
 		chrStarts = new int[chromosomes.size()];
 		Arrays.fill(chrStarts, Integer.MAX_VALUE);
 		chrStops = new int[chromosomes.size()];
