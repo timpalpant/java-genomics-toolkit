@@ -49,10 +49,9 @@ public class ZScore extends WigMathTool {
 				} else {
 					mean = (float) reader.mean();
 					stdev = (float) reader.stdev();
-					log.debug("Z-scoring "+chr+" to global mean = "+mean+", stdev = "+stdev);
 				}
 				
-				if(stdev == 0) {
+				if (stdev == 0) {
 					throw new CommandLineToolException("Cannot Z-score a file with stdev = 0!");
 				}
 				means.put(chr, mean);
@@ -62,6 +61,10 @@ public class ZScore extends WigMathTool {
 			throw new CommandLineToolException(e);
 		}
 		inputs.add(reader);
+
+		if (!byChromosome) {
+			log.debug("Z-scoring all chromosomes to global mean = "+reader.mean()+", stdev = "+reader.stdev());
+		}
 	}
 	
 	@Override

@@ -37,4 +37,4 @@ if [[ "$version" < "1.7" ]]; then
 fi
 
 # Run a tool with the passed arguments
-java -Xss128m -Xmx6000m -Dlog4j.configuration=log4j.properties -cp $DIR:$DIR/build:$DIR/dist/*:$DIR/lib/* edu.unc.genomics."$@"
+java -Xmx2000m -Dlog4j.configuration=log4j.properties -cp $DIR:$DIR/build:$DIR/dist/*:$DIR/lib/* edu.unc.genomics."$@"
