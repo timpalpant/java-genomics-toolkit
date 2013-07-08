@@ -39,6 +39,9 @@ public class ExtractRegion extends CommandLineTool {
 	public int start = -1;
 	@Parameter(names = {"-e", "--stop"}, description = "Stop base pair")
 	public int stop = -1;
+	@Parameter(names = { "--chunk" },
+			   description = "Size to chunk each chromosome into when processing (bp)")
+	public int chunkSize = DEFAULT_CHUNK_SIZE;
 	@Parameter(names = { "-f", "--fixedstep" }, description = "Force fixedStep output")
 	public boolean fixedStep = false;
 	@Parameter(names = {"-o", "--output"}, description = "Output file (wig)", required = true)
