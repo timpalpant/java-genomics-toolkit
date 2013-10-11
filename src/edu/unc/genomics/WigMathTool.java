@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
+import edu.ucsc.genome.TrackHeader;
 import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.io.WigFileException;
@@ -63,7 +64,7 @@ public abstract class WigMathTool extends WigAnalysisTool {
     
     // Setup the output file
     try {
-      writer = new WigFileWriter(outputFile);
+      writer = new WigFileWriter(outputFile, TrackHeader.newWiggle());
     } catch (IOException e) {
       throw new CommandLineToolException("Error initializing output file "+outputFile, e);
     }
