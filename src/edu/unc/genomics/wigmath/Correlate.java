@@ -44,7 +44,7 @@ public class Correlate extends WigAnalysisTool {
 	/**
 	 * Partial sums for each pair of input files
 	 */
-	private float[][] sumX, sumY, sumSqX, sumSqY, sumXY;
+	private double[][] sumX, sumY, sumSqX, sumSqY, sumXY;
 	
 	@Override
   protected void prepare() {
@@ -67,11 +67,11 @@ public class Correlate extends WigAnalysisTool {
     unionExtents = true;
     
     n = new int[inputs.size()][inputs.size()];
-    sumX = new float[inputs.size()][inputs.size()];
-    sumY = new float[inputs.size()][inputs.size()];
-    sumSqX = new float[inputs.size()][inputs.size()];
-    sumSqY = new float[inputs.size()][inputs.size()];
-    sumXY = new float[inputs.size()][inputs.size()];
+    sumX = new double[inputs.size()][inputs.size()];
+    sumY = new double[inputs.size()][inputs.size()];
+    sumSqX = new double[inputs.size()][inputs.size()];
+    sumSqY = new double[inputs.size()][inputs.size()];
+    sumXY = new double[inputs.size()][inputs.size()];
   }
 	
   @Override
@@ -120,10 +120,10 @@ public class Correlate extends WigAnalysisTool {
       correlation[i][i] = 1;
       
       for (int j = 0; j < i; j++) {
-        float covarXY = n[i][j]*sumXY[i][j] - sumX[i][j]*sumY[i][j];
-        float stdX = (float) Math.sqrt(n[i][j]*sumSqX[i][j] - sumX[i][j]*sumX[i][j]);
-        float stdY = (float) Math.sqrt(n[i][j]*sumSqY[i][j] - sumY[i][j]*sumY[i][j]);
-        correlation[i][j] = covarXY / (stdX*stdY);
+        double covarXY = n[i][j]*sumXY[i][j] - sumX[i][j]*sumY[i][j];
+        double stdX = Math.sqrt(n[i][j]*sumSqX[i][j] - sumX[i][j]*sumX[i][j]);
+        double stdY = Math.sqrt(n[i][j]*sumSqY[i][j] - sumY[i][j]*sumY[i][j]);
+        correlation[i][j] = (float) (covarXY / (stdX*stdY));
         // Symmetrize the correlation matrix
         correlation[j][i] = correlation[i][j];
       }
