@@ -26,7 +26,8 @@ public class PercusDecomposition extends WigMathTool {
 	
 	private static final Logger log = Logger.getLogger(PercusDecomposition.class);
 
-	@Parameter(names = {"-d", "--dyads"}, description = "Dyad counts file", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-d", "--dyads"}, description = "Dyad counts file", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path dyadsFile;
 	@Parameter(names = {"-n", "--size"}, description = "Nucleosome size (bp)")
 	public int nucleosomeSize = 147;

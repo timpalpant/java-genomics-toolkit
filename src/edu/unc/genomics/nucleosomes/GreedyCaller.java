@@ -24,9 +24,11 @@ public class GreedyCaller extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(GreedyCaller.class);
 
-	@Parameter(names = {"-d", "--dyads"}, description = "Dyad counts file", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-d", "--dyads"}, description = "Dyad counts file", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path dyadsFile;
-	@Parameter(names = {"-s", "--smoothed"}, description = "Smoothed dyad counts file", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-s", "--smoothed"}, description = "Smoothed dyad counts file", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path smoothedDyadsFile;
 	@Parameter(names = {"-n", "--size"}, description = "Nucleosome size (bp)")
 	public int nucleosomeSize = 147;

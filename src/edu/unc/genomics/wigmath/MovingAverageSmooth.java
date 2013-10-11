@@ -21,7 +21,8 @@ import edu.unc.genomics.io.WigFileException;
  */
 public class MovingAverageSmooth extends WigMathTool {
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-i", "--input"}, description = "Input file", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-w", "--width"}, description = "Width of kernel (bp)")
 	public int width = 10;

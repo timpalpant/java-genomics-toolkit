@@ -23,11 +23,16 @@ public class Subtract extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(Subtract.class);
 
-	@Parameter(names = {"-m", "--minuend"}, description = "Minuend (top - file 1)", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-m", "--minuend"}, 
+	    description = "Minuend (top - file 1)", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path minuendFile;
-	@Parameter(names = {"-s", "--subtrahend"}, description = "Subtrahend (bottom - file 2)", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-s", "--subtrahend"}, 
+	    description = "Subtrahend (bottom - file 2)", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path subtrahendFile;
-	@Parameter(names = {"-z", "--assume-zero"}, description = "Assume missing data is zero")
+	@Parameter(names = {"-z", "--assume-zero"}, 
+	    description = "Assume missing data is zero")
 	public boolean assumeZero = false;
 
 	WigFileReader minuendReader, subtrahendReader;
@@ -52,20 +57,8 @@ public class Subtract extends WigMathTool {
 	
 	@Override
 	public float[] compute(Interval chunk) throws IOException, WigFileException {
-		int minuendStart = Math.max(minuendReader.getChrStart(chunk.getChr()),
-									chunk.getStart());
-		int minuendStop = Math.min(minuendReader.getChrStop(chunk.getChr()),
-								   chunk.getStop());
-		float[] minuend = minuendReader.query(chunk.getChr(),
-											  minuendStart,
-											  minuendStop).get(chunk);
-		int subtrahendStart = Math.max(subtrahendReader.getChrStart(chunk.getChr()),
-									   chunk.getStart());
-		int subtrahendStop = Math.min(subtrahendReader.getChrStop(chunk.getChr()),
-									  chunk.getStop());
-		float[] subtrahend = subtrahendReader.query(chunk.getChr(),
-													subtrahendStart,
-													subtrahendStop).get(chunk);
+    float[] minuend = minuendReader.query(chunk).getValues();
+    float[] subtrahend = subtrahendReader.query(chunk).getValues();
 
 		// Fill missing data with zeros
 		if (assumeZero) {
@@ -85,7 +78,6 @@ public class Subtract extends WigMathTool {
 		
 		return minuend;
 	}
-	
 	
 	/**
 	 * @param args

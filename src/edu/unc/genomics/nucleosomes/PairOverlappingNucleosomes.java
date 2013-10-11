@@ -26,9 +26,11 @@ public class PairOverlappingNucleosomes extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(PairOverlappingNucleosomes.class);
 
-	@Parameter(names = {"-a", "--input1"}, description = "Input file 1 (nucleosome calls)", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-a", "--input1"}, description = "Input file 1 (nucleosome calls)", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile1;
-	@Parameter(names = {"-b", "--input2"}, description = "Input file 2 (nucleosome calls)", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-b", "--input2"}, description = "Input file 2 (nucleosome calls)", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile2;
 	@Parameter(names = {"-m", "--overlap"}, description = "Minimum overlap (bp)")
 	public int minOverlap = 73;

@@ -24,7 +24,8 @@ public class GaussianSmooth extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(GaussianSmooth.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-i", "--input"}, description = "Input file", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-s", "--stdev"}, description = "Standard deviation of Gaussian (bp)")
 	public int stdev = 20;
@@ -43,7 +44,7 @@ public class GaussianSmooth extends WigMathTool {
 		}
 		inputs.add(reader);
 		
-		// Use a window size equal to +/- 3 SD's
+		// Use a window size equal to +/- SD's
 		log.debug("Initializing Gaussian filter");
 		filter = new float[2*windowWidth*stdev+1];
 		float sum = 0;

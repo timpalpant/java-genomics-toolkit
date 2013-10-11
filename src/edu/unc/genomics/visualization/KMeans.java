@@ -35,7 +35,8 @@ public class KMeans extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(KMeans.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (matrix2png format)", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-i", "--input"}, description = "Input file (matrix2png format)", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-k", "--clusters"}, description = "Number of clusters")
 	public int k = 10;

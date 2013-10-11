@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.beust.jcommander.Parameter;
 
 import edu.unc.genomics.CommandLineTool;
+import edu.unc.genomics.CommandLineToolException;
 import edu.unc.genomics.Contig;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
@@ -73,9 +74,7 @@ public class FilterRegions extends CommandLineTool {
 							writer.write(contig.copy(start, contig.getStop()));
 						}
 					} catch (WigFileException e) {
-						log.fatal("Wig file error while processing chunk "+chr+":"+chunkStart+"-"+chunkStop);
-						e.printStackTrace();
-						throw new RuntimeException("Wig file error while processing chunk "+chr+":"+chunkStart+"-"+chunkStop);
+					  throw new CommandLineToolException("Wig file error while processing chunk "+chr+":"+chunkStart+"-"+chunkStop, e);
 					}
 					
 					bp = chunkStop + 1;

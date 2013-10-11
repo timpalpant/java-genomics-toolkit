@@ -27,7 +27,8 @@ public class Summary extends CommandLineTool {
 
 	private static final Logger log = Logger.getLogger(Autocorrelation.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-i", "--input"}, description = "Input file", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
 	@Parameter(names = {"-o", "--output"}, description = "Output file")
 	public Path outputFile;

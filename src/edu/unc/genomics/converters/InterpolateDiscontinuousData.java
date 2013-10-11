@@ -25,11 +25,14 @@ public class InterpolateDiscontinuousData extends WigMathTool {
 
 	private static final Logger log = Logger.getLogger(InterpolateDiscontinuousData.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-i", "--input"}, description = "Input file (Wig)", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path inputFile;
-	@Parameter(names = {"-t", "--type"}, description = "Interpolant (nearest/linear/cubic)")
+	@Parameter(names = {"-t", "--type"}, 
+	    description = "Interpolant (nearest/linear/cubic)")
 	public String type = "linear";
-	@Parameter(names = {"-m", "--max"}, description = "Maximum span of missing values to interpolate (bp)")
+	@Parameter(names = {"-m", "--max"}, 
+	    description = "Maximum span of missing values to interpolate (bp)")
 	public int max = 1000;
 
 	private WigFileReader wig;

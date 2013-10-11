@@ -31,17 +31,23 @@ public abstract class ReadMapperTool extends CommandLineTool {
 	
 	private static final Logger log = Logger.getLogger(ReadMapperTool.class);
 	
-	@Parameter(names = {"-i", "--input"}, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+	@Parameter(names = {"-i", "--input"}, description = "Input file", 
+	    required = true, validateWith = ReadablePathValidator.class)
 	public Path intervalFile;
-	@Parameter(names = {"-a", "--assembly"}, description = "Genome assembly", required = true)
+	@Parameter(names = {"-a", "--assembly"}, 
+	    description = "Genome assembly", required = true)
 	public Assembly assembly;
-	@Parameter(names = {"-c", "--chunk"}, description = "Size to chunk each chromosome into when processing (bp)")
+	@Parameter(names = {"-c", "--chunk"}, 
+	    description = "Size to chunk each chromosome into when processing (bp)")
 	public int chunkSize = DEFAULT_CHUNK_SIZE;
-	@Parameter(names = {"-f", "--fixedstep"}, description = "Force fixedStep output")
+	@Parameter(names = {"-f", "--fixedstep"}, 
+	    description = "Force fixedStep output")
 	public boolean fixedStep = false;
-	@Parameter(names = {"-o", "--output"}, description = "Output file", required = true)
+	@Parameter(names = {"-o", "--output"}, 
+	    description = "Output file", required = true)
 	public Path outputFile;
-	@Parameter(names = {"-b", "--split"}, description = "Write each chromosome into its own output file")
+	@Parameter(names = {"-b", "--split"}, 
+	    description = "Write each chromosome into its own output file")
 	public boolean split = false;
 	
 	/**
