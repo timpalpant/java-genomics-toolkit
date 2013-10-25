@@ -30,6 +30,9 @@ public abstract class WigMathTool extends WigAnalysisTool {
   @Parameter(names = { "-f", "--fixedstep" }, 
       description = "Force fixedStep output")
   public boolean fixedStep = false;
+  @Parameter(names = {"-v", "--variablestep" },
+      description = "Force variableStep output")
+  public boolean variableStep = false;
   @Parameter(names = { "-o", "--output" }, required = true, 
       description = "Output Wig file")
   public Path outputFile;
@@ -96,6 +99,8 @@ public abstract class WigMathTool extends WigAnalysisTool {
     Contig outputContig = new Contig(chunk, result);
     if (fixedStep) {
       writer.writeFixedStepContig(outputContig);
+    } else if (variableStep) {
+      writer.writeVariableStepContig(outputContig);
     } else {
       writer.write(outputContig);
     }
