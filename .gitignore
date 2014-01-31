@@ -1,6 +1,5 @@
 bin
 build
-dist
 reports
 docs
 *.class
