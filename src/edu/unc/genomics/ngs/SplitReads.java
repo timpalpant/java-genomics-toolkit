@@ -22,50 +22,50 @@ import edu.unc.genomics.io.IntervalFileWriter;
  *
  */
 public class SplitReads extends CommandLineTool {
-	
-	private static final Logger log = Logger.getLogger(SplitReads.class);
-	
-	@Parameter(names = {"-i", "--input"}, required=true, description = "Input file", validateWith = ReadablePathValidator.class)
-	public Path input;
-	@Parameter(names = {"-b", "--bins"}, description = "Number of bins to split reads into")
-	public int bins = 5;
-	@Parameter(names = {"-o", "--output"}, description = "Output file")
-	public Path output;
-	
-	@Override
-	public void run() throws IOException {
-		// Prepare the outputs
-		String[] splitName = output.toString().split("\\.(?=[^\\.]+$)");
-		String basename = splitName[0];
-		String ext = splitName[1];
-		List<IntervalFileWriter<Interval>> writers = new ArrayList<>();
-		try {
-			for (int i = 0; i < bins; i++) {
-				Path outFile = output.resolve(basename+'.'+i+'.'+ext);
-				IntervalFileWriter<Interval> writer = new IntervalFileWriter<>(outFile);
-				writers.add(writer);
-			}
-			
-			try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(input)) {
-				int current = 0;
-				int count = 0;
-				for (Interval interval : reader) {
-					writers.get(current).write(interval);
-					current++;
-					current %= bins;
-					if (++count % 1_000_000 == 0) {
-						log.debug("Processed "+count+" reads.");
-					}
-				}
-			}
-		} finally {
-			for (IntervalFileWriter<Interval> writer : writers) {
-				writer.close();
-			}
-		}
-	}
-	
-	public static void main(String[] args) {
-		new SplitReads().instanceMain(args);
-	}
+
+  private static final Logger log = Logger.getLogger(SplitReads.class);
+
+  @Parameter(names = { "-i", "--input" }, required = true, description = "Input file", validateWith = ReadablePathValidator.class)
+  public Path input;
+  @Parameter(names = { "-b", "--bins" }, description = "Number of bins to split reads into")
+  public int bins = 5;
+  @Parameter(names = { "-o", "--output" }, description = "Output file")
+  public Path output;
+
+  @Override
+  public void run() throws IOException {
+    // Prepare the outputs
+    String[] splitName = output.toString().split("\\.(?=[^\\.]+$)");
+    String basename = splitName[0];
+    String ext = splitName[1];
+    List<IntervalFileWriter<Interval>> writers = new ArrayList<>();
+    try {
+      for (int i = 0; i < bins; i++) {
+        Path outFile = output.resolve(basename + '.' + i + '.' + ext);
+        IntervalFileWriter<Interval> writer = new IntervalFileWriter<>(outFile);
+        writers.add(writer);
+      }
+
+      try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(input)) {
+        int current = 0;
+        int count = 0;
+        for (Interval interval : reader) {
+          writers.get(current).write(interval);
+          current++;
+          current %= bins;
+          if (++count % 1_000_000 == 0) {
+            log.debug("Processed " + count + " reads.");
+          }
+        }
+      }
+    } finally {
+      for (IntervalFileWriter<Interval> writer : writers) {
+        writer.close();
+      }
+    }
+  }
+
+  public static void main(String[] args) {
+    new SplitReads().instanceMain(args);
+  }
 }

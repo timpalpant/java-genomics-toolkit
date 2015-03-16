@@ -26,8 +26,8 @@ import edu.unc.genomics.io.WigFileException;
  * chromosomes with data, and then iterates through the inputs in a
  * chunk-by-chunk fashion, calling compute() on each chunk
  * 
- * prepare() is called before the computation loop
- * shutdown() is called after the computation loop
+ * prepare() is called before the computation loop shutdown() is called after
+ * the computation loop
  * 
  * @author timpalpant
  * 
@@ -36,11 +36,9 @@ public abstract class WigAnalysisTool extends CommandLineTool {
 
   private static final Logger log = Logger.getLogger(WigAnalysisTool.class);
 
-  @Parameter(names = { "-c", "--chunk" }, 
-      description = "Maximum number of data values to load per thread (bp)")
+  @Parameter(names = { "-c", "--chunk" }, description = "Maximum number of data values to load per thread (bp)")
   public int chunkSize = DEFAULT_CHUNK_SIZE;
-  @Parameter(names = { "-p", "--threads" }, 
-      description = "Number of threads to use")
+  @Parameter(names = { "-p", "--threads" }, description = "Number of threads to use")
   public int nThreads = 1;
 
   private ExecutorService pool;
@@ -59,19 +57,21 @@ public abstract class WigAnalysisTool extends CommandLineTool {
   protected void addInputFile(WigFileReader wig) {
     inputs.add(wig);
   }
-  
+
   /**
    * Setup the computation. Should add all input Wig files with addInputFile()
    * during setup
    */
   protected abstract void prepare();
-  
+
   /**
    * Optional shutdown the computation, do any cleanup, final processing
-   * @throws IOException 
+   * 
+   * @throws IOException
    */
-  protected void shutdown() throws IOException { }
-  
+  protected void shutdown() throws IOException {
+  }
+
   /**
    * Close the input files
    * 
@@ -99,7 +99,7 @@ public abstract class WigAnalysisTool extends CommandLineTool {
   public final void run() throws IOException {
     log.debug("Executing setup operations");
     prepare();
-    
+
     Set<String> chromosomes = null;
     if (unionExtents) {
       chromosomes = getUnionChromosomes(inputs);
@@ -109,7 +109,7 @@ public abstract class WigAnalysisTool extends CommandLineTool {
       log.debug("Found " + chromosomes.size() + " chromosomes in the intersection of all inputs");
     }
 
-    log.debug("Initializing thread pool with "+nThreads+" threads");
+    log.debug("Initializing thread pool with " + nThreads + " threads");
     pool = Executors.newFixedThreadPool(nThreads);
 
     log.debug("Performing main computation");
@@ -117,28 +117,28 @@ public abstract class WigAnalysisTool extends CommandLineTool {
     try {
       for (String chr : chromosomes) {
         Interval interval = unionExtents ? getUnion(inputs, chr) : getIntersection(inputs, chr);
-  
+
         // Process the chromosome in chunks
         int bp = interval.low();
         while (bp < interval.high()) {
           int chunkStart = bp;
           int chunkStop = Math.min(bp + chunkSize - 1, interval.high());
           final Interval chunk = new Interval(chr, chunkStart, chunkStop);
-  
+
           futures.add(pool.submit(new Runnable() {
-  
+
             @Override
             public void run() {
               log.debug("Processing chunk " + chunk);
               try {
                 process(chunk);
               } catch (Exception e) {
-                throw new CommandLineToolException("Exception while processing chunk "+chunk, e);
+                throw new CommandLineToolException("Exception while processing chunk " + chunk, e);
               }
             }
-  
+
           }));
-  
+
           // Move to the next chunk
           bp = chunkStop + 1;
         }
@@ -184,7 +184,7 @@ public abstract class WigAnalysisTool extends CommandLineTool {
 
     return chromosomes;
   }
-  
+
   /**
    * Gets the intersecting Interval for a chromosome amongst all wigs
    * 
@@ -198,10 +198,11 @@ public abstract class WigAnalysisTool extends CommandLineTool {
     if (wigs == null || wigs.isEmpty()) {
       return null;
     }
-    
+
     Interval intersection = wigs.get(0).getChrExtents(chr);
     for (int i = 1; i < wigs.size(); i++) {
-      if (intersection == null) break;
+      if (intersection == null)
+        break;
       intersection = intersection.intersection(wigs.get(i).getChrExtents(chr));
     }
 
@@ -223,7 +224,7 @@ public abstract class WigAnalysisTool extends CommandLineTool {
 
     return chromosomes;
   }
-  
+
   /**
    * Gets the union Interval for a chromosome amongst all wigs
    * 
@@ -232,19 +233,21 @@ public abstract class WigAnalysisTool extends CommandLineTool {
    * @param chr
    *          the chromosome to get the most conservative start base for
    * @return an Interval for which at least one wig has data
-   * @throws IntervalException if one of the wigs does not contain chr
+   * @throws IntervalException
+   *           if one of the wigs does not contain chr
    */
   public static Interval getUnion(List<WigFileReader> wigs, String chr) throws IntervalException {
-    if (wigs == null || wigs.isEmpty()) { 
+    if (wigs == null || wigs.isEmpty()) {
       return null;
     }
-    
+
     Interval union = null;
     for (WigFileReader wig : wigs) {
-      if (!wig.includes(chr)) continue;
+      if (!wig.includes(chr))
+        continue;
       union = wig.getChrExtents(chr).union(union);
     }
-    
+
     return union;
   }
 }

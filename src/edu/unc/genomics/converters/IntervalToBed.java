@@ -14,31 +14,32 @@ import edu.unc.genomics.io.IntervalFileReader;
 
 /**
  * Convert any known interval format to Bed-6 format
+ * 
  * @author timpalpant
  *
  */
 public class IntervalToBed extends CommandLineTool {
 
-	private static final Logger log = Logger.getLogger(IntervalToBed.class);
+  private static final Logger log = Logger.getLogger(IntervalToBed.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file (Bedgraph/BigBed/GFF/SAM/BAM format)", required = true)
-	public Path inputFile;
-	@Parameter(names = {"-o", "--output"}, description = "Output file (Bed format)", required = true)
-	public Path outputFile;
-	
-	@Override
-	public void run() throws IOException {
-		log.debug("Initializing input/output files");
-		try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(inputFile);
-				 BedFileWriter<Interval> writer = new BedFileWriter<>(outputFile)) {
-			for (Interval entry : reader) {
-				writer.write(entry);
-			}
-		}
-	}
-	
-	public static void main(String[] args) {
-		new IntervalToBed().instanceMain(args);
-	}
+  @Parameter(names = { "-i", "--input" }, description = "Input file (Bedgraph/BigBed/GFF/SAM/BAM format)", required = true)
+  public Path inputFile;
+  @Parameter(names = { "-o", "--output" }, description = "Output file (Bed format)", required = true)
+  public Path outputFile;
+
+  @Override
+  public void run() throws IOException {
+    log.debug("Initializing input/output files");
+    try (IntervalFileReader<? extends Interval> reader = IntervalFileReader.autodetect(inputFile);
+        BedFileWriter<Interval> writer = new BedFileWriter<>(outputFile)) {
+      for (Interval entry : reader) {
+        writer.write(entry);
+      }
+    }
+  }
+
+  public static void main(String[] args) {
+    new IntervalToBed().instanceMain(args);
+  }
 
 }

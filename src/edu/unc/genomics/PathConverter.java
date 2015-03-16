@@ -11,9 +11,9 @@ import com.beust.jcommander.IStringConverter;
  */
 public class PathConverter implements IStringConverter<Path> {
 
-	@Override
-	public Path convert(String value) {
-		return Paths.get(value);
-	}
+  @Override
+  public Path convert(String value) {
+    return Paths.get(value);
+  }
 
 }

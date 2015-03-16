@@ -27,18 +27,15 @@ public abstract class WigMathTool extends WigAnalysisTool {
 
   private static final Logger log = Logger.getLogger(WigMathTool.class);
 
-  @Parameter(names = { "-f", "--fixedstep" }, 
-      description = "Force fixedStep output")
+  @Parameter(names = { "-f", "--fixedstep" }, description = "Force fixedStep output")
   public boolean fixedStep = false;
-  @Parameter(names = {"-v", "--variablestep" },
-      description = "Force variableStep output")
+  @Parameter(names = { "-v", "--variablestep" }, description = "Force variableStep output")
   public boolean variableStep = false;
-  @Parameter(names = { "-o", "--output" }, required = true, 
-      description = "Output Wig file")
+  @Parameter(names = { "-o", "--output" }, required = true, description = "Output Wig file")
   public Path outputFile;
-  
+
   private WigFileWriter writer;
-  
+
   /**
    * Setup the computation, and add all input Wig files
    */
@@ -48,7 +45,8 @@ public abstract class WigMathTool extends WigAnalysisTool {
    * Do the computation on a chunk and return the results. Must return
    * chunk.length() values (one for every base pair in chunk)
    * 
-   * @param chunk the interval to process
+   * @param chunk
+   *          the interval to process
    * @return the results of the computation for this chunk
    * @throws IOException
    * @throws WigFileException
@@ -58,31 +56,33 @@ public abstract class WigMathTool extends WigAnalysisTool {
   /**
    * Setup the computation. Should add all input Wig files with addInputFile()
    * during setup
-   * @throws IOException 
+   * 
+   * @throws IOException
    */
   @Override
   protected final void prepare() {
     // Setup the input files
     setup();
-    
+
     // Setup the output file
     try {
       writer = new WigFileWriter(outputFile, TrackHeader.newWiggle());
     } catch (IOException e) {
-      throw new CommandLineToolException("Error initializing output file "+outputFile, e);
+      throw new CommandLineToolException("Error initializing output file " + outputFile, e);
     }
   }
-  
+
   /**
    * Shutdown the computation and do any cleanup / final processing
-   * @throws IOException 
+   * 
+   * @throws IOException
    */
   @Override
-  protected final void shutdown() throws IOException { 
+  protected final void shutdown() throws IOException {
     writer.close();
     super.shutdown();
   }
-  
+
   @Override
   public final void process(Interval chunk) throws IOException, WigFileException {
     float[] result = compute(chunk);
@@ -90,8 +90,7 @@ public abstract class WigMathTool extends WigAnalysisTool {
     // Verify that the computation returned the correct number of
     // values for the chunk
     if (result.length != chunk.length()) {
-      log.error("Expected result length="+chunk.length() 
-          + ", got="+result.length);
+      log.error("Expected result length=" + chunk.length() + ", got=" + result.length);
       throw new CommandLineToolException("Result of Wig computation is not the expected length!");
     }
 

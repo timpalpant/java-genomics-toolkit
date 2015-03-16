@@ -25,31 +25,30 @@ import edu.unc.genomics.ngs.Autocorrelation;
  */
 public class Summary extends CommandLineTool {
 
-	private static final Logger log = Logger.getLogger(Autocorrelation.class);
+  private static final Logger log = Logger.getLogger(Autocorrelation.class);
 
-	@Parameter(names = {"-i", "--input"}, description = "Input file", 
-	    required = true, validateWith = ReadablePathValidator.class)
-	public Path inputFile;
-	@Parameter(names = {"-o", "--output"}, description = "Output file")
-	public Path outputFile;
-		
-	public void run() throws IOException {		
-		try (WigFileReader reader = WigFileReader.autodetect(inputFile)) {
-			String summary = reader.toString();
-			
-			if (outputFile != null) {
-				log.debug("Writing to output file");
-				try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
-					writer.write(summary);
-				}
-			} else {
-				System.out.println(summary);
-			}
-		}
-	}
-	
-	public static void main(String[] args) throws IOException, WigFileException {
-		new Summary().instanceMain(args);
-	}
+  @Parameter(names = { "-i", "--input" }, description = "Input file", required = true, validateWith = ReadablePathValidator.class)
+  public Path inputFile;
+  @Parameter(names = { "-o", "--output" }, description = "Output file")
+  public Path outputFile;
+
+  public void run() throws IOException {
+    try (WigFileReader reader = WigFileReader.autodetect(inputFile)) {
+      String summary = reader.toString();
+
+      if (outputFile != null) {
+        log.debug("Writing to output file");
+        try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.defaultCharset())) {
+          writer.write(summary);
+        }
+      } else {
+        System.out.println(summary);
+      }
+    }
+  }
+
+  public static void main(String[] args) throws IOException, WigFileException {
+    new Summary().instanceMain(args);
+  }
 
 }
