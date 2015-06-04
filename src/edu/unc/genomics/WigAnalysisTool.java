@@ -117,6 +117,9 @@ public abstract class WigAnalysisTool extends CommandLineTool {
     try {
       for (String chr : chromosomes) {
         Interval interval = unionExtents ? getUnion(inputs, chr) : getIntersection(inputs, chr);
+        if (interval == null) {
+          continue; // input files contain data for disjoint intervals in chr
+        }
 
         // Process the chromosome in chunks
         int bp = interval.low();
