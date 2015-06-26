@@ -31,7 +31,6 @@ public class MovingAverageSmooth extends WigMathTool {
   public int width = 11;
 
   WigFileReader reader;
-  int nterms, nends, nfull, multiplier;
 
   @Override
   public void setup() {
@@ -41,11 +40,6 @@ public class MovingAverageSmooth extends WigMathTool {
       throw new CommandLineToolException(e);
     }
     inputs.add(reader);
-    
-    nterms = width + step - 1;
-    multiplier = Math.min(width, step);
-    nends = multiplier - 1;
-    nfull = nterms - 2*nends;
   }
 
   @Override
@@ -54,29 +48,25 @@ public class MovingAverageSmooth extends WigMathTool {
     int queryStart = Math.max(chunk.getStart() - width / 2, reader.getChrStart(chunk.getChr()));
     int queryStop = Math.min(chunk.getStop() + width / 2, reader.getChrStop(chunk.getChr()));
     Contig contig = reader.query(chunk.getChr(), queryStart, queryStop);
-    // We can simply express the effect of a span > 1 on the result
-    // of moving average, so use this optimization now.
     int nValues = (int) Math.ceil(((float) chunk.length()) / step);
     float[] result = new float[nValues];
     for (int i = 0; i < result.length; i++) {
       float x = 0;
-      int bp = contig.getStart() + i*step - width/2;
-      
-      for (int j = 1; j <= nends; j++) {
-        x += j * contig.get(bp);
-        bp += 1;
+      int start, stop, n;
+      if (step < width) {
+        n = width;
+        start = contig.getStart() + i*step + step/2 - width/2;
+        stop = contig.getStart() + i*step + n;
+      } else {
+        n = step;
+        start = contig.getStart() + i*step;
+        stop = contig.getStart() + n;
       }
       
-      for (int j = 1; j <= nfull; j++) {
-        x += multiplier * contig.get(bp);
-        bp += 1;
+      for (int bp = start; bp <= stop; bp++) {
+        x += contig.get(bp);
       }
-      
-      for (int j = 0; j < nends; j++) {
-        x += (nends-j) * contig.get(bp);
-      }
-      
-      result[i] = x / (step*width);
+      result[i] = x / n;
     }
     return result;
   }
