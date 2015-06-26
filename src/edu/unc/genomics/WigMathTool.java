@@ -31,6 +31,8 @@ public abstract class WigMathTool extends WigAnalysisTool {
   public boolean fixedStep = false;
   @Parameter(names = { "-v", "--variablestep" }, description = "Force variableStep output")
   public boolean variableStep = false;
+  @Parameter(names = { "--step" }, description = "Step size for output Wig files")
+  public int step = 1;
   @Parameter(names = { "-o", "--output" }, required = true, description = "Output Wig file")
   public Path outputFile;
 
@@ -88,14 +90,26 @@ public abstract class WigMathTool extends WigAnalysisTool {
     float[] result = compute(chunk);
 
     // Verify that the computation returned the correct number of
-    // values for the chunk
+    // values for the chunk. It must either be 1 value per base pair,
+    // or one value per step (if the script already computed the reduction).
+    Contig outputContig = null;
     if (result.length != chunk.length()) {
-      log.error("Expected result length=" + chunk.length() + ", got=" + result.length);
-      throw new CommandLineToolException("Result of Wig computation is not the expected length!");
+      int nValues = (int) Math.ceil(((float) chunk.length()) / step);
+      if (result.length == nValues) { // already reduced
+        // assume values have already been condensed to a certain step
+        outputContig = new Contig(chunk, result, step);
+      } else {
+        log.error("Expected result length=" + chunk.length() + ", got=" + result.length);
+        throw new CommandLineToolException("Result of Wig computation is not the expected length!");
+      }
+    } else { // 1 value per base pair
+      outputContig = new Contig(chunk, result);
+      if (step != 1) {
+        outputContig.setSpan(step);
+      }
     }
 
     // Write the result of the computation for this chunk to disk
-    Contig outputContig = new Contig(chunk, result);
     if (fixedStep) {
       writer.writeFixedStepContig(outputContig);
     } else if (variableStep) {

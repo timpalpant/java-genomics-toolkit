@@ -1,5 +1,7 @@
 package edu.unc.utils;
 
+import org.jtransforms.fft.FloatFFT_1D;
+
 /**
  * Routines for working with Fourier transforms and frequency spectrum data
  * 
@@ -77,5 +79,9 @@ public class FFTUtils {
   public static float[] autocovariance(float[] x) {
     return autocovariance(x, x.length);
   }
+  
+  //public static float[] convolve(float[] x, float[] y) {
+    // TODO
+  //}
 
 }

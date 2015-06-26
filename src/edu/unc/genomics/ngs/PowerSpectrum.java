@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 
 import com.beust.jcommander.Parameter;
 
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
+import org.jtransforms.fft.FloatFFT_1D;
 import edu.unc.genomics.CommandLineTool;
 import edu.unc.genomics.Interval;
 import edu.unc.genomics.ReadablePathValidator;
