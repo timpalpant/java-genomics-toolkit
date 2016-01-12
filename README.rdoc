@@ -24,7 +24,7 @@ Configuration files are provided for loading the applications into Galaxy manual
 
 Applications can be run on the command-line, and the toolRunner.sh script is provided for convenience. toolRunner.sh sets up the correct classpath and allows tools to be run using their short name (e.g. converters.IntervalToWig). Calling any script without arguments will display the help, as well as the missing mandatory arguments:
 
-  $ > ./toolRunner.sh wigmath.AddWig
+  $ > ./toolRunner.sh wigmath.Add
   $ Usage: <main class> [options] Input files
   $   Options:
   $   * -o, --output   Output file
