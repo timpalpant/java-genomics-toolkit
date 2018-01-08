@@ -54,7 +54,7 @@ Other tools require more input:
 
 The recommended way to download the toolkit is to checkout the source code with git:
 
-  $ > git clone git://github.com/timpalpant/java-genomics-toolkit.git
+  $ > git clone https://github.com/timpalpant/java-genomics-toolkit.git
   
 since then updates may be easily retrieved with
 
