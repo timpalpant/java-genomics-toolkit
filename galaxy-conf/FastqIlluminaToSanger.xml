@@ -1,6 +1,6 @@
 <tool id="FastqIlluminaToSanger" name="Convert Fastq qualities" version="1.0.0">
   <description>from Illumina to Sanger</description>
-  <command interpreter="sh">galaxyToolRunner.sh converters.FastqIlluminaToSanger -i $input -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh converters.FastqIlluminaToSanger -i $input -o $output</command>
   <inputs>
       <param name="input" type="data" format="fastqillumina" label="FASTQ, Illumina qualities" />
   </inputs>

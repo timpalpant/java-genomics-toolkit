@@ -1,6 +1,6 @@
 <tool id="CallNukes" name="Call Nucleosomes" version="1.1.0">
   <description>in an MNase experiment</description>
-  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.GreedyCaller -d $dyads -s $smoothed -n $N -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh nucleosomes.GreedyCaller -d $dyads -s $smoothed -n $N -o $output</command>
   <inputs>
       <param name="dyads" type="data" format="bigwig,wig" label="Dyad counts" />
       <param name="smoothed" type="data" format="bigwig,wig" label="Smoothed dyad counts" />

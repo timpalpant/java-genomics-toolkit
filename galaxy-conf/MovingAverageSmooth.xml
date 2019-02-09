@@ -1,6 +1,6 @@
 <tool id="WigMovingAverage" name="Moving average smooth" version="1.1.0">
   <description>a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.MovingAverageSmooth -i $input -w $W -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh wigmath.MovingAverageSmooth -i $input -w $W -o $output</command>
   <inputs>
       <param name="input" type="data" format="bigwig,wig" label="Smooth the data in" />
       <param name="W" type="integer" value="20" optional="true" label="Width of the moving average in base pairs" />

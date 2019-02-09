@@ -1,6 +1,6 @@
 <tool id="RollingReadLength" name="Compute mean fragment length" version="1.1.0">
   <description>over each locus</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.RollingReadLength -i $input -a ${chromInfo} -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.RollingReadLength -i $input -a ${chromInfo} -o $output</command>
   <inputs>
       <param format="sam,bam,bed,bedgraph" name="input" type="data" label="Mapped reads" />
   </inputs>

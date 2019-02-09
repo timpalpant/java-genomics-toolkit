@@ -1,6 +1,6 @@
 <tool id="ReadLengthDistributionMatrix" name="Create read length distribution matrix" version="1.0.0">
   <description>across a genomic interval</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.ReadLengthDistributionMatrix -i $input --chr $chr --start $start --stop $stop --min $min --max $max --bin $bin -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.ReadLengthDistributionMatrix -i $input --chr $chr --start $start --stop $stop --min $min --max $max --bin $bin -o $output</command>
   <inputs>
       <param format="sam,bam,bed,bedgraph" name="input" type="data" label="Mapped reads" />
       <param name="chr" type="text" label="Chromosome" />

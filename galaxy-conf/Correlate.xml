@@ -1,6 +1,6 @@
 <tool id="WigCorrelate" name="Correlate" version="1.1.0">
   <description>multiple (Big)Wig files</description>
-  <command interpreter="sh">
+  <command interpreter="bash">
     galaxyToolRunner.sh wigmath.Correlate -w $window -s $step -t $type -o $output $file1 $file2
       #for $input in $inputs
         ${input.file}

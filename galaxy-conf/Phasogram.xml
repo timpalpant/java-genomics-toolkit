@@ -1,6 +1,6 @@
 <tool id="Phasogram" name="Make phasogram" version="1.0.0">
   <description>of dyads</description>
-  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.Phasogram -i $input -m $max -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh nucleosomes.Phasogram -i $input -m $max -o $output</command>
   <inputs>
     <param name="input" type="data" format="bigwig,wig" label="Dyads (Big)Wig file" />
     <param name="max" type="integer" value="1000" label="Maximum phase shift (bp)" />

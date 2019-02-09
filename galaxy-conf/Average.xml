@@ -1,6 +1,6 @@
 <tool id="WigAvg" name="Average" version="1.1.0">
   <description>multiple (Big)Wig files</description>
-  <command interpreter="sh">
+  <command interpreter="bash">
     galaxyToolRunner.sh wigmath.Average -o $output $file1 $file2
       #for $input in $inputs
         ${input.file}

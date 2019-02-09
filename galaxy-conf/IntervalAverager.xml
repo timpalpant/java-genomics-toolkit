@@ -1,6 +1,6 @@
 <tool id="IntervalAverager" name="Average intervals" version="2.1.0">
   <description>that have been aligned</description>
-  <command interpreter="sh">
+  <command interpreter="bash">
     galaxyToolRunner.sh visualization.IntervalAverager -l $loci -o $output $file1
       #for $input in $inputs
         ${input.file}

@@ -1,6 +1,6 @@
 <tool id="PowerSpectrum" name="Compute the power spectrum" version="1.0.0">
   <description>of data in a Wiggle file</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.PowerSpectrum -i $input -l $windows -m $max -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.PowerSpectrum -i $input -l $windows -m $max -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Input data" />
       <param format="bed,bedgraph,gff" name="windows" type="data" label="List of intervals" />

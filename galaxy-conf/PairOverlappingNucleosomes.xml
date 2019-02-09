@@ -1,6 +1,6 @@
 <tool id="PairNukes" name="Pair nucleosomes" version="1.0.0">
   <description>by overlap</description>
-  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.PairOverlappingNucleosomes -a $input1 -b $input2 -m $N -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh nucleosomes.PairOverlappingNucleosomes -a $input1 -b $input2 -m $N -o $output</command>
   <inputs>
       <param name="input1" type="data" format="tabular" label="Nucleosome calls 1" />
       <param name="input2" type="data" format="tabular" label="Nucleosome calls 2" />

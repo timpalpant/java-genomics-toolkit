@@ -1,6 +1,6 @@
 <tool id="WigFindOutliers" name="Find outlier regions" version="1.1.0">
   <description>such as CNVs</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.FindOutlierRegions -i $input -w $window -t $threshold $below -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.FindOutlierRegions -i $input -w $window -t $threshold $below -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Input data" />
       <param name="window" type="integer" value="150" label="Window size" />

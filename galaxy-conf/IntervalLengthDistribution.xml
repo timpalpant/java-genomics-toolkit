@@ -1,6 +1,6 @@
 <tool id="IntervalLengthDistribution" name="Make histogram" version="1.0.0">
   <description>of read lengths</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.IntervalLengthDistribution -i $input $freq -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.IntervalLengthDistribution -i $input $freq -o $output</command>
   <inputs>
       <param name="input" type="data" format="sam,bam,bed,bedgraph,gff" label="Reads/Intervals" />
       <param name="freq" type="boolean" checked="false" truevalue="-f" falsevalue="" label="Output normalized frequencies rather than counts" />

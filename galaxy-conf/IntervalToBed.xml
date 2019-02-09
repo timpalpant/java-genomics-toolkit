@@ -1,6 +1,6 @@
 <tool id="IntervalToBed" name="SAM/BAM/GFF/BedGraph/BigBed/VCF to Bed" version="1.0.0">
   <description>converter</description>
-  <command interpreter="sh">galaxyToolRunner.sh converters.IntervalToBed -i $input -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh converters.IntervalToBed -i $input -o $output</command>
   <inputs>
       <param name="input" type="data" format="sam,bam,gff,bigbed,bedgraph,vcf" label="Input" />
   </inputs>

@@ -1,6 +1,6 @@
 <tool id="WigSubtract" name="Subtract" version="1.1.0">
   <description>two (Big)Wig files</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.Subtract -m $minuend -s $subtrahend -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh wigmath.Subtract -m $minuend -s $subtrahend -o $output</command>
   <inputs>
     <param format="bigwig,wig" name="minuend" type="data" label="File 1 (minuend / top)" />
     <param format="bigwig,wig" name="subtrahend" type="data" label="File 2 (subtrahend / bottom)" />

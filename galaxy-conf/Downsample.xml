@@ -1,6 +1,6 @@
 <tool id="WigDownsample" name="Downsample" version="1.1.0">
   <description>a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.Downsample -i $input -m $metric -w $window -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh wigmath.Downsample -i $input -m $metric -w $window -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Original data" />
       <param name="window" type="integer" value="100" label="Window size (bp)" />

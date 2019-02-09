@@ -1,6 +1,6 @@
 <tool id="Subsample" name="Randomly select N entries" version="1.0.0">
   <description>from an interval file</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.Subsample -i $input -n $n -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.Subsample -i $input -n $n -o $output</command>
   <inputs>
       <param name="input" type="data" format="sam,bam,gff,bed,bigbed,bedgraph,vcf" label="Input file" />
   </inputs>

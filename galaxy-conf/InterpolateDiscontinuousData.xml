@@ -1,6 +1,6 @@
 <tool id="WigInterpolate" name="Interpolate" version="1.1.0">
   <description>missing values in a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh converters.InterpolateDiscontinousData -i $input -t $type -m $max -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh converters.InterpolateDiscontinousData -i $input -t $type -m $max -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Interpolate missing values in" />
       <param name="type" type="select" label="Interpolation type">

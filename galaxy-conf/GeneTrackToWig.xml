@@ -1,6 +1,6 @@
 <tool id="GeneTrackToWig" name="GeneTrack to Wig" version="1.1.0">
   <description>converter</description>
-  <command interpreter="sh">galaxyToolRunner.sh converters.GeneTrackToWig -i $input -s $shift $zero -a ${chromInfo} -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh converters.GeneTrackToWig -i $input -s $shift $zero -a ${chromInfo} -o $output</command>
   <inputs>
       <param name="input" type="data" format="tabular" label="Input GeneTrack index" />
       <param name="shift" type="integer" value="0" optional="true" label="Shift +/- strand counts by this amount when merging" />

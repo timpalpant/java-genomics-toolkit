@@ -1,6 +1,6 @@
 <tool id="WigZScore" name="Z-Score" version="1.2.0">
   <description>a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.ZScore -i $input $chr -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh wigmath.ZScore -i $input $chr -o $output</command>
   <inputs>
       <param format="bigwig,wig" name="input" type="data" label="Z-score the data in" />
       <param name="chr" type="boolean" checked="false" truevalue="--bychr" falsevalue="" label="Z-score chromosomes individually" />

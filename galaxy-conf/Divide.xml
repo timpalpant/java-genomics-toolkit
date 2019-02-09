@@ -1,6 +1,6 @@
 <tool id="WigDivide" name="Divide" version="1.1.0">
   <description>two (Big)Wig files</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.Divide -n $dividend -d $divisor -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh wigmath.Divide -n $dividend -d $divisor -o $output</command>
   <inputs>
     <param format="bigwig,wig" name="dividend" type="data" label="File 1 (dividend)" />
     <param format="bigwig,wig" name="divisor" type="data" label="File 2 (divisor)" />

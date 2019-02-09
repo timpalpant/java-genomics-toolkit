@@ -1,6 +1,6 @@
 <tool id="ExtractDataFromWig" name="Extract data from a Wig file" version="1.0.0">
   <description>for a genomic interval</description>
-  <command interpreter="sh">
+  <command interpreter="bash">
   	galaxyToolRunner.sh ngs.ExtractDataFromRegion --chr $chr --start $start --stop $stop -o $output $file1
   	  #for $input in $inputs
         ${input.file}

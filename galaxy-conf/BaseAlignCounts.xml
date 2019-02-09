@@ -1,6 +1,6 @@
 <tool id="BaseAlignCounts" name="Calculate coverage" version="2.0.0">
   <description>of sequencing reads</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.BaseAlignCounts -i $input -a ${chromInfo} -x $X -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.BaseAlignCounts -i $input -a ${chromInfo} -x $X -o $output</command>
   <inputs>
     <param name="input" type="data" format="sam,bam,bed,bedgraph" label="Sequencing reads" />
     <param name="X" type="integer" value="-1" label="In silico extension (-1 for fragment length)" />

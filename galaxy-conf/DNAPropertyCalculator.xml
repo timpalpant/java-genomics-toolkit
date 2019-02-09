@@ -1,6 +1,6 @@
 <tool id="DNAPropertyCalculator" name="Calculate sequence-specific DNA properties" version="2.0.0">
   <description>for a genome</description>
-  <command interpreter="sh">galaxyToolRunner.sh dna.DNAPropertyCalculator -i 
+  <command interpreter="bash">galaxyToolRunner.sh dna.DNAPropertyCalculator -i 
     #if $refGenomeSource.genomeSource == "history":
       $refGenomeSource.ownFile
     #else

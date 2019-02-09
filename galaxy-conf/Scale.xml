@@ -1,6 +1,6 @@
 <tool id="WigScale" name="Scale" version="1.2.0">
   <description>a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.Scale -i $input -m $M $chr -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh wigmath.Scale -i $input -m $M $chr -o $output</command>
   <inputs>
     <param format="bigwig,wig" name="input" type="data" label="Scale the data in" />
     <param name="M" type="float" value="0" label="Multiply by (leave 0 to scale by 1/mean)" />

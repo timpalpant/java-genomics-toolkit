@@ -1,6 +1,6 @@
 <tool id="MatrixAligner" name="Align values in a matrix" version="1.0.0">
   <description>for a heatmap</description>
-  <command interpreter="sh">galaxyToolRunner.sh visualization.MatrixAligner -i $input -l $loci -m $M -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh visualization.MatrixAligner -i $input -l $loci -m $M -o $output</command>
   <inputs>
       <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
       <param format="bed" name="loci" type="data" label="List of intervals (with alignment points)" />

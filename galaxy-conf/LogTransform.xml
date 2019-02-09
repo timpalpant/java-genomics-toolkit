@@ -1,6 +1,6 @@
 <tool id="WigLogTransform" name="Log transform" version="1.1.0">
   <description>a (Big)Wig file</description>
-  <command interpreter="sh">galaxyToolRunner.sh wigmath.LogTransform -i $input -b $base -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh wigmath.LogTransform -i $input -b $base -o $output</command>
   <inputs>
     <param format="bigwig,wig" name="input" type="data" label="(Big)Wig file" />
     <param name="base" type="integer" value="2" label="Logarithm base" />

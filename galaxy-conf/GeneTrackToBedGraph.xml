@@ -1,6 +1,6 @@
 <tool id="GeneTrackToBedGraph" name="GeneTrack to BedGraph" version="1.1.0">
   <description>converter</description>
-  <command interpreter="sh">galaxyToolRunner.sh converters.GeneTrackToBedGraph -i $input -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh converters.GeneTrackToBedGraph -i $input -o $output</command>
   <inputs>
       <param name="input" type="data" format="tabular" label="Input GeneTrack index" />
   </inputs>

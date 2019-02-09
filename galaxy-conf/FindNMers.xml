@@ -1,6 +1,6 @@
 <tool id="FindNMers" name="Find NMers" version="1.0.0">
   <description>in a DNA sequence</description>
-  <command interpreter="sh">galaxyToolRunner.sh dna.FindNMers -i 
+  <command interpreter="bash">galaxyToolRunner.sh dna.FindNMers -i 
     #if $refGenomeSource.genomeSource == "history":
       $refGenomeSource.ownFile
     #else

@@ -1,6 +1,6 @@
 <tool id="FindNuke" name="Find boundary nucleosomes" version="2.0.0">
   <description>in windows</description>
-  <command interpreter="sh">galaxyToolRunner.sh nucleosomes.FindBoundaryNucleosomes -i $input -l $loci -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh nucleosomes.FindBoundaryNucleosomes -i $input -l $loci -o $output</command>
   <inputs>
     <param name="input" type="data" format="tabular" label="Nucleosome calls" />
     <param name="loci" type="data" format="bed,bedgraph,gff" label="List of intervals" />

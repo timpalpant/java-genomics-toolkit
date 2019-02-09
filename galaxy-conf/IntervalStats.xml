@@ -1,6 +1,6 @@
 <tool id="IntervalStats" name="Compute mean/min/max of intervals" version="1.0.0">
   <description>of data in a (Big)Wig file</description>
-  <command interpreter="sh">
+  <command interpreter="bash">
     galaxyToolRunner.sh ngs.IntervalStats -l $windows -s $stat -o $output
       #for $input in $inputs
         ${input.file}

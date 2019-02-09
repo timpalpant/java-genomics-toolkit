@@ -1,6 +1,6 @@
 <tool id="BedToWig" name="Bed/BedGraph/GFF to Wig" version="1.1.0">
   <description>converter</description>
-  <command interpreter="sh">galaxyToolRunner.sh converters.IntervalToWig -i $input $zero -a ${chromInfo} -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh converters.IntervalToWig -i $input $zero -a ${chromInfo} -o $output</command>
   <inputs>
       <param name="input" type="data" format="bed,bedgraph,gff" label="Input Bed/BedGraph/GFF file" />
   	  <param name="zero" type="boolean" checked="false" truevalue="-z" falsevalue="" label="Assume zero where there is no data (default is NaN)" />

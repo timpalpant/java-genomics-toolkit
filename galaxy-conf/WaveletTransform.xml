@@ -1,6 +1,6 @@
 <tool id="WaveletTransform" name="Wavelet analysis" version="1.0.0">
   <description>across a genomic interval</description>
-  <command interpreter="sh">galaxyToolRunner.sh ngs.WaveletTransform -i $input -w $wavelet --chr $chr --start $start --stop $stop --min $min --max $max --step $N -o $output</command>
+  <command interpreter="bash">galaxyToolRunner.sh ngs.WaveletTransform -i $input -w $wavelet --chr $chr --start $start --stop $stop --min $min --max $max --step $N -o $output</command>
   <inputs>
       <param format="wig,bigwig" name="input" type="data" label="Sequencing data" />
       <param format="tabular" name="wavelet" type="data" label="Wavelet" />
